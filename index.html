@@ -19,7 +19,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* PIN Lock Screen Overlay */
+    /* PIN Lock Screen */
     #pin-overlay {
       position: fixed;
       inset: 0;
@@ -95,6 +95,8 @@
     button:hover { background: #475569; }
     button.primary { background: var(--accent); border-color: #3b82f6; }
     button.primary:hover { background: var(--accent-hover); }
+    button.success { background: #16a34a; border-color: #22c55e; }
+    button.success:hover { background: #15803d; }
     button.danger { background: #991b1b; border-color: #b91c1c; }
     button.danger:hover { background: #b91c1c; }
 
@@ -138,7 +140,7 @@
     .btn-comp strong { font-size: 0.8rem; color: #fff; margin-bottom: 2px; }
     .btn-comp span { color: var(--text-muted); }
 
-    /* Main Area */
+    /* Main */
     main {
       padding: 20px;
       overflow-y: auto;
@@ -305,7 +307,7 @@
       position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;
     }
     .modal {
-      background: #1e293b; border: 1px solid var(--border); border-radius: 8px; width: 90%; max-width: 450px; padding: 20px;
+      background: #1e293b; border: 1px solid var(--border); border-radius: 8px; width: 90%; max-width: 550px; padding: 20px; max-height: 85vh; overflow-y: auto;
     }
     .modal h3 { margin-bottom: 12px; color: #38bdf8; }
     .form-group { margin-bottom: 12px; }
@@ -315,7 +317,23 @@
     }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 
-    /* Print Preview & Print Styles */
+    /* Saved objects list */
+    .obj-list-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .obj-list-info strong { color: #38bdf8; display: block; font-size: 0.9rem; }
+    .obj-list-info span { font-size: 0.75rem; color: #94a3b8; }
+    .obj-list-actions { display: flex; gap: 6px; }
+
+    /* Print Preview & Styles */
     .print-only { display: none; }
 
     @media print {
@@ -460,7 +478,9 @@
       Objekt: <strong id="lbl-obj-name">-</strong> | Adresse: <strong id="lbl-obj-addr">-</strong>
     </div>
     <div class="btn-group">
-      <button onclick="openProjectModal()">📋 Objekt ändern / Neu</button>
+      <button class="success" onclick="saveCurrentObject()">💾 Objekt speichern</button>
+      <button onclick="openNewObjectModal()">➕ Neues Objekt</button>
+      <button onclick="openSavedObjectsModal()">📁 Gespeicherte Objekte</button>
       <button class="primary" onclick="window.print()">🖨️ Drucken / PDF</button>
     </div>
   </header>
@@ -602,9 +622,10 @@
     </main>
   </div>
 
+  <!-- Modal: Neuer Objektstart / Eingabe -->
   <div class="modal-backdrop" id="modal-project">
     <div class="modal">
-      <h3>Objektdaten eingeben</h3>
+      <h3 id="modal-project-title">Neues Objekt anlegen</h3>
       <div class="form-group">
         <label>Objekt / Bauvorhaben:</label>
         <input type="text" id="inp-obj-name" placeholder="z.B. Neubau EFH Maier">
@@ -614,11 +635,26 @@
         <input type="text" id="inp-obj-addr" placeholder="z.B. Musterstraße 12, München">
       </div>
       <div class="modal-actions">
-        <button class="primary" onclick="saveProjectData()">Projekt starten</button>
+        <button onclick="closeProjectModal()">Abbrechen</button>
+        <button class="primary" onclick="confirmProjectData()">Objekt starten</button>
       </div>
     </div>
   </div>
 
+  <!-- Modal: Liste gespeicherter Objekte -->
+  <div class="modal-backdrop" id="modal-saved-list">
+    <div class="modal">
+      <h3>📁 Gespeicherte Objekte</h3>
+      <div id="saved-objects-container" style="margin-top: 12px; max-height: 50vh; overflow-y: auto;">
+        <!-- Dinamički popis spremljenih objekata -->
+      </div>
+      <div class="modal-actions">
+        <button onclick="closeSavedObjectsModal()">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Modul bearbeiten / löschen -->
   <div class="modal-backdrop" id="modal-module">
     <div class="modal">
       <h3>Modul bearbeiten</h3>
@@ -671,6 +707,7 @@
       }
     }
 
+    let currentObjId = null;
     let project = {
       name: "",
       address: "",
@@ -691,10 +728,11 @@
     };
 
     function initApp() {
-      const saved = localStorage.getItem('aprivina_data');
-      if (saved) {
+      const activeData = localStorage.getItem('aprivina_active_obj');
+      if (activeData) {
         try {
-          const parsed = JSON.parse(saved);
+          const parsed = JSON.parse(activeData);
+          currentObjId = parsed.id || ("obj_" + Date.now());
           project = parsed.project || project;
           rowCount = parsed.rowCount || 4;
           rails = parsed.rails || [[], [], [], []];
@@ -702,17 +740,146 @@
           updateProjectLabels();
           updateRailSelector();
           renderCabinet();
-        } catch (e) {
-          openProjectModal();
-        }
-      } else {
-        updateRailSelector();
-        openProjectModal();
+          return;
+        } catch (e) {}
       }
+      openNewObjectModal(false);
     }
 
+    // Pohranjivanje aktivnog stanja
     function saveState() {
-      localStorage.setItem('aprivina_data', JSON.stringify({ project, rowCount, rails }));
+      if (!currentObjId) currentObjId = "obj_" + Date.now();
+      const objData = { id: currentObjId, project, rowCount, rails, updatedAt: new Date().toISOString() };
+      localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
+    }
+
+    // Trajno spremanje objekta u listu
+    function saveCurrentObject() {
+      saveState();
+      let list = getSavedObjectsList();
+      const existingIdx = list.findIndex(o => o.id === currentObjId);
+      const objRecord = {
+        id: currentObjId,
+        project: { ...project },
+        rowCount,
+        rails: JSON.parse(JSON.stringify(rails)),
+        savedAt: new Date().toLocaleString('de-DE')
+      };
+
+      if (existingIdx >= 0) {
+        list[existingIdx] = objRecord;
+      } else {
+        list.push(objRecord);
+      }
+
+      localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
+      alert(`Objekt "${project.name}" wurde erfolgreich gespeichert!`);
+    }
+
+    function getSavedObjectsList() {
+      const str = localStorage.getItem('aprivina_saved_objects');
+      if (!str) return [];
+      try { return JSON.parse(str); } catch (e) { return []; }
+    }
+
+    function openNewObjectModal(canCancel = true) {
+      document.getElementById('inp-obj-name').value = "";
+      document.getElementById('inp-obj-addr').value = "";
+      document.getElementById('modal-project-title').innerText = "Neues Objekt anlegen";
+      document.getElementById('modal-project').style.display = 'flex';
+    }
+
+    function closeProjectModal() {
+      if (!project.name) return; // Nemoj zatvoriti ako nema objekta
+      document.getElementById('modal-project').style.display = 'none';
+    }
+
+    function confirmProjectData() {
+      const name = document.getElementById('inp-obj-name').value.trim() || "Unbenanntes Objekt";
+      const addr = document.getElementById('inp-obj-addr').value.trim() || "-";
+
+      currentObjId = "obj_" + Date.now();
+      project = {
+        name,
+        address: addr,
+        date: new Date().toLocaleDateString('de-DE')
+      };
+      rowCount = 4;
+      rails = [[], [], [], []];
+
+      document.getElementById('modal-project').style.display = 'none';
+      updateProjectLabels();
+      updateRailSelector();
+      saveState();
+      renderCabinet();
+    }
+
+    function openSavedObjectsModal() {
+      const list = getSavedObjectsList();
+      const container = document.getElementById('saved-objects-container');
+      container.innerHTML = "";
+
+      if (list.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding:15px; text-align:center;">Noch keine gespeicherten Objekte vorhanden. Klicken Sie oben auf "Objekt speichern".</div>`;
+      } else {
+        list.forEach((obj, idx) => {
+          const item = document.createElement('div');
+          item.className = 'obj-list-item';
+          const isCurrent = (obj.id === currentObjId);
+          item.innerHTML = `
+            <div class="obj-list-info">
+              <strong>${obj.project.name} ${isCurrent ? '<span style="color:#10b981; font-size:0.7rem;">(Aktiv)</span>' : ''}</strong>
+              <span>📍 ${obj.project.address} • Gespeichert: ${obj.savedAt}</span>
+            </div>
+            <div class="obj-list-actions">
+              <button class="primary" style="padding:5px 10px;" onclick="loadSavedObject('${obj.id}')">Laden</button>
+              <button class="danger" style="padding:5px 10px;" onclick="deleteSavedObject('${obj.id}')">Löschen</button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      document.getElementById('modal-saved-list').style.display = 'flex';
+    }
+
+    function closeSavedObjectsModal() {
+      document.getElementById('modal-saved-list').style.display = 'none';
+    }
+
+    function loadSavedObject(id) {
+      const list = getSavedObjectsList();
+      const target = list.find(o => o.id === id);
+      if (!target) return;
+
+      currentObjId = target.id;
+      project = { ...target.project };
+      rowCount = target.rowCount || 4;
+      rails = JSON.parse(JSON.stringify(target.rails));
+      while (rails.length < 4) rails.push([]);
+
+      updateProjectLabels();
+      updateRailSelector();
+      saveState();
+      renderCabinet();
+      closeSavedObjectsModal();
+    }
+
+    function deleteSavedObject(id) {
+      if (!confirm("Möchten Sie dieses gespeicherte Objekt wirklich unwiderruflich löschen?")) return;
+      let list = getSavedObjectsList();
+      list = list.filter(o => o.id !== id);
+      localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
+      openSavedObjectsModal(); // Osvježi popis
+    }
+
+    function updateProjectLabels() {
+      document.getElementById('lbl-obj-name').innerText = project.name;
+      document.getElementById('lbl-obj-addr').innerText = project.address;
+      document.getElementById('print-obj-name').innerText = project.name;
+      document.getElementById('print-obj-addr').innerText = project.address;
+      document.getElementById('print-obj-date').innerText = project.date;
+      document.getElementById('cab-title').innerText = "Unterverteiler - " + project.name;
     }
 
     function updateRailSelector() {
@@ -726,32 +893,6 @@
         sel.appendChild(opt);
       }
       sel.value = Math.min(parseInt(curVal) || 0, rowCount - 1);
-    }
-
-    function openProjectModal() {
-      document.getElementById('inp-obj-name').value = project.name;
-      document.getElementById('inp-obj-addr').value = project.address;
-      document.getElementById('modal-project').style.display = 'flex';
-    }
-
-    function saveProjectData() {
-      const name = document.getElementById('inp-obj-name').value.trim() || "Unbenanntes Objekt";
-      const addr = document.getElementById('inp-obj-addr').value.trim() || "-";
-      project.name = name;
-      project.address = addr;
-      document.getElementById('modal-project').style.display = 'none';
-      updateProjectLabels();
-      saveState();
-      renderCabinet();
-    }
-
-    function updateProjectLabels() {
-      document.getElementById('lbl-obj-name').innerText = project.name;
-      document.getElementById('lbl-obj-addr').innerText = project.address;
-      document.getElementById('print-obj-name').innerText = project.name;
-      document.getElementById('print-obj-addr').innerText = project.address;
-      document.getElementById('print-obj-date').innerText = project.date;
-      document.getElementById('cab-title').innerText = "Unterverteiler - " + project.name;
     }
 
     function setRows(num) {
