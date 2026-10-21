@@ -103,7 +103,7 @@
     /* Layout Desktop */
     .app-container {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 340px 1fr;
       flex: 1;
       min-height: calc(100vh - 65px);
     }
@@ -121,7 +121,39 @@
     .sidebar-section:last-child { border-bottom: none; }
     .section-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.05em; }
 
-    .component-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .category-pills {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .cat-pill {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .cat-pill.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
     .btn-comp {
       display: flex;
       flex-direction: column;
@@ -136,7 +168,7 @@
       touch-action: manipulation;
     }
     .btn-comp:hover { border-color: #38bdf8; background: #334155; }
-    .btn-comp strong { font-size: 0.8rem; color: #fff; margin-bottom: 2px; }
+    .btn-comp strong { font-size: 0.78rem; color: #fff; margin-bottom: 2px; line-height: 1.1; }
     .btn-comp span { color: var(--text-muted); font-size: 0.65rem; }
 
     /* Main Area */
@@ -299,7 +331,7 @@
       position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 12px;
     }
     .modal {
-      background: #1e293b; border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 550px; padding: 20px; max-height: 90vh; overflow-y: auto;
+      background: #1e293b; border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 600px; padding: 20px; max-height: 90vh; overflow-y: auto;
     }
     .modal h3 { margin-bottom: 12px; color: #38bdf8; font-size: 1.1rem; }
     .form-group { margin-bottom: 12px; }
@@ -315,12 +347,15 @@
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-top: 10px;
+      max-height: 55vh;
+      overflow-y: auto;
+      padding-right: 4px;
     }
     .btn-select-comp {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      padding: 10px;
+      padding: 9px;
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 6px;
@@ -335,8 +370,8 @@
       opacity: 0.4;
       cursor: not-allowed;
     }
-    .btn-select-comp strong { font-size: 0.85rem; color: #fff; margin-bottom: 2px; }
-    .btn-select-comp span { color: var(--text-muted); font-size: 0.7rem; }
+    .btn-select-comp strong { font-size: 0.82rem; color: #fff; margin-bottom: 2px; }
+    .btn-select-comp span { color: var(--text-muted); font-size: 0.68rem; }
 
     /* Saved objects list */
     .obj-list-item {
@@ -385,7 +420,7 @@
       margin-bottom: 4px;
     }
 
-    /* --- RESPONSIVE MEDIA QUERIES (TABLETS & PHONES) --- */
+    /* --- RESPONSIVE MEDIA QUERIES --- */
     @media (max-width: 900px) {
       header {
         flex-direction: column;
@@ -571,7 +606,7 @@
 
   <div class="app-container">
     <button class="mobile-sidebar-toggle" onclick="toggleMobileSidebar()">
-      ⚡ Schnellauswahl anzeigen / ausblenden
+      ⚡ Raum-Katalog anzeigen / ausblenden
     </button>
 
     <aside id="app-sidebar">
@@ -591,38 +626,14 @@
       </div>
 
       <div class="sidebar-section">
-        <div class="section-title">Schnellauswahl Verbraucher (Auto-Phase)</div>
-        <div class="component-grid">
-          <div class="btn-comp" onclick="addAutoPreset('Küche', 'E-Herd', '3P B16', 3, 'NYM-J 5x2.5')">
-            <strong>E-Herd 3P</strong>
-            <span>3 TE • B16 (Drehstrom)</span>
-          </div>
-          <div class="btn-comp" onclick="addAutoPreset('Küche', 'Geschirrspüler', '1P B16', 1, 'NYM-J 3x2.5')">
-            <strong>Geschirrspüler</strong>
-            <span>1 TE • B16</span>
-          </div>
-          <div class="btn-comp" onclick="addAutoPreset('Küche', 'Backofen', '1P B16', 1, 'NYM-J 3x2.5')">
-            <strong>Backofen</strong>
-            <span>1 TE • B16</span>
-          </div>
-          <div class="btn-comp" onclick="addAutoPreset('Bad', 'Waschmaschine', '1P B16', 1, 'NYM-J 3x2.5')">
-            <strong>Waschmaschine</strong>
-            <span>1 TE • B16</span>
-          </div>
-          <div class="btn-comp" onclick="addAutoPreset('Wohnzimmer', 'Steckdosen', '1P B16', 1, 'NYM-J 3x1.5')">
-            <strong>Wohnen Steckd.</strong>
-            <span>1 TE • B16</span>
-          </div>
-          <div class="btn-comp" onclick="addAutoPreset('Allgemein', 'Licht', '1P B10', 1, 'NYM-J 3x1.5')">
-            <strong>Beleuchtung</strong>
-            <span>1 TE • B10</span>
-          </div>
-        </div>
+        <div class="section-title">Kompletter EFH-Katalog nach Räumen</div>
+        <div class="category-pills" id="aside-cat-pills"></div>
+        <div class="component-grid" id="aside-comp-grid"></div>
       </div>
 
       <div class="sidebar-section">
-        <div class="section-title">Schutzgeräte & Module</div>
-        <div class="component-grid">
+        <div class="section-title">Schutzorgane & Einspeisung</div>
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
           <div class="btn-comp" onclick="addPresetManual('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
             <strong>Hauptschalter 3P</strong>
             <span>3 TE • 63A</span>
@@ -631,8 +642,8 @@
             <strong>FI 4-polig</strong>
             <span>4 TE • 30mA</span>
           </div>
-          <div class="btn-comp" onclick="addAutoPreset('Außen', 'Balkon/Außen', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
-            <strong>FI/LS (RCBO)</strong>
+          <div class="btn-comp" onclick="addAutoPreset('Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
+            <strong>FI/LS B16</strong>
             <span>2 TE • 30mA</span>
           </div>
           <div class="btn-comp" onclick="addPresetManual('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
@@ -790,9 +801,10 @@
   <!-- Modal: Direkt-Auswahl per Touch auf freie Position -->
   <div class="modal-backdrop" id="modal-touch-select">
     <div class="modal">
-      <h3 id="touch-select-title">Komponente auf Hutschiene einsetzen</h3>
-      <p id="touch-select-subtitle" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;"></p>
+      <h3 id="touch-select-title">Verbraucher nach Raum wählen</h3>
+      <p id="touch-select-subtitle" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;"></p>
       
+      <div class="category-pills" id="modal-cat-pills"></div>
       <div class="modal-selection-grid" id="touch-select-grid"></div>
 
       <div class="modal-actions">
@@ -862,17 +874,82 @@
     let nextPhaseIdx = 0;
     let touchTargetRail = 0;
 
-    const COMPONENT_CATALOG = [
-      { room: 'Küche', desc: 'E-Herd', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
-      { room: 'Küche', desc: 'Geschirrspüler', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { room: 'Küche', desc: 'Backofen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { room: 'Bad', desc: 'Waschmaschine', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { room: 'Wohnzimmer', desc: 'Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { room: 'Allgemein', desc: 'Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { room: 'Außen', desc: 'Balkon/Außen', type: 'RCBO 1P', te: 2, cable: 'NYM-J 3x2.5', is3P: false },
-      { room: 'Schutz', desc: 'FI-Schalter 40A/30mA', type: 'FI 4P', te: 4, cable: '-', is3P: true },
-      { room: 'Einspeisung', desc: 'Hauptschalter', type: '3P 63A', te: 3, cable: '-', is3P: true },
-      { room: 'Reserve', desc: 'Blindabdeckung', type: 'Blind', te: 1, cable: '-', is3P: false }
+    let activeAsideCategory = 'Küche';
+    let activeModalCategory = 'Küche';
+
+    /* KOMPLETNA BAZA PROSTORIJA I POTROŠAČA ZA NJEMAČKU OBITELJSKU KUĆU (DIN 18015) */
+    const ROOM_CATEGORIES = ['Küche', 'Bad', 'Technik', 'Wohnen', 'Schlafen/Büro', 'Keller/HWR', 'Außen/Garage', 'Flur/Allg'];
+
+    const EFH_CATALOG = [
+      // KÜCHE
+      { cat: 'Küche', room: 'Küche', desc: 'E-Herd', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
+      { cat: 'Küche', room: 'Küche', desc: 'Backofen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Küche', room: 'Küche', desc: 'Geschirrspüler', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Küche', room: 'Küche', desc: 'Mikrowelle', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Küche', room: 'Küche', desc: 'Dunstabzugshaube', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Küche', room: 'Küche', desc: 'Kühlschrank/Gefrierschr.', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Küche', room: 'Küche', desc: 'Arbeitsplatte Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Küche', room: 'Küche', desc: 'Küche Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+
+      // BAD / SANITÄR
+      { cat: 'Bad', room: 'Bad', desc: 'Waschmaschine', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Bad', room: 'Bad', desc: 'Wäschetrockner', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Bad', room: 'Bad', desc: 'Durchlauferhitzer 24kW', type: '3P B32', te: 3, cable: 'NYM-J 5x6.0', is3P: true },
+      { cat: 'Bad', room: 'Bad', desc: 'Whirlpool / Sauna', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
+      { cat: 'Bad', room: 'Bad', desc: 'Spiegelschrank / Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Bad', room: 'Bad', desc: 'Fußbodenheizung Bad', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Bad', room: 'Bad', desc: 'Bad Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Bad', room: 'Gäste-WC', desc: 'Gäste-WC Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+
+      // HAUSTECHNIK / HEIZUNG
+      { cat: 'Technik', room: 'Technik', desc: 'Wärmepumpe Kompressor', type: '3P C16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
+      { cat: 'Technik', room: 'Technik', desc: 'Wärmepumpe Heizstab', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
+      { cat: 'Technik', room: 'Technik', desc: 'Lüftungsanlage (KWL)', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Technik', room: 'Technik', desc: 'PV-Wechselrichter', type: '3P B20', te: 3, cable: 'NYM-J 5x4.0', is3P: true },
+      { cat: 'Technik', room: 'Technik', desc: 'Heizung / Steuerung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Technik', room: 'Technik', desc: 'Hebeanlage Pumpe', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Technik', room: 'Technik', desc: 'Wasserenthärtung / Filter', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+
+      // WOHN- & ESSZIMMER
+      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'TV / Audio / Hifi', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Wohnen Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Wohnen Deckenlicht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Wohnen', room: 'Esszimmer', desc: 'Esszimmer Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Wohnen', room: 'Esszimmer', desc: 'Esszimmer Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Jalousien / Rollos', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+
+      // SCHLAFEN & BÜRO
+      { cat: 'Schlafen/Büro', room: 'Schlafzimmer', desc: 'Schlafen Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Schlafen/Büro', room: 'Schlafzimmer', desc: 'Schlafen Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Schlafen/Büro', room: 'Kinderzimmer 1', desc: 'Kind 1 Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Schlafen/Büro', room: 'Kinderzimmer 2', desc: 'Kind 2 Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Schlafen/Büro', room: 'Büro', desc: 'Büro / PC / Homeoffice', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Schlafen/Büro', room: 'Büro', desc: 'Büro Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Schlafen/Büro', room: 'Dachboden', desc: 'Dachboden Steckd./Licht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+
+      // KELLER & HWR
+      { cat: 'Keller/HWR', room: 'HWR', desc: 'HWR Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Keller/HWR', room: 'Keller', desc: 'Keller Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Keller/HWR', room: 'Keller', desc: 'Keller Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Keller/HWR', room: 'Keller', desc: 'Tiefkühltruhe separat', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Keller/HWR', room: 'Werkstatt', desc: 'Werkbank Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Keller/HWR', room: 'Werkstatt', desc: 'CEE-Steckdose 16A', type: '3P C16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
+
+      // AUSSENBEREICH & GARAGE
+      { cat: 'Außen/Garage', room: 'Garage', desc: 'Wallbox 11kW (E-Auto)', type: '3P B16', te: 3, cable: 'NYM-J 5x6.0', is3P: true },
+      { cat: 'Außen/Garage', room: 'Garage', desc: 'Garage Steckd./Torantrieb', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Außen/Garage', room: 'Garage', desc: 'Garage Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Außen/Garage', room: 'Außen', desc: 'Terrasse Steckdosen', type: 'RCBO 1P', te: 2, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Außen/Garage', room: 'Außen', desc: 'Gartenbeleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Außen/Garage', room: 'Außen', desc: 'Gartenhaus / Schuppen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Außen/Garage', room: 'Außen', desc: 'Balkon Steckdose', type: 'RCBO 1P', te: 2, cable: 'NYM-J 3x2.5', is3P: false },
+
+      // FLUR & ALLGEMEIN
+      { cat: 'Flur/Allg', room: 'Flur', desc: 'Flur EG Licht/Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Flur/Allg', room: 'Flur', desc: 'Flur OG / Treppe Licht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Flur/Allg', room: 'Allgemein', desc: 'Klingeltrafo / Gong', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Flur/Allg', room: 'Allgemein', desc: 'Rauchwarnmelder Zentrale', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { cat: 'Flur/Allg', room: 'Allgemein', desc: 'Serverschrank / Router', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false }
     ];
 
     window.onload = function() {
@@ -888,6 +965,9 @@
         const sb = document.getElementById('app-sidebar');
         if (sb) sb.classList.add('collapsed');
       }
+
+      renderAsideCategoryPills();
+      renderAsideComponents();
     };
 
     function toggleMobileSidebar() {
@@ -913,6 +993,45 @@
         } catch (e) {}
       }
       openNewObjectModal(false);
+    }
+
+    function renderAsideCategoryPills() {
+      const container = document.getElementById('aside-cat-pills');
+      container.innerHTML = "";
+      ROOM_CATEGORIES.forEach(cat => {
+        const pill = document.createElement('div');
+        pill.className = `cat-pill ${cat === activeAsideCategory ? 'active' : ''}`;
+        pill.innerText = cat;
+        pill.onclick = () => {
+          activeAsideCategory = cat;
+          renderAsideCategoryPills();
+          renderAsideComponents();
+        };
+        container.appendChild(pill);
+      });
+    }
+
+    function renderAsideComponents() {
+      const grid = document.getElementById('aside-comp-grid');
+      grid.innerHTML = "";
+      const filtered = EFH_CATALOG.filter(it => it.cat === activeAsideCategory);
+
+      filtered.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'btn-comp';
+        btn.innerHTML = `
+          <strong>${item.desc}</strong>
+          <span>${item.type} • ${item.te} TE ${item.is3P ? '(3P)' : ''}</span>
+        `;
+        btn.onclick = () => {
+          if (item.is3P) {
+            addPresetManual(item.room, item.desc, item.type, item.te, 'L1-L3', item.cable);
+          } else {
+            addAutoPreset(item.room, item.desc, item.type, item.te, item.cable);
+          }
+        };
+        grid.appendChild(btn);
+      });
     }
 
     function syncNextPhaseIndex() {
@@ -1147,16 +1266,41 @@
       }
     }
 
-    /* DIRECT TOUCH TO PLACE ON RAIL */
+    /* TOUCH TO PLACE NA ŠINI S KATEGORIJAMA PROSTORIJA */
     function openTouchSelectModal(railIdx, freeTE) {
       touchTargetRail = railIdx;
-      document.getElementById('touch-select-title').innerText = `Komponente auf Reihe ${railIdx + 1} einsetzen`;
-      document.getElementById('touch-select-subtitle').innerText = `Verfügbarer Platz auf dieser Hutschiene: ${freeTE} / 12 TE`;
+      document.getElementById('touch-select-title').innerText = `Verbraucher auf Hutschiene ${railIdx + 1} einsetzen`;
+      document.getElementById('touch-select-subtitle').innerText = `Verfügbarer Platz: ${freeTE} von 12 TE`;
 
+      renderModalCategoryPills(freeTE);
+      renderModalSelectionGrid(freeTE);
+
+      document.getElementById('modal-touch-select').style.display = 'flex';
+    }
+
+    function renderModalCategoryPills(freeTE) {
+      const container = document.getElementById('modal-cat-pills');
+      container.innerHTML = "";
+      ROOM_CATEGORIES.forEach(cat => {
+        const pill = document.createElement('div');
+        pill.className = `cat-pill ${cat === activeModalCategory ? 'active' : ''}`;
+        pill.innerText = cat;
+        pill.onclick = () => {
+          activeModalCategory = cat;
+          renderModalCategoryPills(freeTE);
+          renderModalSelectionGrid(freeTE);
+        };
+        container.appendChild(pill);
+      });
+    }
+
+    function renderModalSelectionGrid(freeTE) {
       const grid = document.getElementById('touch-select-grid');
       grid.innerHTML = "";
 
-      COMPONENT_CATALOG.forEach(item => {
+      const filtered = EFH_CATALOG.filter(it => it.cat === activeModalCategory);
+
+      filtered.forEach(item => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn-select-comp';
@@ -1165,20 +1309,19 @@
 
         btn.innerHTML = `
           <strong>${item.desc}</strong>
-          <span>${item.type} • ${item.te} TE ${item.is3P ? '(3-phasig)' : ''}</span>
+          <span>${item.room} • ${item.type} (${item.te} TE)</span>
+          <span style="color:#0284c7; font-size:0.65rem;">${item.cable}</span>
           ${isTooBig ? '<span style="color:#ef4444; font-size:0.65rem; font-weight:bold;">Zu wenig Platz</span>' : ''}
         `;
 
         btn.onclick = () => {
-          let phase = item.is3P ? 'L1-L3' : (item.type === 'Blind' ? '-' : getNextRotatedPhase());
+          let phase = item.is3P ? 'L1-L3' : getNextRotatedPhase();
           insertModuleRaw(touchTargetRail, item.room, item.desc, item.type, item.te, phase, item.cable);
           closeTouchSelectModal();
         };
 
         grid.appendChild(btn);
       });
-
-      document.getElementById('modal-touch-select').style.display = 'flex';
     }
 
     function closeTouchSelectModal() {
@@ -1232,7 +1375,6 @@
           grid.appendChild(modEl);
         });
 
-        /* Dodirna zona na slobodno mjesto */
         if (freeTE > 0) {
           const emptySlot = document.createElement('div');
           emptySlot.className = 'touch-slot-empty';
