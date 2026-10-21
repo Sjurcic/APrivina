@@ -140,7 +140,7 @@
     .btn-comp strong { font-size: 0.8rem; color: #fff; margin-bottom: 2px; }
     .btn-comp span { color: var(--text-muted); }
 
-    /* Main */
+    /* Main Area */
     main {
       padding: 20px;
       overflow-y: auto;
@@ -315,7 +315,7 @@
     .form-group input, .form-group select {
       width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border); border-radius: 4px; color: #fff;
     }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 
     /* Saved objects list */
     .obj-list-item {
@@ -333,114 +333,166 @@
     .obj-list-info span { font-size: 0.75rem; color: #94a3b8; }
     .obj-list-actions { display: flex; gap: 6px; }
 
-    /* Print Preview & Styles */
+    /* Print Preview & Styles (COLOR ENHANCED & LARGER FONTS) */
     .print-only { display: none; }
 
     @media print {
-      @page { size: A4 portrait; margin: 10mm; }
-      body { background: #ffffff !important; color: #000000 !important; font-size: 8.5pt; }
+      @page {
+        size: A4 portrait;
+        margin: 8mm 8mm;
+      }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 10pt;
+      }
       #pin-overlay, header, aside, .nav-tabs, .btn-group, button, .modal-backdrop { display: none !important; }
       .app-container { display: block !important; height: auto !important; overflow: visible !important; }
       main { padding: 0 !important; overflow: visible !important; display: block !important; }
       .print-only { display: block !important; }
 
       .doc-header {
-        border-bottom: 2px solid #000;
-        padding-bottom: 6px;
-        margin-bottom: 12px;
+        border-bottom: 3px solid #0284c7;
+        padding-bottom: 8px;
+        margin-bottom: 14px;
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
       }
-      .doc-header h1 { font-size: 15pt; margin: 0; color: #000; }
-      .doc-meta { font-size: 7.5pt; text-align: right; line-height: 1.3; }
+      .doc-header h1 { font-size: 18pt; margin: 0; color: #0369a1; font-weight: 800; }
+      .doc-meta { font-size: 9.5pt; text-align: right; line-height: 1.4; color: #334155; }
+      .doc-meta strong { color: #0f172a; }
 
       .section-heading-print {
-        font-size: 10.5pt;
-        font-weight: bold;
-        border-bottom: 1.5px solid #000;
-        margin: 14px 0 6px 0;
-        padding-bottom: 2px;
+        font-size: 12pt;
+        font-weight: 800;
+        background: #f0f9ff;
+        border-left: 4px solid #0284c7;
+        margin: 16px 0 8px 0;
+        padding: 5px 10px;
         text-transform: uppercase;
-        color: #000;
+        color: #0369a1;
       }
 
       .cabinet-wrapper {
         box-shadow: none !important;
-        border: 1.5px solid #000 !important;
+        border: 2px solid #64748b !important;
         max-width: 100% !important;
-        background: #fff !important;
-        padding: 6px !important;
+        background: #f8fafc !important;
+        padding: 8px !important;
         page-break-inside: avoid;
+        border-radius: 6px;
       }
       .cabinet-header {
-        background: #f1f5f9 !important;
-        border: 1px solid #000 !important;
-        color: #000 !important;
-        padding: 4px 6px !important;
-        margin-bottom: 6px !important;
+        background: #e2e8f0 !important;
+        border: 1.5px solid #94a3b8 !important;
+        color: #0f172a !important;
+        padding: 6px 10px !important;
+        font-size: 10pt !important;
+        margin-bottom: 8px !important;
       }
       .din-rail-row {
-        background: #f8fafc !important;
-        border: 1px solid #666 !important;
-        margin-bottom: 6px !important;
-        padding: 4px !important;
+        background: #f1f5f9 !important;
+        border: 1.5px solid #94a3b8 !important;
+        margin-bottom: 10px !important;
+        padding: 6px !important;
+        border-radius: 4px;
       }
-      .rail-info { color: #000 !important; font-size: 7pt !important; margin-bottom: 2px !important; }
+      .rail-info { color: #334155 !important; font-size: 8.5pt !important; font-weight: bold; margin-bottom: 4px !important; }
       .din-rail {
-        background: #e2e8f0 !important;
-        padding: 2px !important;
-        min-height: 95px !important;
-        gap: 2px !important;
+        background: #cbd5e1 !important;
+        padding: 3px !important;
+        min-height: 110px !important;
+        gap: 3px !important;
+        border: 1px solid #94a3b8;
       }
       .module-item {
-        border: 1px solid #000 !important;
-        color: #000 !important;
+        border: 1.5px solid #334155 !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
         box-shadow: none !important;
-        padding: 2px 1px !important;
+        padding: 3px 2px !important;
       }
-      .mod-type { font-size: 6pt !important; }
-      .mod-toggle { background: #000 !important; width: 8px !important; height: 16px !important; }
-      .btn-test { background: #000 !important; color: #fff !important; font-size: 5pt !important; }
-      .mod-bottom { background: #fff !important; border-top: 1px solid #000 !important; }
-      .mod-room { color: #000 !important; font-size: 5pt !important; }
-      .mod-desc { color: #000 !important; font-size: 5pt !important; }
+      .mod-top { border-bottom: 1px solid #cbd5e1 !important; padding-bottom: 2px; }
+      .mod-type { font-size: 8pt !important; font-weight: 800 !important; color: #0f172a !important; }
+      .mod-toggle { background: #1e293b !important; width: 10px !important; height: 20px !important; }
+      .btn-test { background: #2563eb !important; color: #ffffff !important; font-size: 6.5pt !important; padding: 1px 4px !important; }
+      .mod-bottom { background: #f0fdf4 !important; border-top: 1px solid #94a3b8 !important; padding: 2px !important; }
+      .mod-room { color: #0369a1 !important; font-size: 7pt !important; font-weight: 800 !important; }
+      .mod-desc { color: #1e293b !important; font-size: 6.5pt !important; font-weight: 600 !important; }
 
       .page-break { page-break-before: always; }
       .topology-container {
-        background: #fff !important;
-        border: 1.5px solid #000 !important;
-        padding: 8px !important;
-        color: #000 !important;
+        background: #ffffff !important;
+        border: 2px solid #cbd5e1 !important;
+        padding: 12px !important;
+        color: #0f172a !important;
         page-break-inside: avoid;
+        border-radius: 6px;
       }
-      .topo-node { background: #fff !important; border: 1.5px solid #000 !important; color: #000 !important; }
-      .topo-node-title { color: #000 !important; font-size: 7.5pt !important; }
-      .topo-node-sub { color: #444 !important; font-size: 6.5pt !important; }
-      .topo-busbar { background: #000 !important; }
-      .topo-busbar::after { color: #000 !important; font-weight: bold; }
-      .topo-rail-card { background: #fff !important; border: 1px solid #000 !important; color: #000 !important; padding: 6px !important; }
-      .topo-rail-card-title { border-bottom: 1.5px solid #000 !important; color: #000 !important; font-size: 7pt !important; }
-      .topo-item {
+      .topo-node {
         background: #f8fafc !important;
-        border-left: 2px solid #000 !important;
-        border-top: 1px solid #ddd;
-        border-right: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        color: #000 !important;
-        font-size: 6.5pt !important;
-        padding: 2px 4px !important;
+        border: 2px solid #0284c7 !important;
+        color: #0f172a !important;
+        padding: 8px 14px !important;
       }
+      .topo-node-title { color: #0284c7 !important; font-size: 9.5pt !important; font-weight: 800; }
+      .topo-node-sub { color: #475569 !important; font-size: 8pt !important; }
+      .topo-line-v { background: #0284c7 !important; }
+      .topo-busbar { background: #eab308 !important; height: 6px !important; }
+      .topo-busbar::after { color: #a16207 !important; font-weight: bold; font-size: 8pt !important; }
+      .topo-rail-card {
+        background: #f8fafc !important;
+        border: 1.5px solid #bae6fd !important;
+        color: #0f172a !important;
+        padding: 8px !important;
+        border-radius: 6px;
+      }
+      .topo-rail-card-title {
+        border-bottom: 2px solid #0284c7 !important;
+        color: #0369a1 !important;
+        font-size: 9pt !important;
+        font-weight: 800 !important;
+      }
+      .topo-item {
+        background: #ffffff !important;
+        border-left: 3.5px solid #10b981 !important;
+        border-top: 1px solid #e2e8f0 !important;
+        border-right: 1px solid #e2e8f0 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #0f172a !important;
+        font-size: 8pt !important;
+        padding: 4px 6px !important;
+      }
+      .topo-item strong { color: #0369a1 !important; }
 
       .table-container {
-        background: #fff !important;
-        border: 1.5px solid #000 !important;
-        margin-top: 8px !important;
+        background: #ffffff !important;
+        border: 1.5px solid #94a3b8 !important;
+        margin-top: 10px !important;
         page-break-inside: avoid;
+        border-radius: 4px;
       }
-      table { font-size: 7pt !important; }
-      th { background: #e2e8f0 !important; color: #000 !important; border-bottom: 1.5px solid #000 !important; padding: 3px 5px !important; }
-      td { border-bottom: 1px solid #ccc !important; padding: 3px 5px !important; color: #000 !important; }
+      table { font-size: 8.5pt !important; width: 100%; border-collapse: collapse; }
+      th {
+        background: #e0f2fe !important;
+        color: #0369a1 !important;
+        font-weight: 800 !important;
+        border-bottom: 2px solid #0284c7 !important;
+        padding: 6px 8px !important;
+      }
+      td {
+        border-bottom: 1px solid #cbd5e1 !important;
+        padding: 5px 8px !important;
+        color: #1e293b !important;
+      }
+      tr:nth-child(even) td {
+        background: #f8fafc !important;
+      }
     }
   </style>
 </head>
@@ -462,7 +514,7 @@
     <div class="doc-header">
       <div>
         <h1>APrivina Unterverteiler Planer</h1>
-        <div style="font-size: 8.5pt; margin-top: 3px;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
+        <div style="font-size: 9.5pt; margin-top: 4px; color: #475569; font-weight: 600;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
       </div>
       <div class="doc-meta">
         <div><strong>Objekt:</strong> <span id="print-obj-name">-</span></div>
@@ -622,10 +674,20 @@
     </main>
   </div>
 
-  <!-- Modal: Neuer Objektstart / Eingabe -->
+  <!-- Modal: Neuer Objektstart / Eingabe (Sa opcijom otvaranja postojećeg objekta) -->
   <div class="modal-backdrop" id="modal-project">
     <div class="modal">
-      <h3 id="modal-project-title">Neues Objekt anlegen</h3>
+      <h3 id="modal-project-title">Objekt auswählen oder anlegen</h3>
+      <div style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155; margin-bottom:14px; text-align:center;">
+        <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:10px;">Möchten Sie ein bereits gespeichertes Projekt öffnen?</p>
+        <button type="button" class="primary" style="width:100%; justify-content:center; padding:9px;" onclick="switchFromStartToSaved()">📁 Gespeichertes Objekt öffnen</button>
+      </div>
+
+      <div style="position:relative; text-align:center; margin:16px 0;">
+        <hr style="border:0; border-top:1px solid #334155;">
+        <span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:#1e293b; padding:0 10px; font-size:0.75rem; color:#94a3b8; font-weight:bold;">ODER NEUES OBJEKT STARTEN</span>
+      </div>
+
       <div class="form-group">
         <label>Objekt / Bauvorhaben:</label>
         <input type="text" id="inp-obj-name" placeholder="z.B. Neubau EFH Maier">
@@ -635,8 +697,8 @@
         <input type="text" id="inp-obj-addr" placeholder="z.B. Musterstraße 12, München">
       </div>
       <div class="modal-actions">
-        <button onclick="closeProjectModal()">Abbrechen</button>
-        <button class="primary" onclick="confirmProjectData()">Objekt starten</button>
+        <button id="btn-cancel-project" onclick="closeProjectModal()">Abbrechen</button>
+        <button class="success" onclick="confirmProjectData()">Objekt starten</button>
       </div>
     </div>
   </div>
@@ -645,9 +707,7 @@
   <div class="modal-backdrop" id="modal-saved-list">
     <div class="modal">
       <h3>📁 Gespeicherte Objekte</h3>
-      <div id="saved-objects-container" style="margin-top: 12px; max-height: 50vh; overflow-y: auto;">
-        <!-- Dinamički popis spremljenih objekata -->
-      </div>
+      <div id="saved-objects-container" style="margin-top: 12px; max-height: 50vh; overflow-y: auto;"></div>
       <div class="modal-actions">
         <button onclick="closeSavedObjectsModal()">Schließen</button>
       </div>
@@ -746,14 +806,12 @@
       openNewObjectModal(false);
     }
 
-    // Pohranjivanje aktivnog stanja
     function saveState() {
       if (!currentObjId) currentObjId = "obj_" + Date.now();
       const objData = { id: currentObjId, project, rowCount, rails, updatedAt: new Date().toISOString() };
       localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
     }
 
-    // Trajno spremanje objekta u listu
     function saveCurrentObject() {
       saveState();
       let list = getSavedObjectsList();
@@ -785,13 +843,19 @@
     function openNewObjectModal(canCancel = true) {
       document.getElementById('inp-obj-name').value = "";
       document.getElementById('inp-obj-addr').value = "";
-      document.getElementById('modal-project-title').innerText = "Neues Objekt anlegen";
+      document.getElementById('modal-project-title').innerText = "Objekt auswählen oder anlegen";
+      document.getElementById('btn-cancel-project').style.display = canCancel ? 'inline-flex' : 'none';
       document.getElementById('modal-project').style.display = 'flex';
     }
 
     function closeProjectModal() {
-      if (!project.name) return; // Nemoj zatvoriti ako nema objekta
+      if (!project.name) return;
       document.getElementById('modal-project').style.display = 'none';
+    }
+
+    function switchFromStartToSaved() {
+      document.getElementById('modal-project').style.display = 'none';
+      openSavedObjectsModal();
     }
 
     function confirmProjectData() {
@@ -845,6 +909,10 @@
 
     function closeSavedObjectsModal() {
       document.getElementById('modal-saved-list').style.display = 'none';
+      // Ako još nema učitanog objekta, vrati prozor za unos
+      if (!project.name) {
+        openNewObjectModal(false);
+      }
     }
 
     function loadSavedObject(id) {
@@ -870,7 +938,7 @@
       let list = getSavedObjectsList();
       list = list.filter(o => o.id !== id);
       localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
-      openSavedObjectsModal(); // Osvježi popis
+      openSavedObjectsModal();
     }
 
     function updateProjectLabels() {
@@ -1006,7 +1074,7 @@
         col.innerHTML = `
           <div class="topo-rail-card-title">
             <span>⚡ ${groupTitle}</span>
-            <span style="font-size:0.7rem; color:var(--text-muted);">${validItems.length} Module</span>
+            <span style="font-size:0.75rem; color:#0284c7; font-weight:bold;">${validItems.length} Module</span>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
             ${validItems.map(it => `
@@ -1015,8 +1083,8 @@
                   <strong>${it.room}:</strong>${it.desc}
                 </div>
                 <div style="text-align:right;">
-                  <span style="font-weight:bold; color:#38bdf8;">${it.type}</span>
-                  <div style="font-size:0.65rem; color:#94a3b8;">${it.phase} •${it.cable}</div>
+                  <span style="font-weight:bold; color:#0284c7;">${it.type}</span>
+                  <div style="font-size:0.7rem; color:#475569; font-weight:600;">${it.phase} •${it.cable}</div>
                 </div>
               </div>
             `).join('')}
@@ -1042,12 +1110,12 @@
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>F${count++}</td>
-            <td>Reihe ${r + 1}</td>
-            <td><strong>${m.room}</strong></td>
+            <td><strong>Reihe ${r + 1}</strong></td>
+            <td><strong style="color:#0284c7;">${m.room}</strong></td>
             <td>${m.desc}</td>
-            <td>${m.type}</td>
+            <td><strong>${m.type}</strong></td>
             <td>${m.te} TE</td>
-            <td>${m.phase}</td>
+            <td><span style="font-weight:bold; color:#047857;">${m.phase}</span></td>
             <td>${m.cable}</td>
           `;
           tbody.appendChild(tr);
