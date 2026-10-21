@@ -19,6 +19,50 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
+    /* PIN Lock Screen Overlay */
+    #pin-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+    .pin-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 30px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .pin-title { font-size: 1.25rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
+    .pin-subtitle { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; }
+    .pin-input {
+      width: 100%;
+      font-size: 1.6rem;
+      letter-spacing: 12px;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      background: #0f172a;
+      border: 2px solid #334155;
+      color: #fff;
+      margin-bottom: 15px;
+      outline: none;
+    }
+    .pin-input:focus { border-color: #38bdf8; }
+    .pin-error {
+      color: #ef4444;
+      font-size: 0.8rem;
+      min-height: 20px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
     /* Header */
     header {
       background: var(--panel);
@@ -179,7 +223,7 @@
     .mod-room { font-weight: 700; color: #0284c7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.6rem; }
     .mod-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.55rem; color: #334155; }
 
-    /* Topology Tree */
+    /* Topology */
     .topology-container {
       background: #0f172a;
       border: 1px solid var(--border);
@@ -194,34 +238,33 @@
       padding: 10px 14px;
       display: inline-block;
       text-align: center;
-      min-width: 160px;
+      min-width: 180px;
     }
     .topo-node-title { font-weight: 700; font-size: 0.85rem; color: #38bdf8; }
     .topo-node-sub { font-size: 0.75rem; color: var(--text-muted); }
-    .topo-line-v { width: 2px; height: 24px; background: #475569; margin: 0 auto; }
+    .topo-line-v { width: 2px; height: 20px; background: #475569; margin: 0 auto; }
     .topo-busbar {
       height: 6px;
       background: #eab308;
       border-radius: 3px;
-      margin: 10px 0;
+      margin: 12px 0 20px 0;
       position: relative;
     }
     .topo-busbar::after {
-      content: 'L1 / L2 / L3 / N / PE - Sammelschiene';
+      content: 'L1 / L2 / L3 / N / PE - Hauptverteilung';
       position: absolute;
       top: -18px;
-      left: 10px;
-      font-size: 0.65rem;
+      left: 8px;
+      font-size: 0.7rem;
       color: #eab308;
       font-weight: 700;
     }
-    .topo-branches {
+    .topo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
-      margin-top: 15px;
     }
-    .topo-group {
+    .topo-rail-card {
       background: #1e293b;
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -230,23 +273,24 @@
       flex-direction: column;
       gap: 8px;
     }
-    .topo-group-header {
-      border-bottom: 2px solid #38bdf8;
-      padding-bottom: 6px;
-      font-size: 0.8rem;
+    .topo-rail-card-title {
+      font-size: 0.85rem;
       font-weight: 700;
-      color: #fff;
+      color: #38bdf8;
+      border-bottom: 2px solid #38bdf8;
+      padding-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
     }
-    .topo-leaf {
+    .topo-item {
       background: #0f172a;
       border-left: 3px solid #10b981;
-      padding: 6px 8px;
-      border-radius: 3px;
-      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 6px;
+      font-size: 0.75rem;
     }
 
     /* Tables */
@@ -275,28 +319,11 @@
     .print-only { display: none; }
 
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 10mm;
-      }
-      body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        font-size: 8.5pt;
-      }
-      header, aside, .nav-tabs, .btn-group, button, .modal-backdrop {
-        display: none !important;
-      }
-      .app-container {
-        display: block !important;
-        height: auto !important;
-        overflow: visible !important;
-      }
-      main {
-        padding: 0 !important;
-        overflow: visible !important;
-        display: block !important;
-      }
+      @page { size: A4 portrait; margin: 10mm; }
+      body { background: #ffffff !important; color: #000000 !important; font-size: 8.5pt; }
+      #pin-overlay, header, aside, .nav-tabs, .btn-group, button, .modal-backdrop { display: none !important; }
+      .app-container { display: block !important; height: auto !important; overflow: visible !important; }
+      main { padding: 0 !important; overflow: visible !important; display: block !important; }
       .print-only { display: block !important; }
 
       .doc-header {
@@ -369,23 +396,14 @@
         color: #000 !important;
         page-break-inside: avoid;
       }
-      .topo-node {
-        background: #fff !important;
-        border: 1.5px solid #000 !important;
-        color: #000 !important;
-      }
+      .topo-node { background: #fff !important; border: 1.5px solid #000 !important; color: #000 !important; }
       .topo-node-title { color: #000 !important; font-size: 7.5pt !important; }
       .topo-node-sub { color: #444 !important; font-size: 6.5pt !important; }
       .topo-busbar { background: #000 !important; }
       .topo-busbar::after { color: #000 !important; font-weight: bold; }
-      .topo-group {
-        background: #fff !important;
-        border: 1px solid #000 !important;
-        color: #000 !important;
-        padding: 6px !important;
-      }
-      .topo-group-header { border-bottom: 1.5px solid #000 !important; color: #000 !important; font-size: 7pt !important; }
-      .topo-leaf {
+      .topo-rail-card { background: #fff !important; border: 1px solid #000 !important; color: #000 !important; padding: 6px !important; }
+      .topo-rail-card-title { border-bottom: 1.5px solid #000 !important; color: #000 !important; font-size: 7pt !important; }
+      .topo-item {
         background: #f8fafc !important;
         border-left: 2px solid #000 !important;
         border-top: 1px solid #ddd;
@@ -403,23 +421,25 @@
         page-break-inside: avoid;
       }
       table { font-size: 7pt !important; }
-      th {
-        background: #e2e8f0 !important;
-        color: #000 !important;
-        border-bottom: 1.5px solid #000 !important;
-        padding: 3px 5px !important;
-      }
-      td {
-        border-bottom: 1px solid #ccc !important;
-        padding: 3px 5px !important;
-        color: #000 !important;
-      }
+      th { background: #e2e8f0 !important; color: #000 !important; border-bottom: 1.5px solid #000 !important; padding: 3px 5px !important; }
+      td { border-bottom: 1px solid #ccc !important; padding: 3px 5px !important; color: #000 !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Printable Header -->
+  <!-- PIN Protection Overlay -->
+  <div id="pin-overlay">
+    <div class="pin-card">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">🔒</div>
+      <div class="pin-title">Zugriff geschützt</div>
+      <div class="pin-subtitle">Bitte 4-stelligen Sicherheits-PIN eingeben:</div>
+      <input type="password" id="inp-pin" class="pin-input" maxlength="4" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') verifyPin()">
+      <div id="pin-error-msg" class="pin-error"></div>
+      <button class="primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="verifyPin()">Entsperren</button>
+    </div>
+  </div>
+
   <div class="print-only">
     <div class="doc-header">
       <div>
@@ -459,35 +479,33 @@
 
       <div class="sidebar-section">
         <div class="section-title">Aktive Hutschiene zum Einfügen</div>
-        <select id="sel-active-rail" style="width: 100%; padding: 6px; background: #1e293b; color: #fff; border: 1px solid var(--border); border-radius: 4px;">
-          <!-- Dinamički popunjeno ovisno o broju redova -->
-        </select>
+        <select id="sel-active-rail" style="width: 100%; padding: 6px; background: #1e293b; color: #fff; border: 1px solid var(--border); border-radius: 4px;"></select>
       </div>
 
       <div class="sidebar-section">
         <div class="section-title">Schnellauswahl Verbraucher</div>
         <div class="component-grid">
-          <div class="btn-comp" onclick="addPreset('Küche', 'E-Herd', '3P B16', 3, 'L1-L3', 'NYM-J 5x2.5', 'FI 1')">
+          <div class="btn-comp" onclick="addPreset('Küche', 'E-Herd', '3P B16', 3, 'L1-L3', 'NYM-J 5x2.5')">
             <strong>E-Herd 3P</strong>
             <span>3 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Küche', 'Geschirrspüler', '1P B16', 1, 'L1', 'NYM-J 3x2.5', 'FI 1')">
+          <div class="btn-comp" onclick="addPreset('Küche', 'Geschirrspüler', '1P B16', 1, 'L1', 'NYM-J 3x2.5')">
             <strong>Geschirrspüler</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Küche', 'Backofen', '1P B16', 1, 'L2', 'NYM-J 3x2.5', 'FI 1')">
+          <div class="btn-comp" onclick="addPreset('Küche', 'Backofen', '1P B16', 1, 'L2', 'NYM-J 3x2.5')">
             <strong>Backofen</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Bad', 'Waschmaschine', '1P B16', 1, 'L3', 'NYM-J 3x2.5', 'FI 2')">
+          <div class="btn-comp" onclick="addPreset('Bad', 'Waschmaschine', '1P B16', 1, 'L3', 'NYM-J 3x2.5')">
             <strong>Waschmaschine</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Wohnzimmer', 'Steckdosen', '1P B16', 1, 'L1', 'NYM-J 3x1.5', 'FI 1')">
+          <div class="btn-comp" onclick="addPreset('Wohnzimmer', 'Steckdosen', '1P B16', 1, 'L1', 'NYM-J 3x1.5')">
             <strong>Wohnen Steckd.</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Allgemein', 'Licht', '1P B10', 1, 'L2', 'NYM-J 3x1.5', 'FI 2')">
+          <div class="btn-comp" onclick="addPreset('Allgemein', 'Licht', '1P B10', 1, 'L2', 'NYM-J 3x1.5')">
             <strong>Beleuchtung</strong>
             <span>1 TE • B10</span>
           </div>
@@ -497,27 +515,19 @@
       <div class="sidebar-section">
         <div class="section-title">Schutzgeräte & Module</div>
         <div class="component-grid">
-          <div class="btn-comp" onclick="addPreset('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-', 'Direkt')">
+          <div class="btn-comp" onclick="addPreset('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
             <strong>Hauptschalter 3P</strong>
             <span>3 TE • 63A</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Schutz', 'FI 1 40A/30mA', 'FI 4P', 4, 'L1-L3', '-', 'FI 1')">
-            <strong>FI 1 (4P 30mA)</strong>
-            <span>4 TE</span>
+          <div class="btn-comp" onclick="addPreset('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
+            <strong>FI 4-polig</strong>
+            <span>4 TE • 30mA</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Schutz', 'FI 2 40A/30mA', 'FI 4P', 4, 'L1-L3', '-', 'FI 2')">
-            <strong>FI 2 (4P 30mA)</strong>
-            <span>4 TE</span>
-          </div>
-          <div class="btn-comp" onclick="addPreset('Schutz', 'FI 3 40A/30mA', 'FI 4P', 4, 'L1-L3', '-', 'FI 3')">
-            <strong>FI 3 (4P 30mA)</strong>
-            <span>4 TE</span>
-          </div>
-          <div class="btn-comp" onclick="addPreset('Außen', 'Balkon/Außen', 'RCBO 1P', 2, 'L1', 'NYM-J 3x2.5', 'FI/LS')">
+          <div class="btn-comp" onclick="addPreset('Außen', 'Balkon/Außen', 'RCBO 1P', 2, 'L1', 'NYM-J 3x2.5')">
             <strong>FI/LS (RCBO)</strong>
             <span>2 TE • 30mA</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-', 'Direkt')">
+          <div class="btn-comp" onclick="addPreset('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
             <strong>Blindabdeckung</strong>
             <span>1 TE</span>
           </div>
@@ -536,7 +546,6 @@
         <button class="nav-tab" onclick="switchView('tabelle')">Stromkreisliste</button>
       </div>
 
-      <!-- View 1: Verteiler -->
       <div id="view-verteiler">
         <div class="print-only section-heading-print">1. Verteiler-Bestückungsplan (Hutschienen 1–4)</div>
         <div class="cabinet-wrapper">
@@ -548,7 +557,6 @@
         </div>
       </div>
 
-      <!-- View 2: Topologie -->
       <div id="view-topologie" style="display: none;">
         <div class="print-only section-heading-print page-break">2. Einpolige Übersicht (Topologie)</div>
         <div class="topology-container">
@@ -567,13 +575,10 @@
 
           <div class="topo-busbar"></div>
 
-          <div class="topo-branches" id="topo-branches-container">
-            <!-- Dynamisch generierte Topologie-Zweige für alle Reihen -->
-          </div>
+          <div class="topo-grid" id="topo-branches-container"></div>
         </div>
       </div>
 
-      <!-- View 3: Tabelle -->
       <div id="view-tabelle" style="display: none;">
         <div class="print-only section-heading-print page-break">3. Stromkreisliste nach DIN 18015</div>
         <div class="table-container">
@@ -587,7 +592,6 @@
                 <th>Schutzorgan</th>
                 <th>Breite</th>
                 <th>Phase</th>
-                <th>RCD/FI</th>
                 <th>Kabeltyp</th>
               </tr>
             </thead>
@@ -598,7 +602,6 @@
     </main>
   </div>
 
-  <!-- Modal: Initial / Objekt Eingabe -->
   <div class="modal-backdrop" id="modal-project">
     <div class="modal">
       <h3>Objektdaten eingeben</h3>
@@ -616,7 +619,6 @@
     </div>
   </div>
 
-  <!-- Modal: Modul bearbeiten / löschen -->
   <div class="modal-backdrop" id="modal-module">
     <div class="modal">
       <h3>Modul bearbeiten</h3>
@@ -629,17 +631,6 @@
       <div class="form-group">
         <label>Bezeichnung / Verbraucher:</label>
         <input type="text" id="edit-desc">
-      </div>
-      <div class="form-group">
-        <label>FI / RCD Zuordnung:</label>
-        <select id="edit-fi">
-          <option value="FI 1">FI 1 (RCD Gruppe 1)</option>
-          <option value="FI 2">FI 2 (RCD Gruppe 2)</option>
-          <option value="FI 3">FI 3 (RCD Gruppe 3)</option>
-          <option value="FI 4">FI 4 (RCD Gruppe 4)</option>
-          <option value="FI/LS">FI/LS (Separater RCBO)</option>
-          <option value="Direkt">Direkt (ohne FI / Zuleitung)</option>
-        </select>
       </div>
       <div class="form-group">
         <label>Phase:</label>
@@ -664,6 +655,22 @@
   </div>
 
   <script>
+    const CORRECT_PIN = "0104";
+
+    function verifyPin() {
+      const entered = document.getElementById('inp-pin').value.trim();
+      const errBox = document.getElementById('pin-error-msg');
+      if (entered === CORRECT_PIN) {
+        sessionStorage.setItem('aprivina_auth', 'true');
+        document.getElementById('pin-overlay').style.display = 'none';
+        initApp();
+      } else {
+        errBox.innerText = "Falscher PIN! Bitte erneut versuchen.";
+        document.getElementById('inp-pin').value = "";
+        document.getElementById('inp-pin').focus();
+      }
+    }
+
     let project = {
       name: "",
       address: "",
@@ -674,6 +681,16 @@
     let rails = [[], [], [], []];
 
     window.onload = function() {
+      if (sessionStorage.getItem('aprivina_auth') === 'true') {
+        document.getElementById('pin-overlay').style.display = 'none';
+        initApp();
+      } else {
+        document.getElementById('pin-overlay').style.display = 'flex';
+        document.getElementById('inp-pin').focus();
+      }
+    };
+
+    function initApp() {
       const saved = localStorage.getItem('aprivina_data');
       if (saved) {
         try {
@@ -692,7 +709,7 @@
         updateRailSelector();
         openProjectModal();
       }
-    };
+    }
 
     function saveState() {
       localStorage.setItem('aprivina_data', JSON.stringify({ project, rowCount, rails }));
@@ -747,29 +764,17 @@
       renderCabinet();
     }
 
-    function addPreset(room, desc, type, te, phase, cable, fiGroup = 'FI 1') {
+    function addPreset(room, desc, type, te, phase, cable) {
       const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
-      
-      if (!rails[railIdx]) {
-        rails[railIdx] = [];
-      }
+      if (!rails[railIdx]) rails[railIdx] = [];
 
       const currentTE = rails[railIdx].reduce((acc, m) => acc + m.te, 0);
-
       if (currentTE + te > 12) {
         alert("Nicht genügend Platz! Eine Reihe hat maximal 12 TE. Verfügbar: " + (12 - currentTE) + " TE.");
         return;
       }
 
-      // Automatsko inteligentno dodjeljivanje FI grupe ovisno o redu ako je standardni FI
-      let assignedFI = fiGroup;
-      if (fiGroup.startsWith('FI ') && assignedFI === 'FI 1') {
-        if (railIdx === 1) assignedFI = 'FI 2';
-        else if (railIdx === 2) assignedFI = 'FI 3';
-        else if (railIdx === 3) assignedFI = 'FI 4';
-      }
-
-      rails[railIdx].push({ room, desc, type, te, phase, cable, fiGroup: assignedFI });
+      rails[railIdx].push({ room, desc, type, te, phase, cable });
       saveState();
       renderCabinet();
     }
@@ -839,65 +844,48 @@
       const branchesContainer = document.getElementById('topo-branches-container');
       branchesContainer.innerHTML = "";
 
-      // Dinamičke grupe s podrškom za sva 4 reda
-      const groups = {
-        'FI 1': { title: 'RCD / FI-Gruppe 1 (Reihe 1)', items: [] },
-        'FI 2': { title: 'RCD / FI-Gruppe 2 (Reihe 2)', items: [] },
-        'FI 3': { title: 'RCD / FI-Gruppe 3 (Reihe 3)', items: [] },
-        'FI 4': { title: 'RCD / FI-Gruppe 4 (Reihe 4)', items: [] },
-        'FI/LS': { title: 'FI/LS Einzelschutz (RCBO)', items: [] },
-        'Direkt': { title: 'Direkte Abgänge / Einspeisung', items: [] }
-      };
+      let totalBreakers = 0;
 
-      // Čitanje svih redova (0 do rowCount - 1)
       for (let r = 0; r < rowCount; r++) {
-        if (!rails[r]) continue;
-        rails[r].forEach((m, idx) => {
-          if (m.type === 'Blind' || m.desc.includes('Hauptschalter')) return;
+        const railItems = rails[r] || [];
+        const validItems = railItems.filter(m => m.type !== 'Blind');
 
-          let groupKey = m.fiGroup;
-          if (!groupKey || !groups[groupKey]) {
-            groupKey = `FI ${r + 1}`;
-          }
+        if (validItems.length === 0) continue;
 
-          if (!groups[groupKey]) {
-            groups[groupKey] = { title: `${groupKey}`, items: [] };
-          }
+        totalBreakers += validItems.length;
 
-          groups[groupKey].items.push({ ...m, railNum: r + 1 });
-        });
-      }
+        const fiItem = validItems.find(m => m.type.includes('FI'));
+        let groupTitle = `Hutschiene ${r + 1}`;
+        if (fiItem) {
+          groupTitle += ` • FI-Schutz (${fiItem.desc || 'RCD'})`;
+        }
 
-      let renderedCount = 0;
-      Object.keys(groups).forEach(key => {
-        const grp = groups[key];
-        if (!grp.items || grp.items.length === 0) return;
-
-        renderedCount++;
         const col = document.createElement('div');
-        col.className = 'topo-group';
+        col.className = 'topo-rail-card';
         col.innerHTML = `
-          <div class="topo-group-header">⚡ ${grp.title}</div>
+          <div class="topo-rail-card-title">
+            <span>⚡ ${groupTitle}</span>
+            <span style="font-size:0.7rem; color:var(--text-muted);">${validItems.length} Module</span>
+          </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
-            ${grp.items.map(it => `
-              <div class="topo-leaf">
+            ${validItems.map(it => `
+              <div class="topo-item">
                 <div>
                   <strong>${it.room}:</strong>${it.desc}
-                  <div style="font-size:0.65rem; color:#94a3b8;">Reihe ${it.railNum}</div>
                 </div>
                 <div style="text-align:right;">
                   <span style="font-weight:bold; color:#38bdf8;">${it.type}</span>
-                  <div style="font-size:0.65rem; color:#94a3b8;">${it.phase}</div>
+                  <div style="font-size:0.65rem; color:#94a3b8;">${it.phase} •${it.cable}</div>
                 </div>
               </div>
             `).join('')}
           </div>
         `;
         branchesContainer.appendChild(col);
-      });
+      }
 
-      if (renderedCount === 0) {
-        branchesContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Keine Stromkreise vorhanden. Bitte fügen Sie Verbraucher in die Reihen 1 bis 4 ein.</div>';
+      if (totalBreakers === 0) {
+        branchesContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Keine Stromkreise vorhanden. Bitte Verbraucher über das Menü links hinzufügen.</div>';
       }
     }
 
@@ -919,7 +907,6 @@
             <td>${m.type}</td>
             <td>${m.te} TE</td>
             <td>${m.phase}</td>
-            <td>${m.fiGroup || `FI ${r+1}`}</td>
             <td>${m.cable}</td>
           `;
           tbody.appendChild(tr);
@@ -933,7 +920,6 @@
       document.getElementById('edit-mod-idx').value = modIdx;
       document.getElementById('edit-room').value = mod.room;
       document.getElementById('edit-desc').value = mod.desc;
-      document.getElementById('edit-fi').value = mod.fiGroup || `FI ${railIdx + 1}`;
       document.getElementById('edit-phase').value = mod.phase;
       document.getElementById('edit-cable').value = mod.cable;
       document.getElementById('modal-module').style.display = 'flex';
@@ -949,7 +935,6 @@
 
       rails[r][m].room = document.getElementById('edit-room').value;
       rails[r][m].desc = document.getElementById('edit-desc').value;
-      rails[r][m].fiGroup = document.getElementById('edit-fi').value;
       rails[r][m].phase = document.getElementById('edit-phase').value;
       rails[r][m].cable = document.getElementById('edit-cable').value;
 
