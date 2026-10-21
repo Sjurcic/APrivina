@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APrivina Unterverteiler Planer</title>
+  <style>
+    :root {
+      --bg: #1e293b;
+      --panel: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Header */
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand { font-size: 1.25rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    .project-meta { font-size: 0.9rem; color: var(--text-muted); }
+    .project-meta strong { color: var(--text); }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    button {
+      background: #334155;
+      color: var(--text);
+      border: 1px solid #475569;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+    button:hover { background: #475569; }
+    button.primary { background: var(--accent); border-color: #3b82f6; }
+    button.primary:hover { background: var(--accent-hover); }
+    button.danger { background: #991b1b; border-color: #b91c1c; }
+    button.danger:hover { background: #b91c1c; }
+
+    /* Layout */
+    .app-container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      flex: 1;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    aside {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .sidebar-section { border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    .sidebar-section:last-child { border-bottom: none; }
+    .section-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; letter-spacing: 0.05em; }
+
+    .component-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .btn-comp {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 8px;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .btn-comp:hover { border-color: #38bdf8; background: #334155; }
+    .btn-comp strong { font-size: 0.8rem; color: #fff; margin-bottom: 2px; }
+    .btn-comp span { color: var(--text-muted); }
+
+    /* Main Area */
+    main {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .nav-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .nav-tab { background: transparent; border: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 6px 12px; }
+    .nav-tab.active { border-color: #38bdf8; color: #38bdf8; font-weight: 700; }
+
+    /* Cabinet View */
+    .cabinet-wrapper {
+      background: #e2e8f0;
+      border: 6px solid #94a3b8;
+      border-radius: 8px;
+      padding: 16px;
+      color: #0f172a;
+      max-width: 950px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .cabinet-header {
+      background: #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      border: 1px solid #94a3b8;
+    }
+
+    .din-rail-row {
+      margin-bottom: 16px;
+      background: #cbd5e1;
+      border: 1px solid #94a3b8;
+      border-radius: 6px;
+      padding: 8px;
+    }
+    .rail-info { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
+
+    .din-rail {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 3px;
+      background: #64748b;
+      padding: 4px;
+      border-radius: 4px;
+      min-height: 140px;
+      position: relative;
+    }
+
+    /* Breaker Elements */
+    .module-item {
+      background: #ffffff;
+      border: 1px solid #0f172a;
+      border-radius: 3px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4px 2px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      user-select: none;
+    }
+    .module-item:hover { outline: 2px solid #2563eb; }
+    .mod-1 { grid-column: span 1; }
+    .mod-2 { grid-column: span 2; }
+    .mod-3 { grid-column: span 3; }
+    .mod-4 { grid-column: span 4; }
+
+    .mod-top { text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
+    .mod-type { font-weight: 700; font-size: 0.7rem; color: #0f172a; }
+    .mod-center { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 6px 0; }
+    .mod-toggle { width: 14px; height: 26px; background: #0f172a; border-radius: 2px; margin-bottom: 4px; }
+    .btn-test { background: #2563eb; color: #fff; border-radius: 2px; font-size: 0.55rem; padding: 1px 3px; font-weight: 700; margin-bottom: 2px; }
+    .mod-bottom { background: #f1f5f9; padding: 2px; text-align: center; border-top: 1px solid #cbd5e1; }
+    .mod-room { font-weight: 700; color: #0284c7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.6rem; }
+    .mod-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.55rem; color: #334155; }
+
+    /* Topology Tree */
+    .topology-container {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+    .topo-node {
+      background: #1e293b;
+      border: 2px solid #38bdf8;
+      border-radius: 6px;
+      padding: 10px 14px;
+      display: inline-block;
+      text-align: center;
+      min-width: 160px;
+    }
+    .topo-node-title { font-weight: 700; font-size: 0.85rem; color: #38bdf8; }
+    .topo-node-sub { font-size: 0.75rem; color: var(--text-muted); }
+    .topo-line-v { width: 2px; height: 24px; background: #475569; margin: 0 auto; }
+    .topo-busbar {
+      height: 6px;
+      background: #eab308;
+      border-radius: 3px;
+      margin: 10px 0;
+      position: relative;
+    }
+    .topo-busbar::after {
+      content: 'L1 / L2 / L3 / N / PE - Sammelschiene';
+      position: absolute;
+      top: -18px;
+      left: 10px;
+      font-size: 0.65rem;
+      color: #eab308;
+      font-weight: 700;
+    }
+    .topo-branches {
+      display: flex;
+      gap: 20px;
+      justify-content: flex-start;
+      margin-top: 15px;
+    }
+    .topo-group {
+      flex: 1;
+      min-width: 200px;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .topo-group-header {
+      border-bottom: 2px solid #38bdf8;
+      padding-bottom: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .topo-leaf {
+      background: #0f172a;
+      border-left: 3px solid #10b981;
+      padding: 6px 8px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Tables */
+    .table-container { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+    th { background: #1e293b; padding: 10px 12px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal {
+      background: #1e293b; border: 1px solid var(--border); border-radius: 8px; width: 90%; max-width: 450px; padding: 20px;
+    }
+    .modal h3 { margin-bottom: 12px; color: #38bdf8; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border); border-radius: 4px; color: #fff;
+    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+    /* Print Preview & Print Styles */
+    .print-only { display: none; }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 10mm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 9pt;
+      }
+      header, aside, .nav-tabs, .btn-group, button, .modal-backdrop {
+        display: none !important;
+      }
+      .app-container {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      main {
+        padding: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+      .print-only { display: block !important; }
+
+      /* Technical Document Header */
+      .doc-header {
+        border-bottom: 2px solid #000;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .doc-header h1 { font-size: 16pt; margin: 0; color: #000; }
+      .doc-meta { font-size: 8pt; text-align: right; line-height: 1.3; }
+
+      .section-heading-print {
+        font-size: 11pt;
+        font-weight: bold;
+        border-bottom: 1.5px solid #000;
+        margin: 18px 0 8px 0;
+        padding-bottom: 3px;
+        text-transform: uppercase;
+        color: #000;
+      }
+
+      /* Cabinet in Print */
+      .cabinet-wrapper {
+        box-shadow: none !important;
+        border: 1.5px solid #000 !important;
+        max-width: 100% !important;
+        background: #fff !important;
+        padding: 8px !important;
+        page-break-inside: avoid;
+      }
+      .cabinet-header {
+        background: #f1f5f9 !important;
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        padding: 4px 8px !important;
+        margin-bottom: 8px !important;
+      }
+      .din-rail-row {
+        background: #f8fafc !important;
+        border: 1px solid #666 !important;
+        margin-bottom: 8px !important;
+        padding: 4px !important;
+      }
+      .rail-info { color: #000 !important; font-size: 7.5pt !important; margin-bottom: 3px !important; }
+      .din-rail {
+        background: #e2e8f0 !important;
+        padding: 2px !important;
+        min-height: 105px !important;
+        gap: 2px !important;
+      }
+      .module-item {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        padding: 2px 1px !important;
+      }
+      .mod-type { font-size: 6.5pt !important; }
+      .mod-toggle { background: #000 !important; width: 10px !important; height: 18px !important; }
+      .btn-test { background: #000 !important; color: #fff !important; font-size: 5pt !important; }
+      .mod-bottom { background: #fff !important; border-top: 1px solid #000 !important; }
+      .mod-room { color: #000 !important; font-size: 5.5pt !important; }
+      .mod-desc { color: #000 !important; font-size: 5.5pt !important; }
+
+      /* Topology in Print */
+      .page-break { page-break-before: always; }
+      .topology-container {
+        background: #fff !important;
+        border: 1.5px solid #000 !important;
+        padding: 10px !important;
+        color: #000 !important;
+        page-break-inside: avoid;
+      }
+      .topo-node {
+        background: #fff !important;
+        border: 1.5px solid #000 !important;
+        color: #000 !important;
+      }
+      .topo-node-title { color: #000 !important; font-size: 8pt !important; }
+      .topo-node-sub { color: #444 !important; font-size: 7pt !important; }
+      .topo-busbar { background: #000 !important; }
+      .topo-busbar::after { color: #000 !important; font-weight: bold; }
+      .topo-group {
+        background: #fff !important;
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        padding: 6px !important;
+      }
+      .topo-group-header { border-bottom: 1.5px solid #000 !important; color: #000 !important; font-size: 7.5pt !important; }
+      .topo-leaf {
+        background: #f8fafc !important;
+        border-left: 2px solid #000 !important;
+        border-top: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        color: #000 !important;
+        font-size: 7pt !important;
+        padding: 3px 5px !important;
+      }
+
+      /* Table in Print */
+      .table-container {
+        background: #fff !important;
+        border: 1.5px solid #000 !important;
+        margin-top: 10px !important;
+        page-break-inside: avoid;
+      }
+      table { font-size: 7.5pt !important; }
+      th {
+        background: #e2e8f0 !important;
+        color: #000 !important;
+        border-bottom: 1.5px solid #000 !important;
+        padding: 4px 6px !important;
+      }
+      td {
+        border-bottom: 1px solid #ccc !important;
+        padding: 4px 6px !important;
+        color: #000 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Printable Header -->
+  <div class="print-only">
+    <div class="doc-header">
+      <div>
+        <h1>APrivina Unterverteiler Planer</h1>
+        <div style="font-size: 9pt; margin-top: 4px;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
+      </div>
+      <div class="doc-meta">
+        <div><strong>Objekt:</strong> <span id="print-obj-name">-</span></div>
+        <div><strong>Standort:</strong> <span id="print-obj-addr">-</span></div>
+        <div><strong>Datum:</strong> <span id="print-obj-date">-</span></div>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="brand">⚡ APrivina Unterverteiler Planer</div>
+    <div class="project-meta">
+      Objekt: <strong id="lbl-obj-name">-</strong> | Adresse: <strong id="lbl-obj-addr">-</strong>
+    </div>
+    <div class="btn-group">
+      <button onclick="openProjectModal()">📋 Objekt ändern / Neu</button>
+      <button class="primary" onclick="window.print()">🖨️ Drucken / PDF</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <aside>
+      <div class="sidebar-section">
+        <div class="section-title">Reihenanzahl (Verteilergröße)</div>
+        <div style="display: flex; gap: 4px;">
+          <button style="flex:1" onclick="setRows(1)">1R (12 TE)</button>
+          <button style="flex:1" onclick="setRows(2)">2R (24 TE)</button>
+          <button style="flex:1" onclick="setRows(3)">3R (36 TE)</button>
+          <button style="flex:1" onclick="setRows(4)">4R (48 TE)</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Aktive Hutschiene zum Einfügen</div>
+        <select id="sel-active-rail" style="width: 100%; padding: 6px; background: #1e293b; color: #fff; border: 1px solid var(--border); border-radius: 4px;">
+          <option value="0">Reihe 1</option>
+          <option value="1">Reihe 2</option>
+          <option value="2">Reihe 3</option>
+          <option value="3">Reihe 4</option>
+        </select>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Schnellauswahl Verbraucher</div>
+        <div class="component-grid">
+          <div class="btn-comp" onclick="addPreset('Küche', 'E-Herd', '3P B16', 3, 'L1-L3', 'NYM-J 5x2.5', 'FI 1')">
+            <strong>E-Herd 3P</strong>
+            <span>3 TE • B16</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Küche', 'Geschirrspüler', '1P B16', 1, 'L1', 'NYM-J 3x2.5', 'FI 1')">
+            <strong>Geschirrspüler</strong>
+            <span>1 TE • B16</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Küche', 'Backofen', '1P B16', 1, 'L2', 'NYM-J 3x2.5', 'FI 1')">
+            <strong>Backofen</strong>
+            <span>1 TE • B16</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Bad', 'Waschmaschine', '1P B16', 1, 'L3', 'NYM-J 3x2.5', 'FI 2')">
+            <strong>Waschmaschine</strong>
+            <span>1 TE • B16</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Wohnzimmer', 'Steckdosen', '1P B16', 1, 'L1', 'NYM-J 3x1.5', 'FI 1')">
+            <strong>Wohnen Steckd.</strong>
+            <span>1 TE • B16</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Allgemein', 'Licht', '1P B10', 1, 'L2', 'NYM-J 3x1.5', 'FI 2')">
+            <strong>Beleuchtung</strong>
+            <span>1 TE • B10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Schutzgeräte & Module</div>
+        <div class="component-grid">
+          <div class="btn-comp" onclick="addPreset('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-', 'Direkt')">
+            <strong>Hauptschalter 3P</strong>
+            <span>3 TE • 63A</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Schutz', 'FI 1 40A/30mA', 'FI 4P', 4, 'L1-L3', '-', 'FI 1')">
+            <strong>FI 1 (4P 30mA)</strong>
+            <span>4 TE</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Schutz', 'FI 2 40A/30mA', 'FI 4P', 4, 'L1-L3', '-', 'FI 2')">
+            <strong>FI 2 (4P 30mA)</strong>
+            <span>4 TE</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Außen', 'Balkon/Außen', 'RCBO 1P', 2, 'L1', 'NYM-J 3x2.5', 'FI/LS')">
+            <strong>FI/LS (RCBO)</strong>
+            <span>2 TE • 30mA</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-', 'Direkt')">
+            <strong>Blindabdeckung</strong>
+            <span>1 TE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <button class="danger" style="width: 100%;" onclick="clearActiveRail()">Aktive Reihe leeren</button>
+      </div>
+    </aside>
+
+    <main>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchView('verteiler')">Verteiler-Ansicht</button>
+        <button class="nav-tab" onclick="switchView('topologie')">Topologie (Einpolig)</button>
+        <button class="nav-tab" onclick="switchView('tabelle')">Stromkreisliste</button>
+      </div>
+
+      <!-- View 1: Verteiler -->
+      <div id="view-verteiler">
+        <div class="print-only section-heading-print">1. Verteiler-Bestückungsplan (Hutschienen 1–4)</div>
+        <div class="cabinet-wrapper">
+          <div class="cabinet-header">
+            <span id="cab-title">Unterverteilung</span>
+            <span>DIN 18015 / DIN EN 60898</span>
+          </div>
+          <div id="cabinet-rows"></div>
+        </div>
+      </div>
+
+      <!-- View 2: Topologie -->
+      <div id="view-topologie" style="display: none;">
+        <div class="print-only section-heading-print page-break">2. Einpolige Übersicht (Topologie)</div>
+        <div class="topology-container">
+          <div style="text-align: center; margin-bottom: 10px;">
+            <div class="topo-node">
+              <div class="topo-node-title">⚡ Hauseinspeisung</div>
+              <div class="topo-node-sub">3~ 400V TN-S / 50 Hz</div>
+            </div>
+            <div class="topo-line-v"></div>
+            <div class="topo-node">
+              <div class="topo-node-title">Hauptschalter</div>
+              <div class="topo-node-sub">IS-63 / 3-polig 63A</div>
+            </div>
+            <div class="topo-line-v"></div>
+          </div>
+
+          <div class="topo-busbar"></div>
+
+          <div class="topo-branches" id="topo-branches-container">
+            <!-- Dynamisch generierte Topologie-Zweige -->
+          </div>
+        </div>
+      </div>
+
+      <!-- View 3: Tabelle -->
+      <div id="view-tabelle" style="display: none;">
+        <div class="print-only section-heading-print page-break">3. Stromkreisliste nach DIN 18015</div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nr.</th>
+                <th>Raum</th>
+                <th>Verbraucher / Funktion</th>
+                <th>Schutzorgan</th>
+                <th>Breite</th>
+                <th>Phase</th>
+                <th>RCD/FI</th>
+                <th>Kabeltyp</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Initial / Objekt Eingabe -->
+  <div class="modal-backdrop" id="modal-project">
+    <div class="modal">
+      <h3>Objektdaten eingeben</h3>
+      <div class="form-group">
+        <label>Objekt / Bauvorhaben:</label>
+        <input type="text" id="inp-obj-name" placeholder="z.B. Neubau EFH Maier">
+      </div>
+      <div class="form-group">
+        <label>Adresse / Standort:</label>
+        <input type="text" id="inp-obj-addr" placeholder="z.B. Musterstraße 12, München">
+      </div>
+      <div class="modal-actions">
+        <button class="primary" onclick="saveProjectData()">Projekt starten</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Modul bearbeiten / löschen -->
+  <div class="modal-backdrop" id="modal-module">
+    <div class="modal">
+      <h3>Modul bearbeiten</h3>
+      <input type="hidden" id="edit-rail-idx">
+      <input type="hidden" id="edit-mod-idx">
+      <div class="form-group">
+        <label>Raum:</label>
+        <input type="text" id="edit-room">
+      </div>
+      <div class="form-group">
+        <label>Bezeichnung / Verbraucher:</label>
+        <input type="text" id="edit-desc">
+      </div>
+      <div class="form-group">
+        <label>FI / RCD Zuordnung:</label>
+        <select id="edit-fi">
+          <option value="FI 1">FI 1 (RCD Gruppe 1)</option>
+          <option value="FI 2">FI 2 (RCD Gruppe 2)</option>
+          <option value="FI/LS">FI/LS (Separater RCBO)</option>
+          <option value="Direkt">Direkt (ohne FI / Zuleitung)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Phase:</label>
+        <select id="edit-phase">
+          <option value="L1">L1</option>
+          <option value="L2">L2</option>
+          <option value="L3">L3</option>
+          <option value="L1-L3">L1-L3 (Drehstrom)</option>
+          <option value="-">-</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Kabeltyp:</label>
+        <input type="text" id="edit-cable">
+      </div>
+      <div class="modal-actions">
+        <button class="danger" onclick="deleteCurrentModule()">Löschen</button>
+        <button onclick="closeModuleModal()">Abbrechen</button>
+        <button class="primary" onclick="saveModuleEdit()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let project = {
+      name: "",
+      address: "",
+      date: new Date().toLocaleDateString('de-DE')
+    };
+
+    let rowCount = 3;
+    let rails = [[], [], [], []];
+
+    window.onload = function() {
+      const saved = localStorage.getItem('aprivina_data');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          project = parsed.project || project;
+          rowCount = parsed.rowCount || 3;
+          rails = parsed.rails || [[], [], [], []];
+          updateProjectLabels();
+          renderCabinet();
+        } catch (e) {
+          openProjectModal();
+        }
+      } else {
+        openProjectModal();
+      }
+    };
+
+    function saveState() {
+      localStorage.setItem('aprivina_data', JSON.stringify({ project, rowCount, rails }));
+    }
+
+    function openProjectModal() {
+      document.getElementById('inp-obj-name').value = project.name;
+      document.getElementById('inp-obj-addr').value = project.address;
+      document.getElementById('modal-project').style.display = 'flex';
+    }
+
+    function saveProjectData() {
+      const name = document.getElementById('inp-obj-name').value.trim() || "Unbenanntes Objekt";
+      const addr = document.getElementById('inp-obj-addr').value.trim() || "-";
+      project.name = name;
+      project.address = addr;
+      document.getElementById('modal-project').style.display = 'none';
+      updateProjectLabels();
+      saveState();
+      renderCabinet();
+    }
+
+    function updateProjectLabels() {
+      document.getElementById('lbl-obj-name').innerText = project.name;
+      document.getElementById('lbl-obj-addr').innerText = project.address;
+      document.getElementById('print-obj-name').innerText = project.name;
+      document.getElementById('print-obj-addr').innerText = project.address;
+      document.getElementById('print-obj-date').innerText = project.date;
+      document.getElementById('cab-title').innerText = "Unterverteiler - " + project.name;
+    }
+
+    function setRows(num) {
+      rowCount = num;
+      saveState();
+      renderCabinet();
+    }
+
+    function addPreset(room, desc, type, te, phase, cable, fiGroup = 'FI 1') {
+      const railIdx = parseInt(document.getElementById('sel-active-rail').value);
+      const currentTE = rails[railIdx].reduce((acc, m) => acc + m.te, 0);
+
+      if (currentTE + te > 12) {
+        alert("Nicht genügend Platz! Eine Reihe hat maximal 12 TE. Verfügbar: " + (12 - currentTE) + " TE.");
+        return;
+      }
+
+      rails[railIdx].push({ room, desc, type, te, phase, cable, fiGroup });
+      saveState();
+      renderCabinet();
+    }
+
+    function clearActiveRail() {
+      const railIdx = parseInt(document.getElementById('sel-active-rail').value);
+      if (confirm(`Möchten Sie die Hutschiene ${railIdx + 1} wirklich komplett leeren?`)) {
+        rails[railIdx] = [];
+        saveState();
+        renderCabinet();
+      }
+    }
+
+    function renderCabinet() {
+      const container = document.getElementById('cabinet-rows');
+      container.innerHTML = "";
+
+      for (let r = 0; r < rowCount; r++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'din-rail-row';
+
+        const usedTE = rails[r].reduce((acc, m) => acc + m.te, 0);
+
+        rowDiv.innerHTML = `
+          <div class="rail-info">
+            <span>Hutschiene ${r + 1}</span>
+            <span>Belegt: ${usedTE} / 12 TE (${12 - usedTE} TE frei)</span>
+          </div>
+          <div class="din-rail" id="rail-grid-${r}"></div>
+        `;
+        container.appendChild(rowDiv);
+
+        const grid = rowDiv.querySelector(`#rail-grid-${r}`);
+        rails[r].forEach((mod, modIdx) => {
+          const modEl = document.createElement('div');
+          modEl.className = `module-item mod-${mod.te}`;
+          modEl.onclick = () => openEditModule(r, modIdx);
+
+          let centerContent = `<div class="mod-toggle"></div>`;
+          if (mod.type.includes('FI')) {
+            centerContent = `<div class="btn-test">T</div><div class="mod-toggle"></div>`;
+          }
+
+          modEl.innerHTML = `
+            <div class="mod-top">
+              <span class="mod-type">${mod.type}</span>
+            </div>
+            <div class="mod-center">
+              ${centerContent}
+            </div>
+            <div class="mod-bottom">
+              <div class="mod-room">${mod.room}</div>
+              <div class="mod-desc">${mod.desc}</div>
+            </div>
+          `;
+          grid.appendChild(modEl);
+        });
+      }
+
+      renderTable();
+      renderTopology();
+    }
+
+    function renderTopology() {
+      const branchesContainer = document.getElementById('topo-branches-container');
+      branchesContainer.innerHTML = "";
+
+      const groups = {
+        'FI 1': { title: 'RCD / FI-Gruppe 1 (40A / 30mA)', items: [] },
+        'FI 2': { title: 'RCD / FI-Gruppe 2 (40A / 30mA)', items: [] },
+        'FI/LS': { title: 'FI/LS Einzelschutz (RCBOs)', items: [] },
+        'Direkt': { title: 'Direkte Abgänge / Einspeisung', items: [] }
+      };
+
+      for (let r = 0; r < rowCount; r++) {
+        rails[r].forEach(m => {
+          if (m.type === 'Blind' || m.desc.includes('Hauptschalter')) return;
+          const targetGroup = groups[m.fiGroup] ? m.fiGroup : 'FI 1';
+          groups[targetGroup].items.push(m);
+        });
+      }
+
+      Object.keys(groups).forEach(key => {
+        const grp = groups[key];
+        if (grp.items.length === 0) return;
+
+        const col = document.createElement('div');
+        col.className = 'topo-group';
+        col.innerHTML = `
+          <div class="topo-group-header">⚡ ${grp.title}</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${grp.items.map(it => `
+              <div class="topo-leaf">
+                <div>
+                  <strong>${it.room}:</strong>${it.desc}
+                </div>
+                <div>
+                  <span style="font-weight:bold; color:#38bdf8;">${it.type}</span> (${it.phase})
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        branchesContainer.appendChild(col);
+      });
+
+      if (branchesContainer.children.length === 0) {
+        branchesContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Keine Stromkreise vorhanden. Bitte fügen Sie Verbraucher hinzu.</div>';
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = "";
+      let count = 1;
+
+      for (let r = 0; r < rowCount; r++) {
+        rails[r].forEach(m => {
+          if (m.type === 'Blind') return;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>F${count++}</td>
+            <td><strong>${m.room}</strong></td>
+            <td>${m.desc}</td>
+            <td>${m.type}</td>
+            <td>${m.te} TE</td>
+            <td>${m.phase}</td>
+            <td>${m.fiGroup || '-'}</td>
+            <td>${m.cable}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    function openEditModule(railIdx, modIdx) {
+      const mod = rails[railIdx][modIdx];
+      document.getElementById('edit-rail-idx').value = railIdx;
+      document.getElementById('edit-mod-idx').value = modIdx;
+      document.getElementById('edit-room').value = mod.room;
+      document.getElementById('edit-desc').value = mod.desc;
+      document.getElementById('edit-fi').value = mod.fiGroup || 'FI 1';
+      document.getElementById('edit-phase').value = mod.phase;
+      document.getElementById('edit-cable').value = mod.cable;
+      document.getElementById('modal-module').style.display = 'flex';
+    }
+
+    function closeModuleModal() {
+      document.getElementById('modal-module').style.display = 'none';
+    }
+
+    function saveModuleEdit() {
+      const r = parseInt(document.getElementById('edit-rail-idx').value);
+      const m = parseInt(document.getElementById('edit-mod-idx').value);
+
+      rails[r][m].room = document.getElementById('edit-room').value;
+      rails[r][m].desc = document.getElementById('edit-desc').value;
+      rails[r][m].fiGroup = document.getElementById('edit-fi').value;
+      rails[r][m].phase = document.getElementById('edit-phase').value;
+      rails[r][m].cable = document.getElementById('edit-cable').value;
+
+      closeModuleModal();
+      saveState();
+      renderCabinet();
+    }
+
+    function deleteCurrentModule() {
+      const r = parseInt(document.getElementById('edit-rail-idx').value);
+      const m = parseInt(document.getElementById('edit-mod-idx').value);
+      rails[r].splice(m, 1);
+      closeModuleModal();
+      saveState();
+      renderCabinet();
+    }
+
+    function switchView(view) {
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('view-verteiler').style.display = 'none';
+      document.getElementById('view-topologie').style.display = 'none';
+      document.getElementById('view-tabelle').style.display = 'none';
+
+      if (view === 'verteiler') {
+        document.querySelectorAll('.nav-tab')[0].classList.add('active');
+        document.getElementById('view-verteiler').style.display = 'block';
+      } else if (view === 'topologie') {
+        document.querySelectorAll('.nav-tab')[1].classList.add('active');
+        document.getElementById('view-topologie').style.display = 'block';
+      } else {
+        document.querySelectorAll('.nav-tab')[2].classList.add('active');
+        document.getElementById('view-tabelle').style.display = 'block';
+      }
+    }
+
+    window.onbeforeprint = function() {
+      document.getElementById('view-verteiler').style.display = 'block';
+      document.getElementById('view-topologie').style.display = 'block';
+      document.getElementById('view-tabelle').style.display = 'block';
+    };
+
+    window.onafterprint = function() {
+      const activeIdx = Array.from(document.querySelectorAll('.nav-tab')).findIndex(b => b.classList.contains('active'));
+      if (activeIdx === 0) switchView('verteiler');
+      else if (activeIdx === 1) switchView('topologie');
+      else switchView('tabelle');
+    };
+  </script>
+</body>
+</html>
