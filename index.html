@@ -217,6 +217,7 @@
       position: relative;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
       user-select: none;
+      touch-action: manipulation;
     }
     .module-item:hover { outline: 2px solid #2563eb; }
     .mod-1 { grid-column: span 1; }
@@ -232,6 +233,31 @@
     .mod-bottom { background: #f1f5f9; padding: 2px; text-align: center; border-top: 1px solid #cbd5e1; }
     .mod-room { font-weight: 700; color: #0284c7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.6rem; }
     .mod-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.55rem; color: #334155; }
+
+    /* Touch Slot Button for Free TE */
+    .touch-slot-empty {
+      border: 2px dashed #94a3b8;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      transition: all 0.2s ease;
+      padding: 6px 4px;
+      text-align: center;
+    }
+    .touch-slot-empty:hover, .touch-slot-empty:active {
+      background: rgba(56, 189, 248, 0.3);
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .touch-slot-icon { font-size: 1.4rem; font-weight: bold; line-height: 1; margin-bottom: 4px; }
+    .touch-slot-label { font-size: 0.7rem; font-weight: 700; }
 
     /* Topology */
     .topology-container {
@@ -282,6 +308,35 @@
       width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border); border-radius: 4px; color: #fff; font-size: 0.9rem;
     }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+    /* Selection Grid in Touch Modal */
+    .modal-selection-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-select-comp {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .btn-select-comp:hover:not(:disabled) {
+      border-color: #38bdf8;
+      background: #1e293b;
+    }
+    .btn-select-comp:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .btn-select-comp strong { font-size: 0.85rem; color: #fff; margin-bottom: 2px; }
+    .btn-select-comp span { color: var(--text-muted); font-size: 0.7rem; }
 
     /* Saved objects list */
     .obj-list-item {
@@ -393,9 +448,12 @@
       .btn-group {
         grid-template-columns: repeat(2, 1fr);
       }
+      .modal-selection-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
-    /* Print Preview & Styles (COLOR ENHANCED) */
+    /* Print Preview & Styles */
     .print-only { display: none; }
     .print-strips-only { display: none; }
 
@@ -403,7 +461,7 @@
       @page { size: A4 portrait; margin: 8mm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { background: #ffffff !important; color: #0f172a !important; font-size: 10pt; }
-      #pin-overlay, header, aside, .mobile-sidebar-toggle, .nav-tabs, .btn-group, button, .modal-backdrop { display: none !important; }
+      #pin-overlay, header, aside, .mobile-sidebar-toggle, .nav-tabs, .btn-group, button, .modal-backdrop, .touch-slot-empty { display: none !important; }
       .app-container { display: block !important; height: auto !important; overflow: visible !important; }
       main { padding: 0 !important; overflow: visible !important; display: block !important; }
 
@@ -513,7 +571,7 @@
 
   <div class="app-container">
     <button class="mobile-sidebar-toggle" onclick="toggleMobileSidebar()">
-      ⚡ Komponenten-Menü anzeigen / ausblenden
+      ⚡ Schnellauswahl anzeigen / ausblenden
     </button>
 
     <aside id="app-sidebar">
@@ -729,6 +787,20 @@
     </div>
   </div>
 
+  <!-- Modal: Direkt-Auswahl per Touch auf freie Position -->
+  <div class="modal-backdrop" id="modal-touch-select">
+    <div class="modal">
+      <h3 id="touch-select-title">Komponente auf Hutschiene einsetzen</h3>
+      <p id="touch-select-subtitle" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;"></p>
+      
+      <div class="modal-selection-grid" id="touch-select-grid"></div>
+
+      <div class="modal-actions">
+        <button onclick="closeTouchSelectModal()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Optionen (Backup, Restore, PIN ändern) -->
   <div class="modal-backdrop" id="modal-settings">
     <div class="modal">
@@ -788,6 +860,20 @@
     let rowCount = 4;
     let rails = [[], [], [], []];
     let nextPhaseIdx = 0;
+    let touchTargetRail = 0;
+
+    const COMPONENT_CATALOG = [
+      { room: 'Küche', desc: 'E-Herd', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
+      { room: 'Küche', desc: 'Geschirrspüler', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { room: 'Küche', desc: 'Backofen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { room: 'Bad', desc: 'Waschmaschine', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { room: 'Wohnzimmer', desc: 'Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { room: 'Allgemein', desc: 'Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
+      { room: 'Außen', desc: 'Balkon/Außen', type: 'RCBO 1P', te: 2, cable: 'NYM-J 3x2.5', is3P: false },
+      { room: 'Schutz', desc: 'FI-Schalter 40A/30mA', type: 'FI 4P', te: 4, cable: '-', is3P: true },
+      { room: 'Einspeisung', desc: 'Hauptschalter', type: '3P 63A', te: 3, cable: '-', is3P: true },
+      { room: 'Reserve', desc: 'Blindabdeckung', type: 'Blind', te: 1, cable: '-', is3P: false }
+    ];
 
     window.onload = function() {
       if (sessionStorage.getItem('aprivina_auth') === 'true') {
@@ -829,7 +915,6 @@
       openNewObjectModal(false);
     }
 
-    /* Sinkronizira sljedeću fazu s brojem postojećih 1-polnih modula */
     function syncNextPhaseIndex() {
       let count1P = 0;
       for (let r = 0; r < rowCount; r++) {
@@ -1016,7 +1101,6 @@
       renderCabinet();
     }
 
-    /* AUTOMATSKO SEKVENCIJALNO ROTIRANJE FAZA (L1 -> L2 -> L3 -> L1) */
     function getNextRotatedPhase() {
       const phases = ['L1', 'L2', 'L3'];
       const chosen = phases[nextPhaseIdx % 3];
@@ -1025,16 +1109,21 @@
     }
 
     function addAutoPreset(room, desc, type, te, cable) {
-      let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
-      insertModule(room, desc, type, te, phase, cable);
+      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
+      insertModuleToRail(railIdx, room, desc, type, te, cable);
     }
 
     function addPresetManual(room, desc, type, te, phase, cable) {
-      insertModule(room, desc, type, te, phase, cable);
+      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
+      insertModuleRaw(railIdx, room, desc, type, te, phase, cable);
     }
 
-    function insertModule(room, desc, type, te, phase, cable) {
-      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
+    function insertModuleToRail(railIdx, room, desc, type, te, cable) {
+      let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
+      insertModuleRaw(railIdx, room, desc, type, te, phase, cable);
+    }
+
+    function insertModuleRaw(railIdx, room, desc, type, te, phase, cable) {
       if (!rails[railIdx]) rails[railIdx] = [];
 
       const currentTE = rails[railIdx].reduce((acc, m) => acc + m.te, 0);
@@ -1058,6 +1147,44 @@
       }
     }
 
+    /* DIRECT TOUCH TO PLACE ON RAIL */
+    function openTouchSelectModal(railIdx, freeTE) {
+      touchTargetRail = railIdx;
+      document.getElementById('touch-select-title').innerText = `Komponente auf Reihe ${railIdx + 1} einsetzen`;
+      document.getElementById('touch-select-subtitle').innerText = `Verfügbarer Platz auf dieser Hutschiene: ${freeTE} / 12 TE`;
+
+      const grid = document.getElementById('touch-select-grid');
+      grid.innerHTML = "";
+
+      COMPONENT_CATALOG.forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-select-comp';
+        const isTooBig = item.te > freeTE;
+        btn.disabled = isTooBig;
+
+        btn.innerHTML = `
+          <strong>${item.desc}</strong>
+          <span>${item.type} • ${item.te} TE ${item.is3P ? '(3-phasig)' : ''}</span>
+          ${isTooBig ? '<span style="color:#ef4444; font-size:0.65rem; font-weight:bold;">Zu wenig Platz</span>' : ''}
+        `;
+
+        btn.onclick = () => {
+          let phase = item.is3P ? 'L1-L3' : (item.type === 'Blind' ? '-' : getNextRotatedPhase());
+          insertModuleRaw(touchTargetRail, item.room, item.desc, item.type, item.te, phase, item.cable);
+          closeTouchSelectModal();
+        };
+
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('modal-touch-select').style.display = 'flex';
+    }
+
+    function closeTouchSelectModal() {
+      document.getElementById('modal-touch-select').style.display = 'none';
+    }
+
     function renderCabinet() {
       const container = document.getElementById('cabinet-rows');
       container.innerHTML = "";
@@ -1068,11 +1195,12 @@
         const rowDiv = document.createElement('div');
         rowDiv.className = 'din-rail-row';
         const usedTE = rails[r].reduce((acc, m) => acc + m.te, 0);
+        const freeTE = 12 - usedTE;
 
         rowDiv.innerHTML = `
           <div class="rail-info">
             <span>Hutschiene ${r + 1}</span>
-            <span>Belegt: ${usedTE} / 12 TE (${12 - usedTE} TE frei)</span>
+            <span>Belegt: ${usedTE} / 12 TE (${freeTE} TE frei)</span>
           </div>
           <div class="din-rail" id="rail-grid-${r}"></div>
         `;
@@ -1103,6 +1231,19 @@
           `;
           grid.appendChild(modEl);
         });
+
+        /* Dodirna zona na slobodno mjesto */
+        if (freeTE > 0) {
+          const emptySlot = document.createElement('div');
+          emptySlot.className = 'touch-slot-empty';
+          emptySlot.style.gridColumn = `span ${freeTE}`;
+          emptySlot.innerHTML = `
+            <div class="touch-slot-icon">+</div>
+            <div class="touch-slot-label">Hier tippen (${freeTE} TE frei)</div>
+          `;
+          emptySlot.onclick = () => openTouchSelectModal(r, freeTE);
+          grid.appendChild(emptySlot);
+        }
       }
 
       renderTable();
