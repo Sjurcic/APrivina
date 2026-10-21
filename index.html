@@ -216,21 +216,19 @@
       font-weight: 700;
     }
     .topo-branches {
-      display: flex;
-      gap: 20px;
-      justify-content: flex-start;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
       margin-top: 15px;
     }
     .topo-group {
-      flex: 1;
-      min-width: 200px;
       background: #1e293b;
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     .topo-group-header {
       border-bottom: 2px solid #38bdf8;
@@ -248,6 +246,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 6px;
     }
 
     /* Tables */
@@ -278,12 +277,12 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 12mm 10mm;
+        margin: 10mm;
       }
       body {
         background: #ffffff !important;
         color: #000000 !important;
-        font-size: 9pt;
+        font-size: 8.5pt;
       }
       header, aside, .nav-tabs, .btn-group, button, .modal-backdrop {
         display: none !important;
@@ -300,55 +299,53 @@
       }
       .print-only { display: block !important; }
 
-      /* Technical Document Header */
       .doc-header {
         border-bottom: 2px solid #000;
-        padding-bottom: 8px;
-        margin-bottom: 15px;
+        padding-bottom: 6px;
+        margin-bottom: 12px;
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
       }
-      .doc-header h1 { font-size: 16pt; margin: 0; color: #000; }
-      .doc-meta { font-size: 8pt; text-align: right; line-height: 1.3; }
+      .doc-header h1 { font-size: 15pt; margin: 0; color: #000; }
+      .doc-meta { font-size: 7.5pt; text-align: right; line-height: 1.3; }
 
       .section-heading-print {
-        font-size: 11pt;
+        font-size: 10.5pt;
         font-weight: bold;
         border-bottom: 1.5px solid #000;
-        margin: 18px 0 8px 0;
-        padding-bottom: 3px;
+        margin: 14px 0 6px 0;
+        padding-bottom: 2px;
         text-transform: uppercase;
         color: #000;
       }
 
-      /* Cabinet in Print */
       .cabinet-wrapper {
         box-shadow: none !important;
         border: 1.5px solid #000 !important;
         max-width: 100% !important;
         background: #fff !important;
-        padding: 8px !important;
+        padding: 6px !important;
         page-break-inside: avoid;
       }
       .cabinet-header {
         background: #f1f5f9 !important;
         border: 1px solid #000 !important;
         color: #000 !important;
-        padding: 4px 8px !important;
-        margin-bottom: 8px !important;
+        padding: 4px 6px !important;
+        margin-bottom: 6px !important;
       }
       .din-rail-row {
         background: #f8fafc !important;
         border: 1px solid #666 !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
         padding: 4px !important;
       }
-      .rail-info { color: #000 !important; font-size: 7.5pt !important; margin-bottom: 3px !important; }
+      .rail-info { color: #000 !important; font-size: 7pt !important; margin-bottom: 2px !important; }
       .din-rail {
         background: #e2e8f0 !important;
         padding: 2px !important;
-        min-height: 105px !important;
+        min-height: 95px !important;
         gap: 2px !important;
       }
       .module-item {
@@ -357,19 +354,18 @@
         box-shadow: none !important;
         padding: 2px 1px !important;
       }
-      .mod-type { font-size: 6.5pt !important; }
-      .mod-toggle { background: #000 !important; width: 10px !important; height: 18px !important; }
+      .mod-type { font-size: 6pt !important; }
+      .mod-toggle { background: #000 !important; width: 8px !important; height: 16px !important; }
       .btn-test { background: #000 !important; color: #fff !important; font-size: 5pt !important; }
       .mod-bottom { background: #fff !important; border-top: 1px solid #000 !important; }
-      .mod-room { color: #000 !important; font-size: 5.5pt !important; }
-      .mod-desc { color: #000 !important; font-size: 5.5pt !important; }
+      .mod-room { color: #000 !important; font-size: 5pt !important; }
+      .mod-desc { color: #000 !important; font-size: 5pt !important; }
 
-      /* Topology in Print */
       .page-break { page-break-before: always; }
       .topology-container {
         background: #fff !important;
         border: 1.5px solid #000 !important;
-        padding: 10px !important;
+        padding: 8px !important;
         color: #000 !important;
         page-break-inside: avoid;
       }
@@ -378,8 +374,8 @@
         border: 1.5px solid #000 !important;
         color: #000 !important;
       }
-      .topo-node-title { color: #000 !important; font-size: 8pt !important; }
-      .topo-node-sub { color: #444 !important; font-size: 7pt !important; }
+      .topo-node-title { color: #000 !important; font-size: 7.5pt !important; }
+      .topo-node-sub { color: #444 !important; font-size: 6.5pt !important; }
       .topo-busbar { background: #000 !important; }
       .topo-busbar::after { color: #000 !important; font-weight: bold; }
       .topo-group {
@@ -388,7 +384,7 @@
         color: #000 !important;
         padding: 6px !important;
       }
-      .topo-group-header { border-bottom: 1.5px solid #000 !important; color: #000 !important; font-size: 7.5pt !important; }
+      .topo-group-header { border-bottom: 1.5px solid #000 !important; color: #000 !important; font-size: 7pt !important; }
       .topo-leaf {
         background: #f8fafc !important;
         border-left: 2px solid #000 !important;
@@ -396,27 +392,26 @@
         border-right: 1px solid #ddd;
         border-bottom: 1px solid #ddd;
         color: #000 !important;
-        font-size: 7pt !important;
-        padding: 3px 5px !important;
+        font-size: 6.5pt !important;
+        padding: 2px 4px !important;
       }
 
-      /* Table in Print */
       .table-container {
         background: #fff !important;
         border: 1.5px solid #000 !important;
-        margin-top: 10px !important;
+        margin-top: 8px !important;
         page-break-inside: avoid;
       }
-      table { font-size: 7.5pt !important; }
+      table { font-size: 7pt !important; }
       th {
         background: #e2e8f0 !important;
         color: #000 !important;
         border-bottom: 1.5px solid #000 !important;
-        padding: 4px 6px !important;
+        padding: 3px 5px !important;
       }
       td {
         border-bottom: 1px solid #ccc !important;
-        padding: 4px 6px !important;
+        padding: 3px 5px !important;
         color: #000 !important;
       }
     }
@@ -429,7 +424,7 @@
     <div class="doc-header">
       <div>
         <h1>APrivina Unterverteiler Planer</h1>
-        <div style="font-size: 9pt; margin-top: 4px;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
+        <div style="font-size: 8.5pt; margin-top: 3px;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
       </div>
       <div class="doc-meta">
         <div><strong>Objekt:</strong> <span id="print-obj-name">-</span></div>
@@ -465,10 +460,7 @@
       <div class="sidebar-section">
         <div class="section-title">Aktive Hutschiene zum Einfügen</div>
         <select id="sel-active-rail" style="width: 100%; padding: 6px; background: #1e293b; color: #fff; border: 1px solid var(--border); border-radius: 4px;">
-          <option value="0">Reihe 1</option>
-          <option value="1">Reihe 2</option>
-          <option value="2">Reihe 3</option>
-          <option value="3">Reihe 4</option>
+          <!-- Dinamički popunjeno ovisno o broju redova -->
         </select>
       </div>
 
@@ -515,6 +507,10 @@
           </div>
           <div class="btn-comp" onclick="addPreset('Schutz', 'FI 2 40A/30mA', 'FI 4P', 4, 'L1-L3', '-', 'FI 2')">
             <strong>FI 2 (4P 30mA)</strong>
+            <span>4 TE</span>
+          </div>
+          <div class="btn-comp" onclick="addPreset('Schutz', 'FI 3 40A/30mA', 'FI 4P', 4, 'L1-L3', '-', 'FI 3')">
+            <strong>FI 3 (4P 30mA)</strong>
             <span>4 TE</span>
           </div>
           <div class="btn-comp" onclick="addPreset('Außen', 'Balkon/Außen', 'RCBO 1P', 2, 'L1', 'NYM-J 3x2.5', 'FI/LS')">
@@ -572,7 +568,7 @@
           <div class="topo-busbar"></div>
 
           <div class="topo-branches" id="topo-branches-container">
-            <!-- Dynamisch generierte Topologie-Zweige -->
+            <!-- Dynamisch generierte Topologie-Zweige für alle Reihen -->
           </div>
         </div>
       </div>
@@ -585,6 +581,7 @@
             <thead>
               <tr>
                 <th>Nr.</th>
+                <th>Hutschiene</th>
                 <th>Raum</th>
                 <th>Verbraucher / Funktion</th>
                 <th>Schutzorgan</th>
@@ -638,6 +635,8 @@
         <select id="edit-fi">
           <option value="FI 1">FI 1 (RCD Gruppe 1)</option>
           <option value="FI 2">FI 2 (RCD Gruppe 2)</option>
+          <option value="FI 3">FI 3 (RCD Gruppe 3)</option>
+          <option value="FI 4">FI 4 (RCD Gruppe 4)</option>
           <option value="FI/LS">FI/LS (Separater RCBO)</option>
           <option value="Direkt">Direkt (ohne FI / Zuleitung)</option>
         </select>
@@ -671,7 +670,7 @@
       date: new Date().toLocaleDateString('de-DE')
     };
 
-    let rowCount = 3;
+    let rowCount = 4;
     let rails = [[], [], [], []];
 
     window.onload = function() {
@@ -680,20 +679,36 @@
         try {
           const parsed = JSON.parse(saved);
           project = parsed.project || project;
-          rowCount = parsed.rowCount || 3;
+          rowCount = parsed.rowCount || 4;
           rails = parsed.rails || [[], [], [], []];
+          while (rails.length < 4) rails.push([]);
           updateProjectLabels();
+          updateRailSelector();
           renderCabinet();
         } catch (e) {
           openProjectModal();
         }
       } else {
+        updateRailSelector();
         openProjectModal();
       }
     };
 
     function saveState() {
       localStorage.setItem('aprivina_data', JSON.stringify({ project, rowCount, rails }));
+    }
+
+    function updateRailSelector() {
+      const sel = document.getElementById('sel-active-rail');
+      const curVal = sel.value || "0";
+      sel.innerHTML = "";
+      for (let i = 0; i < rowCount; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.innerText = `Reihe ${i + 1} (Hutschiene ${i + 1})`;
+        sel.appendChild(opt);
+      }
+      sel.value = Math.min(parseInt(curVal) || 0, rowCount - 1);
     }
 
     function openProjectModal() {
@@ -724,12 +739,21 @@
 
     function setRows(num) {
       rowCount = num;
+      while (rails.length < rowCount) {
+        rails.push([]);
+      }
+      updateRailSelector();
       saveState();
       renderCabinet();
     }
 
     function addPreset(room, desc, type, te, phase, cable, fiGroup = 'FI 1') {
-      const railIdx = parseInt(document.getElementById('sel-active-rail').value);
+      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
+      
+      if (!rails[railIdx]) {
+        rails[railIdx] = [];
+      }
+
       const currentTE = rails[railIdx].reduce((acc, m) => acc + m.te, 0);
 
       if (currentTE + te > 12) {
@@ -737,13 +761,21 @@
         return;
       }
 
-      rails[railIdx].push({ room, desc, type, te, phase, cable, fiGroup });
+      // Automatsko inteligentno dodjeljivanje FI grupe ovisno o redu ako je standardni FI
+      let assignedFI = fiGroup;
+      if (fiGroup.startsWith('FI ') && assignedFI === 'FI 1') {
+        if (railIdx === 1) assignedFI = 'FI 2';
+        else if (railIdx === 2) assignedFI = 'FI 3';
+        else if (railIdx === 3) assignedFI = 'FI 4';
+      }
+
+      rails[railIdx].push({ room, desc, type, te, phase, cable, fiGroup: assignedFI });
       saveState();
       renderCabinet();
     }
 
     function clearActiveRail() {
-      const railIdx = parseInt(document.getElementById('sel-active-rail').value);
+      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
       if (confirm(`Möchten Sie die Hutschiene ${railIdx + 1} wirklich komplett leeren?`)) {
         rails[railIdx] = [];
         saveState();
@@ -756,6 +788,8 @@
       container.innerHTML = "";
 
       for (let r = 0; r < rowCount; r++) {
+        if (!rails[r]) rails[r] = [];
+
         const rowDiv = document.createElement('div');
         rowDiv.className = 'din-rail-row';
 
@@ -805,25 +839,41 @@
       const branchesContainer = document.getElementById('topo-branches-container');
       branchesContainer.innerHTML = "";
 
+      // Dinamičke grupe s podrškom za sva 4 reda
       const groups = {
-        'FI 1': { title: 'RCD / FI-Gruppe 1 (40A / 30mA)', items: [] },
-        'FI 2': { title: 'RCD / FI-Gruppe 2 (40A / 30mA)', items: [] },
-        'FI/LS': { title: 'FI/LS Einzelschutz (RCBOs)', items: [] },
+        'FI 1': { title: 'RCD / FI-Gruppe 1 (Reihe 1)', items: [] },
+        'FI 2': { title: 'RCD / FI-Gruppe 2 (Reihe 2)', items: [] },
+        'FI 3': { title: 'RCD / FI-Gruppe 3 (Reihe 3)', items: [] },
+        'FI 4': { title: 'RCD / FI-Gruppe 4 (Reihe 4)', items: [] },
+        'FI/LS': { title: 'FI/LS Einzelschutz (RCBO)', items: [] },
         'Direkt': { title: 'Direkte Abgänge / Einspeisung', items: [] }
       };
 
+      // Čitanje svih redova (0 do rowCount - 1)
       for (let r = 0; r < rowCount; r++) {
-        rails[r].forEach(m => {
+        if (!rails[r]) continue;
+        rails[r].forEach((m, idx) => {
           if (m.type === 'Blind' || m.desc.includes('Hauptschalter')) return;
-          const targetGroup = groups[m.fiGroup] ? m.fiGroup : 'FI 1';
-          groups[targetGroup].items.push(m);
+
+          let groupKey = m.fiGroup;
+          if (!groupKey || !groups[groupKey]) {
+            groupKey = `FI ${r + 1}`;
+          }
+
+          if (!groups[groupKey]) {
+            groups[groupKey] = { title: `${groupKey}`, items: [] };
+          }
+
+          groups[groupKey].items.push({ ...m, railNum: r + 1 });
         });
       }
 
+      let renderedCount = 0;
       Object.keys(groups).forEach(key => {
         const grp = groups[key];
-        if (grp.items.length === 0) return;
+        if (!grp.items || grp.items.length === 0) return;
 
+        renderedCount++;
         const col = document.createElement('div');
         col.className = 'topo-group';
         col.innerHTML = `
@@ -833,9 +883,11 @@
               <div class="topo-leaf">
                 <div>
                   <strong>${it.room}:</strong>${it.desc}
+                  <div style="font-size:0.65rem; color:#94a3b8;">Reihe ${it.railNum}</div>
                 </div>
-                <div>
-                  <span style="font-weight:bold; color:#38bdf8;">${it.type}</span> (${it.phase})
+                <div style="text-align:right;">
+                  <span style="font-weight:bold; color:#38bdf8;">${it.type}</span>
+                  <div style="font-size:0.65rem; color:#94a3b8;">${it.phase}</div>
                 </div>
               </div>
             `).join('')}
@@ -844,8 +896,8 @@
         branchesContainer.appendChild(col);
       });
 
-      if (branchesContainer.children.length === 0) {
-        branchesContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Keine Stromkreise vorhanden. Bitte fügen Sie Verbraucher hinzu.</div>';
+      if (renderedCount === 0) {
+        branchesContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Keine Stromkreise vorhanden. Bitte fügen Sie Verbraucher in die Reihen 1 bis 4 ein.</div>';
       }
     }
 
@@ -855,17 +907,19 @@
       let count = 1;
 
       for (let r = 0; r < rowCount; r++) {
+        if (!rails[r]) continue;
         rails[r].forEach(m => {
           if (m.type === 'Blind') return;
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>F${count++}</td>
+            <td>Reihe ${r + 1}</td>
             <td><strong>${m.room}</strong></td>
             <td>${m.desc}</td>
             <td>${m.type}</td>
             <td>${m.te} TE</td>
             <td>${m.phase}</td>
-            <td>${m.fiGroup || '-'}</td>
+            <td>${m.fiGroup || `FI ${r+1}`}</td>
             <td>${m.cable}</td>
           `;
           tbody.appendChild(tr);
@@ -879,7 +933,7 @@
       document.getElementById('edit-mod-idx').value = modIdx;
       document.getElementById('edit-room').value = mod.room;
       document.getElementById('edit-desc').value = mod.desc;
-      document.getElementById('edit-fi').value = mod.fiGroup || 'FI 1';
+      document.getElementById('edit-fi').value = mod.fiGroup || `FI ${railIdx + 1}`;
       document.getElementById('edit-phase').value = mod.phase;
       document.getElementById('edit-cable').value = mod.cable;
       document.getElementById('modal-module').style.display = 'flex';
