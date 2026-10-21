@@ -40,7 +40,7 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     }
     .pin-title { font-size: 1.25rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
-    .pin-subtitle { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; }
+    .pin-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; }
     .pin-input {
       width: 100%;
       font-size: 1.6rem;
@@ -55,19 +55,13 @@
       outline: none;
     }
     .pin-input:focus { border-color: #38bdf8; }
-    .pin-error {
-      color: #ef4444;
-      font-size: 0.8rem;
-      min-height: 20px;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
+    .pin-error { color: #ef4444; font-size: 0.8rem; min-height: 20px; margin-bottom: 10px; font-weight: 600; }
 
     /* Header */
     header {
       background: var(--panel);
       border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
+      padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -75,21 +69,22 @@
       gap: 12px;
     }
     .brand { font-size: 1.25rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
-    .project-meta { font-size: 0.9rem; color: var(--text-muted); }
+    .project-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 15px; }
     .project-meta strong { color: var(--text); }
-    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .phase-badge { background: #0f172a; padding: 4px 8px; border-radius: 4px; border: 1px solid #334155; font-size: 0.75rem; }
+    .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
 
     button {
       background: #334155;
       color: var(--text);
       border: 1px solid #475569;
-      padding: 7px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-weight: 500;
     }
     button:hover { background: #475569; }
@@ -97,6 +92,8 @@
     button.primary:hover { background: var(--accent-hover); }
     button.success { background: #16a34a; border-color: #22c55e; }
     button.success:hover { background: #15803d; }
+    button.warning { background: #d97706; border-color: #f59e0b; }
+    button.warning:hover { background: #b45309; }
     button.danger { background: #991b1b; border-color: #b91c1c; }
     button.danger:hover { background: #b91c1c; }
 
@@ -117,11 +114,11 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
-    .sidebar-section { border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    .sidebar-section { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
     .sidebar-section:last-child { border-bottom: none; }
-    .section-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; letter-spacing: 0.05em; }
+    .section-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.05em; }
 
     .component-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
     .btn-comp {
@@ -138,15 +135,15 @@
     }
     .btn-comp:hover { border-color: #38bdf8; background: #334155; }
     .btn-comp strong { font-size: 0.8rem; color: #fff; margin-bottom: 2px; }
-    .btn-comp span { color: var(--text-muted); }
+    .btn-comp span { color: var(--text-muted); font-size: 0.65rem; }
 
     /* Main Area */
     main {
-      padding: 20px;
+      padding: 16px 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
 
     .nav-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
@@ -245,55 +242,12 @@
     .topo-node-title { font-weight: 700; font-size: 0.85rem; color: #38bdf8; }
     .topo-node-sub { font-size: 0.75rem; color: var(--text-muted); }
     .topo-line-v { width: 2px; height: 20px; background: #475569; margin: 0 auto; }
-    .topo-busbar {
-      height: 6px;
-      background: #eab308;
-      border-radius: 3px;
-      margin: 12px 0 20px 0;
-      position: relative;
-    }
-    .topo-busbar::after {
-      content: 'L1 / L2 / L3 / N / PE - Hauptverteilung';
-      position: absolute;
-      top: -18px;
-      left: 8px;
-      font-size: 0.7rem;
-      color: #eab308;
-      font-weight: 700;
-    }
-    .topo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    .topo-rail-card {
-      background: #1e293b;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .topo-rail-card-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #38bdf8;
-      border-bottom: 2px solid #38bdf8;
-      padding-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .topo-item {
-      background: #0f172a;
-      border-left: 3px solid #10b981;
-      padding: 6px 10px;
-      border-radius: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-    }
+    .topo-busbar { height: 6px; background: #eab308; border-radius: 3px; margin: 12px 0 20px 0; position: relative; }
+    .topo-busbar::after { content: 'L1 / L2 / L3 / N / PE - Hauptverteilung'; position: absolute; top: -18px; left: 8px; font-size: 0.7rem; color: #eab308; font-weight: 700; }
+    .topo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .topo-rail-card { background: #1e293b; border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .topo-rail-card-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; display: flex; justify-content: space-between; }
+    .topo-item { background: #0f172a; border-left: 3px solid #10b981; padding: 6px 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; }
 
     /* Tables */
     .table-container { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
@@ -319,104 +273,69 @@
 
     /* Saved objects list */
     .obj-list-item {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+      background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;
     }
     .obj-list-info strong { color: #38bdf8; display: block; font-size: 0.9rem; }
-    .obj-list-info span { font-size: 0.75rem; color: #94a3b8; }
+    .obj-list-info span { font-size: 0.75rem; color: var(--text-muted); }
     .obj-list-actions { display: flex; gap: 6px; }
 
-    /* Print Preview & Styles (COLOR ENHANCED & LARGER FONTS) */
+    /* DIN 18015 Beschriftungsstreifen Ansicht */
+    .strip-row {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      border: 1px solid #000;
+      background: #fff;
+      color: #000;
+      height: 20mm;
+      margin-bottom: 8mm;
+    }
+    .strip-cell {
+      border-right: 1px dashed #666;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 1mm;
+      font-size: 7pt;
+      overflow: hidden;
+      line-height: 1.1;
+    }
+    .strip-cell:last-child { border-right: none; }
+    .strip-cell strong { font-size: 7.5pt; color: #000; }
+
+    /* Print Preview & Styles (COLOR ENHANCED) */
     .print-only { display: none; }
+    .print-strips-only { display: none; }
 
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 8mm 8mm;
-      }
-      * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      body {
-        background: #ffffff !important;
-        color: #0f172a !important;
-        font-size: 10pt;
-      }
+      @page { size: A4 portrait; margin: 8mm; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: #ffffff !important; color: #0f172a !important; font-size: 10pt; }
       #pin-overlay, header, aside, .nav-tabs, .btn-group, button, .modal-backdrop { display: none !important; }
       .app-container { display: block !important; height: auto !important; overflow: visible !important; }
       main { padding: 0 !important; overflow: visible !important; display: block !important; }
-      .print-only { display: block !important; }
 
-      .doc-header {
-        border-bottom: 3px solid #0284c7;
-        padding-bottom: 8px;
-        margin-bottom: 14px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-      }
+      body.print-mode-doc .print-only { display: block !important; }
+      body.print-mode-doc .print-strips-only { display: none !important; }
+      body.print-mode-strips .print-only { display: none !important; }
+      body.print-mode-strips #view-verteiler, 
+      body.print-mode-strips #view-topologie, 
+      body.print-mode-strips #view-tabelle { display: none !important; }
+      body.print-mode-strips .print-strips-only { display: block !important; }
+
+      .doc-header { border-bottom: 3px solid #0284c7; padding-bottom: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-end; }
       .doc-header h1 { font-size: 18pt; margin: 0; color: #0369a1; font-weight: 800; }
       .doc-meta { font-size: 9.5pt; text-align: right; line-height: 1.4; color: #334155; }
-      .doc-meta strong { color: #0f172a; }
 
-      .section-heading-print {
-        font-size: 12pt;
-        font-weight: 800;
-        background: #f0f9ff;
-        border-left: 4px solid #0284c7;
-        margin: 16px 0 8px 0;
-        padding: 5px 10px;
-        text-transform: uppercase;
-        color: #0369a1;
-      }
+      .section-heading-print { font-size: 12pt; font-weight: 800; background: #f0f9ff; border-left: 4px solid #0284c7; margin: 16px 0 8px 0; padding: 5px 10px; text-transform: uppercase; color: #0369a1; }
 
-      .cabinet-wrapper {
-        box-shadow: none !important;
-        border: 2px solid #64748b !important;
-        max-width: 100% !important;
-        background: #f8fafc !important;
-        padding: 8px !important;
-        page-break-inside: avoid;
-        border-radius: 6px;
-      }
-      .cabinet-header {
-        background: #e2e8f0 !important;
-        border: 1.5px solid #94a3b8 !important;
-        color: #0f172a !important;
-        padding: 6px 10px !important;
-        font-size: 10pt !important;
-        margin-bottom: 8px !important;
-      }
-      .din-rail-row {
-        background: #f1f5f9 !important;
-        border: 1.5px solid #94a3b8 !important;
-        margin-bottom: 10px !important;
-        padding: 6px !important;
-        border-radius: 4px;
-      }
+      .cabinet-wrapper { box-shadow: none !important; border: 2px solid #64748b !important; max-width: 100% !important; background: #f8fafc !important; padding: 8px !important; page-break-inside: avoid; border-radius: 6px; }
+      .cabinet-header { background: #e2e8f0 !important; border: 1.5px solid #94a3b8 !important; color: #0f172a !important; padding: 6px 10px !important; font-size: 10pt !important; margin-bottom: 8px !important; }
+      .din-rail-row { background: #f1f5f9 !important; border: 1.5px solid #94a3b8 !important; margin-bottom: 10px !important; padding: 6px !important; border-radius: 4px; }
       .rail-info { color: #334155 !important; font-size: 8.5pt !important; font-weight: bold; margin-bottom: 4px !important; }
-      .din-rail {
-        background: #cbd5e1 !important;
-        padding: 3px !important;
-        min-height: 110px !important;
-        gap: 3px !important;
-        border: 1px solid #94a3b8;
-      }
-      .module-item {
-        border: 1.5px solid #334155 !important;
-        background: #ffffff !important;
-        color: #0f172a !important;
-        box-shadow: none !important;
-        padding: 3px 2px !important;
-      }
+      .din-rail { background: #cbd5e1 !important; padding: 3px !important; min-height: 110px !important; gap: 3px !important; border: 1px solid #94a3b8; }
+      .module-item { border: 1.5px solid #334155 !important; background: #ffffff !important; color: #0f172a !important; box-shadow: none !important; padding: 3px 2px !important; }
       .mod-top { border-bottom: 1px solid #cbd5e1 !important; padding-bottom: 2px; }
       .mod-type { font-size: 8pt !important; font-weight: 800 !important; color: #0f172a !important; }
       .mod-toggle { background: #1e293b !important; width: 10px !important; height: 20px !important; }
@@ -426,77 +345,27 @@
       .mod-desc { color: #1e293b !important; font-size: 6.5pt !important; font-weight: 600 !important; }
 
       .page-break { page-break-before: always; }
-      .topology-container {
-        background: #ffffff !important;
-        border: 2px solid #cbd5e1 !important;
-        padding: 12px !important;
-        color: #0f172a !important;
-        page-break-inside: avoid;
-        border-radius: 6px;
-      }
-      .topo-node {
-        background: #f8fafc !important;
-        border: 2px solid #0284c7 !important;
-        color: #0f172a !important;
-        padding: 8px 14px !important;
-      }
+      .topology-container { background: #ffffff !important; border: 2px solid #cbd5e1 !important; padding: 12px !important; color: #0f172a !important; page-break-inside: avoid; border-radius: 6px; }
+      .topo-node { background: #f8fafc !important; border: 2px solid #0284c7 !important; color: #0f172a !important; padding: 8px 14px !important; }
       .topo-node-title { color: #0284c7 !important; font-size: 9.5pt !important; font-weight: 800; }
       .topo-node-sub { color: #475569 !important; font-size: 8pt !important; }
       .topo-line-v { background: #0284c7 !important; }
       .topo-busbar { background: #eab308 !important; height: 6px !important; }
       .topo-busbar::after { color: #a16207 !important; font-weight: bold; font-size: 8pt !important; }
-      .topo-rail-card {
-        background: #f8fafc !important;
-        border: 1.5px solid #bae6fd !important;
-        color: #0f172a !important;
-        padding: 8px !important;
-        border-radius: 6px;
-      }
-      .topo-rail-card-title {
-        border-bottom: 2px solid #0284c7 !important;
-        color: #0369a1 !important;
-        font-size: 9pt !important;
-        font-weight: 800 !important;
-      }
-      .topo-item {
-        background: #ffffff !important;
-        border-left: 3.5px solid #10b981 !important;
-        border-top: 1px solid #e2e8f0 !important;
-        border-right: 1px solid #e2e8f0 !important;
-        border-bottom: 1px solid #e2e8f0 !important;
-        color: #0f172a !important;
-        font-size: 8pt !important;
-        padding: 4px 6px !important;
-      }
+      .topo-rail-card { background: #f8fafc !important; border: 1.5px solid #bae6fd !important; color: #0f172a !important; padding: 8px !important; border-radius: 6px; }
+      .topo-rail-card-title { border-bottom: 2px solid #0284c7 !important; color: #0369a1 !important; font-size: 9pt !important; font-weight: 800 !important; }
+      .topo-item { background: #ffffff !important; border-left: 3.5px solid #10b981 !important; border: 1px solid #e2e8f0; color: #0f172a !important; font-size: 8pt !important; padding: 4px 6px !important; }
       .topo-item strong { color: #0369a1 !important; }
 
-      .table-container {
-        background: #ffffff !important;
-        border: 1.5px solid #94a3b8 !important;
-        margin-top: 10px !important;
-        page-break-inside: avoid;
-        border-radius: 4px;
-      }
+      .table-container { background: #ffffff !important; border: 1.5px solid #94a3b8 !important; margin-top: 10px !important; page-break-inside: avoid; border-radius: 4px; }
       table { font-size: 8.5pt !important; width: 100%; border-collapse: collapse; }
-      th {
-        background: #e0f2fe !important;
-        color: #0369a1 !important;
-        font-weight: 800 !important;
-        border-bottom: 2px solid #0284c7 !important;
-        padding: 6px 8px !important;
-      }
-      td {
-        border-bottom: 1px solid #cbd5e1 !important;
-        padding: 5px 8px !important;
-        color: #1e293b !important;
-      }
-      tr:nth-child(even) td {
-        background: #f8fafc !important;
-      }
+      th { background: #e0f2fe !important; color: #0369a1 !important; font-weight: 800 !important; border-bottom: 2px solid #0284c7 !important; padding: 6px 8px !important; }
+      td { border-bottom: 1px solid #cbd5e1 !important; padding: 5px 8px !important; color: #1e293b !important; }
+      tr:nth-child(even) td { background: #f8fafc !important; }
     }
   </style>
 </head>
-<body>
+<body class="print-mode-doc">
 
   <!-- PIN Protection Overlay -->
   <div id="pin-overlay">
@@ -510,6 +379,7 @@
     </div>
   </div>
 
+  <!-- Dokumentations-Header (Druck) -->
   <div class="print-only">
     <div class="doc-header">
       <div>
@@ -524,16 +394,29 @@
     </div>
   </div>
 
+  <!-- Beschriftungsstreifen (Druck) -->
+  <div class="print-strips-only" style="padding: 10mm 5mm;">
+    <div style="border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 8mm;">
+      <h2 style="font-size: 14pt;">Beschriftungsstreifen nach DIN 18015 (18 mm je TE)</h2>
+      <p style="font-size: 8pt; color: #666;"><span id="strip-obj-name">-</span> | Entlang der gestrichelten Linien ausschneiden und in Klarsichtfenster einlegen.</p>
+    </div>
+    <div id="strips-render-container"></div>
+  </div>
+
   <header>
     <div class="brand">⚡ APrivina Unterverteiler Planer</div>
     <div class="project-meta">
-      Objekt: <strong id="lbl-obj-name">-</strong> | Adresse: <strong id="lbl-obj-addr">-</strong>
+      <div>Objekt: <strong id="lbl-obj-name">-</strong> | <span id="lbl-obj-addr">-</span></div>
+      <div class="phase-badge" id="phase-balance-bar">L1: 0 | L2: 0 | L3: 0</div>
     </div>
     <div class="btn-group">
-      <button class="success" onclick="saveCurrentObject()">💾 Objekt speichern</button>
-      <button onclick="openNewObjectModal()">➕ Neues Objekt</button>
-      <button onclick="openSavedObjectsModal()">📁 Gespeicherte Objekte</button>
-      <button class="primary" onclick="window.print()">🖨️ Drucken / PDF</button>
+      <button class="success" onclick="saveCurrentObject()">💾 Speichern</button>
+      <button onclick="openNewObjectModal()">➕ Neu</button>
+      <button onclick="openSavedObjectsModal()">📁 Objekte</button>
+      <button class="warning" onclick="exportToCSV()">📊 Excel/CSV</button>
+      <button onclick="printStrips()">🏷️ Beschriftung</button>
+      <button class="primary" onclick="printDoc()">🖨️ Drucken / PDF</button>
+      <button onclick="openSettingsModal()">⚙️ Optionen</button>
     </div>
   </header>
 
@@ -555,29 +438,29 @@
       </div>
 
       <div class="sidebar-section">
-        <div class="section-title">Schnellauswahl Verbraucher</div>
+        <div class="section-title">Schnellauswahl Verbraucher (Auto-Phase)</div>
         <div class="component-grid">
-          <div class="btn-comp" onclick="addPreset('Küche', 'E-Herd', '3P B16', 3, 'L1-L3', 'NYM-J 5x2.5')">
+          <div class="btn-comp" onclick="addAutoPreset('Küche', 'E-Herd', '3P B16', 3, 'NYM-J 5x2.5')">
             <strong>E-Herd 3P</strong>
-            <span>3 TE • B16</span>
+            <span>3 TE • B16 (Drehstrom)</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Küche', 'Geschirrspüler', '1P B16', 1, 'L1', 'NYM-J 3x2.5')">
+          <div class="btn-comp" onclick="addAutoPreset('Küche', 'Geschirrspüler', '1P B16', 1, 'NYM-J 3x2.5')">
             <strong>Geschirrspüler</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Küche', 'Backofen', '1P B16', 1, 'L2', 'NYM-J 3x2.5')">
+          <div class="btn-comp" onclick="addAutoPreset('Küche', 'Backofen', '1P B16', 1, 'NYM-J 3x2.5')">
             <strong>Backofen</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Bad', 'Waschmaschine', '1P B16', 1, 'L3', 'NYM-J 3x2.5')">
+          <div class="btn-comp" onclick="addAutoPreset('Bad', 'Waschmaschine', '1P B16', 1, 'NYM-J 3x2.5')">
             <strong>Waschmaschine</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Wohnzimmer', 'Steckdosen', '1P B16', 1, 'L1', 'NYM-J 3x1.5')">
+          <div class="btn-comp" onclick="addAutoPreset('Wohnzimmer', 'Steckdosen', '1P B16', 1, 'NYM-J 3x1.5')">
             <strong>Wohnen Steckd.</strong>
             <span>1 TE • B16</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Allgemein', 'Licht', '1P B10', 1, 'L2', 'NYM-J 3x1.5')">
+          <div class="btn-comp" onclick="addAutoPreset('Allgemein', 'Licht', '1P B10', 1, 'NYM-J 3x1.5')">
             <strong>Beleuchtung</strong>
             <span>1 TE • B10</span>
           </div>
@@ -587,19 +470,19 @@
       <div class="sidebar-section">
         <div class="section-title">Schutzgeräte & Module</div>
         <div class="component-grid">
-          <div class="btn-comp" onclick="addPreset('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
+          <div class="btn-comp" onclick="addPresetManual('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
             <strong>Hauptschalter 3P</strong>
             <span>3 TE • 63A</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
+          <div class="btn-comp" onclick="addPresetManual('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
             <strong>FI 4-polig</strong>
             <span>4 TE • 30mA</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Außen', 'Balkon/Außen', 'RCBO 1P', 2, 'L1', 'NYM-J 3x2.5')">
+          <div class="btn-comp" onclick="addAutoPreset('Außen', 'Balkon/Außen', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
             <strong>FI/LS (RCBO)</strong>
             <span>2 TE • 30mA</span>
           </div>
-          <div class="btn-comp" onclick="addPreset('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
+          <div class="btn-comp" onclick="addPresetManual('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
             <strong>Blindabdeckung</strong>
             <span>1 TE</span>
           </div>
@@ -674,7 +557,7 @@
     </main>
   </div>
 
-  <!-- Modal: Neuer Objektstart / Eingabe (Sa opcijom otvaranja postojećeg objekta) -->
+  <!-- Modal: Neuer Objektstart / Eingabe -->
   <div class="modal-backdrop" id="modal-project">
     <div class="modal">
       <h3 id="modal-project-title">Objekt auswählen oder anlegen</h3>
@@ -714,7 +597,7 @@
     </div>
   </div>
 
-  <!-- Modal: Modul bearbeiten / löschen -->
+  <!-- Modal: Modul bearbeiten / löschen / duplizieren -->
   <div class="modal-backdrop" id="modal-module">
     <div class="modal">
       <h3>Modul bearbeiten</h3>
@@ -743,6 +626,7 @@
         <input type="text" id="edit-cable">
       </div>
       <div class="modal-actions">
+        <button class="warning" onclick="duplicateCurrentModule()">📋 Duplizieren</button>
         <button class="danger" onclick="deleteCurrentModule()">Löschen</button>
         <button onclick="closeModuleModal()">Abbrechen</button>
         <button class="primary" onclick="saveModuleEdit()">Speichern</button>
@@ -750,13 +634,45 @@
     </div>
   </div>
 
+  <!-- Modal: Optionen (Backup, Restore, PIN ändern) -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal">
+      <h3>⚙️ Optionen & Datensicherung</h3>
+      
+      <div style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155; margin-bottom:14px;">
+        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">💾 Projekt-Backup (JSON)</strong>
+        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:10px;">Laden Sie alle Objekte als Datei herunter oder importieren Sie diese auf einem anderen Gerät.</p>
+        <div style="display:flex; gap:8px;">
+          <button class="primary" style="flex:1;" onclick="downloadBackupJSON()">Export Datei</button>
+          <button style="flex:1;" onclick="document.getElementById('inp-file-import').click()">Import Datei</button>
+          <input type="file" id="inp-file-import" style="display:none;" accept=".json" onchange="importBackupJSON(event)">
+        </div>
+      </div>
+
+      <div style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155;">
+        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">🔑 PIN-Code ändern</strong>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label>Neuer 4-stelliger PIN:</label>
+          <input type="password" id="inp-new-pin" maxlength="4" placeholder="z.B. 1234">
+        </div>
+        <button class="success" style="width:100%; justify-content:center;" onclick="changePinCode()">PIN aktualisieren</button>
+      </div>
+
+      <div class="modal-actions">
+        <button onclick="closeSettingsModal()">Schließen</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const CORRECT_PIN = "0104";
+    function getStoredPin() {
+      return localStorage.getItem('aprivina_user_pin') || "0104";
+    }
 
     function verifyPin() {
       const entered = document.getElementById('inp-pin').value.trim();
       const errBox = document.getElementById('pin-error-msg');
-      if (entered === CORRECT_PIN) {
+      if (entered === getStoredPin()) {
         sessionStorage.setItem('aprivina_auth', 'true');
         document.getElementById('pin-overlay').style.display = 'none';
         initApp();
@@ -776,6 +692,7 @@
 
     let rowCount = 4;
     let rails = [[], [], [], []];
+    let nextPhaseIdx = 0; // 0=L1, 1=L2, 2=L3 za auto-rotaciju
 
     window.onload = function() {
       if (sessionStorage.getItem('aprivina_auth') === 'true') {
@@ -810,6 +727,21 @@
       if (!currentObjId) currentObjId = "obj_" + Date.now();
       const objData = { id: currentObjId, project, rowCount, rails, updatedAt: new Date().toISOString() };
       localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
+      updatePhaseBalanceBar();
+    }
+
+    function updatePhaseBalanceBar() {
+      let l1 = 0, l2 = 0, l3 = 0;
+      for (let r = 0; r < rowCount; r++) {
+        (rails[r] || []).forEach(m => {
+          if (m.type === 'Blind') return;
+          if (m.phase === 'L1') l1++;
+          else if (m.phase === 'L2') l2++;
+          else if (m.phase === 'L3') l3++;
+          else if (m.phase === 'L1-L3') { l1++; l2++; l3++; }
+        });
+      }
+      document.getElementById('phase-balance-bar').innerHTML = `Phasen: <span style="color:#38bdf8;">L1: ${l1}</span> | <span style="color:#10b981;">L2: ${l2}</span> | <span style="color:#f59e0b;">L3: ${l3}</span>`;
     }
 
     function saveCurrentObject() {
@@ -863,11 +795,7 @@
       const addr = document.getElementById('inp-obj-addr').value.trim() || "-";
 
       currentObjId = "obj_" + Date.now();
-      project = {
-        name,
-        address: addr,
-        date: new Date().toLocaleDateString('de-DE')
-      };
+      project = { name, address: addr, date: new Date().toLocaleDateString('de-DE') };
       rowCount = 4;
       rails = [[], [], [], []];
 
@@ -884,9 +812,9 @@
       container.innerHTML = "";
 
       if (list.length === 0) {
-        container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding:15px; text-align:center;">Noch keine gespeicherten Objekte vorhanden. Klicken Sie oben auf "Objekt speichern".</div>`;
+        container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding:15px; text-align:center;">Noch keine gespeicherten Objekte vorhanden. Klicken Sie oben auf "Speichern".</div>`;
       } else {
-        list.forEach((obj, idx) => {
+        list.forEach(obj => {
           const item = document.createElement('div');
           item.className = 'obj-list-item';
           const isCurrent = (obj.id === currentObjId);
@@ -903,16 +831,12 @@
           container.appendChild(item);
         });
       }
-
       document.getElementById('modal-saved-list').style.display = 'flex';
     }
 
     function closeSavedObjectsModal() {
       document.getElementById('modal-saved-list').style.display = 'none';
-      // Ako još nema učitanog objekta, vrati prozor za unos
-      if (!project.name) {
-        openNewObjectModal(false);
-      }
+      if (!project.name) openNewObjectModal(false);
     }
 
     function loadSavedObject(id) {
@@ -947,7 +871,9 @@
       document.getElementById('print-obj-name').innerText = project.name;
       document.getElementById('print-obj-addr').innerText = project.address;
       document.getElementById('print-obj-date').innerText = project.date;
+      document.getElementById('strip-obj-name').innerText = project.name + " (" + project.address + ")";
       document.getElementById('cab-title').innerText = "Unterverteiler - " + project.name;
+      updatePhaseBalanceBar();
     }
 
     function updateRailSelector() {
@@ -965,15 +891,35 @@
 
     function setRows(num) {
       rowCount = num;
-      while (rails.length < rowCount) {
-        rails.push([]);
-      }
+      while (rails.length < rowCount) rails.push([]);
       updateRailSelector();
       saveState();
       renderCabinet();
     }
 
-    function addPreset(room, desc, type, te, phase, cable) {
+    /* Auto-Phase Balancer */
+    function getNextRotatedPhase() {
+      const phases = ['L1', 'L2', 'L3'];
+      const chosen = phases[nextPhaseIdx % 3];
+      nextPhaseIdx++;
+      return chosen;
+    }
+
+    function addAutoPreset(room, desc, type, te, cable) {
+      let phase = 'L1';
+      if (te >= 3) {
+        phase = 'L1-L3';
+      } else {
+        phase = getNextRotatedPhase();
+      }
+      insertModule(room, desc, type, te, phase, cable);
+    }
+
+    function addPresetManual(room, desc, type, te, phase, cable) {
+      insertModule(room, desc, type, te, phase, cable);
+    }
+
+    function insertModule(room, desc, type, te, phase, cable) {
       const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
       if (!rails[railIdx]) rails[railIdx] = [];
 
@@ -1006,7 +952,6 @@
 
         const rowDiv = document.createElement('div');
         rowDiv.className = 'din-rail-row';
-
         const usedTE = rails[r].reduce((acc, m) => acc + m.te, 0);
 
         rowDiv.innerHTML = `
@@ -1047,6 +992,7 @@
 
       renderTable();
       renderTopology();
+      renderStrips();
     }
 
     function renderTopology() {
@@ -1060,7 +1006,6 @@
         const validItems = railItems.filter(m => m.type !== 'Blind');
 
         if (validItems.length === 0) continue;
-
         totalBreakers += validItems.length;
 
         const fiItem = validItems.find(m => m.type.includes('FI'));
@@ -1080,11 +1025,11 @@
             ${validItems.map(it => `
               <div class="topo-item">
                 <div>
-                  <strong>${it.room}:</strong>${it.desc}
+                  <strong>${it.room}:</strong> ${it.desc}
                 </div>
                 <div style="text-align:right;">
                   <span style="font-weight:bold; color:#0284c7;">${it.type}</span>
-                  <div style="font-size:0.7rem; color:#475569; font-weight:600;">${it.phase} •${it.cable}</div>
+                  <div style="font-size:0.7rem; color:#475569; font-weight:600;">${it.phase} • ${it.cable}</div>
                 </div>
               </div>
             `).join('')}
@@ -1123,6 +1068,51 @@
       }
     }
 
+    /* Trake za ormar (DIN 18015 Beschriftungsstreifen) */
+    function renderStrips() {
+      const container = document.getElementById('strips-render-container');
+      container.innerHTML = "";
+
+      for (let r = 0; r < rowCount; r++) {
+        const railItems = rails[r] || [];
+        const stripRow = document.createElement('div');
+        stripRow.className = 'strip-row';
+
+        let curTE = 0;
+        railItems.forEach(m => {
+          const cell = document.createElement('div');
+          cell.className = 'strip-cell';
+          cell.style.gridColumn = `span ${m.te}`;
+          cell.innerHTML = `
+            <strong>${m.room}</strong>
+            <div>${m.desc}</div>
+            <div style="font-size:6pt; color:#444;">${m.type} (${m.phase})</div>
+          `;
+          stripRow.appendChild(cell);
+          curTE += m.te;
+        });
+
+        // Popuni prazan prostor do 12 TE
+        while (curTE < 12) {
+          const emptyCell = document.createElement('div');
+          emptyCell.className = 'strip-cell';
+          emptyCell.style.gridColumn = `span 1`;
+          emptyCell.innerHTML = `<span style="color:#bbb;">Reserve</span>`;
+          stripRow.appendChild(emptyCell);
+          curTE++;
+        }
+
+        const title = document.createElement('div');
+        title.style.fontSize = '8pt';
+        title.style.fontWeight = 'bold';
+        title.style.marginBottom = '2mm';
+        title.innerText = `Reihe ${r + 1} (Hutschiene ${r + 1}):`;
+
+        container.appendChild(title);
+        container.appendChild(stripRow);
+      }
+    }
+
     function openEditModule(railIdx, modIdx) {
       const mod = rails[railIdx][modIdx];
       document.getElementById('edit-rail-idx').value = railIdx;
@@ -1152,6 +1142,37 @@
       renderCabinet();
     }
 
+    function duplicateCurrentModule() {
+      const r = parseInt(document.getElementById('edit-rail-idx').value);
+      const m = parseInt(document.getElementById('edit-mod-idx').value);
+      const target = rails[r][m];
+
+      const currentTE = rails[r].reduce((acc, it) => acc + it.te, 0);
+      if (currentTE + target.te > 12) {
+        alert("Nicht genügend freier Platz in dieser Reihe für ein Duplikat (max. 12 TE)!");
+        return;
+      }
+
+      // Dupliciraj s automatskom rotacijom faze za 1-polne
+      let dupPhase = target.phase;
+      if (target.te === 1) {
+        dupPhase = getNextRotatedPhase();
+      }
+
+      rails[r].push({
+        room: target.room,
+        desc: target.desc,
+        type: target.type,
+        te: target.te,
+        phase: dupPhase,
+        cable: target.cable
+      });
+
+      closeModuleModal();
+      saveState();
+      renderCabinet();
+    }
+
     function deleteCurrentModule() {
       const r = parseInt(document.getElementById('edit-rail-idx').value);
       const m = parseInt(document.getElementById('edit-mod-idx').value);
@@ -1160,6 +1181,125 @@
       saveState();
       renderCabinet();
     }
+
+    /* CSV / Excel Export */
+    function exportToCSV() {
+      let csv = "\uFEFF"; // UTF-8 BOM za Excel
+      csv += "Nr;Hutschiene;Raum;Verbraucher / Funktion;Schutzorgan;Breite (TE);Phase;Kabeltyp\r\n";
+
+      let count = 1;
+      for (let r = 0; r < rowCount; r++) {
+        (rails[r] || []).forEach(m => {
+          if (m.type === 'Blind') return;
+          csv += `F${count++};Reihe ${r + 1};"${m.room}";"${m.desc}";"${m.type}";${m.te};"${m.phase}";"${m.cable}"\r\n`;
+        });
+      }
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `${project.name.replace(/[^a-zA-Z0-9]/g, '_')}_Stromkreisliste.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /* JSON Backup & Restore */
+    function downloadBackupJSON() {
+      const fullBackup = {
+        app: "APrivina Unterverteiler Planer",
+        backupDate: new Date().toISOString(),
+        userPin: getStoredPin(),
+        activeProject: { id: currentObjId, project, rowCount, rails },
+        savedProjects: getSavedObjectsList()
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullBackup, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `APrivina_Backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importBackupJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.savedProjects) {
+            localStorage.setItem('aprivina_saved_objects', JSON.stringify(parsed.savedProjects));
+          }
+          if (parsed.activeProject) {
+            localStorage.setItem('aprivina_active_obj', JSON.stringify(parsed.activeProject));
+            currentObjId = parsed.activeProject.id;
+            project = parsed.activeProject.project;
+            rowCount = parsed.activeProject.rowCount;
+            rails = parsed.activeProject.rails;
+          }
+          if (parsed.userPin) {
+            localStorage.setItem('aprivina_user_pin', parsed.userPin);
+          }
+          alert("Backup erfolgreich importiert!");
+          closeSettingsModal();
+          updateProjectLabels();
+          updateRailSelector();
+          renderCabinet();
+        } catch (err) {
+          alert("Fehler beim Lesen der Backup-Datei! Bitte gültiges JSON wählen.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* PIN Code ändern */
+    function openSettingsModal() {
+      document.getElementById('inp-new-pin').value = "";
+      document.getElementById('modal-settings').style.display = 'flex';
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('modal-settings').style.display = 'none';
+    }
+
+    function changePinCode() {
+      const newPin = document.getElementById('inp-new-pin').value.trim();
+      if (!/^\d{4}$/.test(newPin)) {
+        alert("Der PIN muss aus genau 4 Ziffern bestehen!");
+        return;
+      }
+      localStorage.setItem('aprivina_user_pin', newPin);
+      alert(`PIN erfolgreich geändert auf: ${newPin}`);
+      closeSettingsModal();
+    }
+
+    /* Print Triggers */
+    function printDoc() {
+      document.body.className = "print-mode-doc";
+      document.getElementById('view-verteiler').style.display = 'block';
+      document.getElementById('view-topologie').style.display = 'block';
+      document.getElementById('view-tabelle').style.display = 'block';
+      window.print();
+    }
+
+    function printStrips() {
+      document.body.className = "print-mode-strips";
+      renderStrips();
+      window.print();
+    }
+
+    window.onafterprint = function() {
+      document.body.className = "print-mode-doc";
+      const activeIdx = Array.from(document.querySelectorAll('.nav-tab')).findIndex(b => b.classList.contains('active'));
+      if (activeIdx === 0) switchView('verteiler');
+      else if (activeIdx === 1) switchView('topologie');
+      else switchView('tabelle');
+    };
 
     function switchView(view) {
       document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
@@ -1178,19 +1318,6 @@
         document.getElementById('view-tabelle').style.display = 'block';
       }
     }
-
-    window.onbeforeprint = function() {
-      document.getElementById('view-verteiler').style.display = 'block';
-      document.getElementById('view-topologie').style.display = 'block';
-      document.getElementById('view-tabelle').style.display = 'block';
-    };
-
-    window.onafterprint = function() {
-      const activeIdx = Array.from(document.querySelectorAll('.nav-tab')).findIndex(b => b.classList.contains('active'));
-      if (activeIdx === 0) switchView('verteiler');
-      else if (activeIdx === 1) switchView('topologie');
-      else switchView('tabelle');
-    };
   </script>
 </body>
 </html>
