@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APrivina Unterverteiler Planer v2.5</title>
+  <title>APrivina Unterverteiler Planer v2.6</title>
   
   <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -318,7 +318,7 @@
     .mod-top { text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
     .mod-type { font-weight: 800; font-size: 0.72rem; color: #0f172a; line-height: 1.1; }
     
-    .mod-center { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 4px 0; }
+    .mod-center { display: flex; direction: column; align-items: center; justify-content: center; margin: 4px 0; }
     .mod-toggle { width: 14px; height: 26px; background: #0f172a; border-radius: 2px; margin-bottom: 3px; }
     .btn-test { background: #2563eb; color: #fff; border-radius: 2px; font-size: 0.58rem; padding: 1px 4px; font-weight: 800; margin-bottom: 2px; }
     
@@ -1352,6 +1352,23 @@
       initCloudSyncListener();
     };
 
+    /* SPREMANJE I PRETVARANJE U FLATTEN FORMAT ZA FIRESTORE */
+    function convertRailsToFirestore(railsArray) {
+      const obj = {};
+      for (let i = 0; i < railsArray.length; i++) {
+        obj['row_' + i] = railsArray[i] || [];
+      }
+      return obj;
+    }
+
+    function convertFirestoreToRails(dataObj, count) {
+      const arr = [];
+      for (let i = 0; i < (count || 4); i++) {
+        arr.push(dataObj['row_' + i] || []);
+      }
+      return arr;
+    }
+
     function initCloudSyncListener() {
       if (!db) {
         updateCloudBadge("⚡ Offline Modus", false);
@@ -1363,7 +1380,12 @@
           let cloudList = [];
           snapshot.forEach(doc => {
             if (doc.id !== "_ping_test_") {
-              cloudList.push(doc.data());
+              const data = doc.data();
+              // Ako dolazi iz Firestorea u objekt obliku, pretvori u nizove
+              if (data.railsData && !Array.isArray(data.rails)) {
+                data.rails = convertFirestoreToRails(data.railsData, data.rowCount || 4);
+              }
+              cloudList.push(data);
             }
           });
           if (cloudList.length > 0) {
@@ -1385,21 +1407,31 @@
     }
 
     function initApp() {
-      const activeData = localStorage.getItem('aprivina_active_obj');
-      if (activeData) {
-        try {
+      try {
+        const activeData = localStorage.getItem('aprivina_active_obj');
+        if (activeData) {
           const parsed = JSON.parse(activeData);
           currentObjId = parsed.id || ("obj_" + Date.now());
           project = parsed.project || project;
           if (!project.author) project.author = "";
           rowCount = parsed.rowCount || 4;
-          rails = parsed.rails || [[], [], [], []];
+          
+          if (Array.isArray(parsed.rails)) {
+            rails = parsed.rails;
+          } else if (parsed.railsData) {
+            rails = convertFirestoreToRails(parsed.railsData, rowCount);
+          } else {
+            rails = [[], [], [], []];
+          }
+
           while (rails.length < 4) rails.push([]);
           syncNextPhaseIndex();
           updateProjectLabels();
           renderCabinet();
           return;
-        } catch (e) {}
+        }
+      } catch (e) {
+        console.warn("initApp parsing:", e);
       }
       openNewObjectModal(false);
     }
@@ -1457,7 +1489,7 @@
     function quickAddFirstFree(room, desc, type, te, cable) {
       let placed = false;
       for (let r = 0; r < rowCount; r++) {
-        const usedTE = rails[r].reduce((acc, m) => acc + (m ? m.te : 0), 0);
+        const usedTE = (rails[r] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
         if (usedTE + te <= 12) {
           let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
           insertModuleRaw(r, room, desc, type, te, phase, cable);
@@ -1583,7 +1615,7 @@
         rails[fromRail].splice(toIdx, 0, temp);
       } else {
         const movingMod = rails[fromRail][fromIdx];
-        const targetRailTE = rails[toRail].reduce((acc, m) => acc + (m ? m.te : 0), 0);
+        const targetRailTE = (rails[toRail] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
 
         if (targetRailTE + movingMod.te > 12) {
           triggerVibration([100, 50, 100]);
@@ -1602,7 +1634,7 @@
 
     function moveModuleToRailEnd(fromRail, fromIdx, toRail) {
       const movingMod = rails[fromRail][fromIdx];
-      const targetRailTE = rails[toRail].reduce((acc, m) => acc + (m ? m.te : 0), 0);
+      const targetRailTE = (rails[toRail] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
 
       if (targetRailTE + movingMod.te > 12) {
         triggerVibration([100, 50, 100]);
@@ -1674,7 +1706,13 @@
     function saveState() {
       try {
         if (!currentObjId) currentObjId = "obj_" + Date.now();
-        const objData = { id: currentObjId, project, rowCount, rails, updatedAt: new Date().toISOString() };
+        const objData = { 
+          id: currentObjId, 
+          project, 
+          rowCount, 
+          rails: JSON.parse(JSON.stringify(rails)),
+          updatedAt: new Date().toISOString() 
+        };
         localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
         updatePhaseBalanceBar();
       } catch (e) {
@@ -1699,7 +1737,7 @@
       }
     }
 
-    /* POUZDANO I ROBUSTNO SPREMANJE BEZ BLOKADA */
+    /* POUZDANO I ROBUSTNO SPREMANJE (FIRESTORE COMPLIANT) */
     function saveCurrentObject() {
       try {
         if (!currentObjId) currentObjId = "obj_" + Date.now();
@@ -1711,6 +1749,8 @@
 
         let list = getSavedObjectsList();
         const existingIdx = list.findIndex(o => o.id === currentObjId);
+        
+        // Za lokalnu memoriju koristimo niz
         const objRecord = {
           id: currentObjId,
           project: { ...project },
@@ -1727,13 +1767,22 @@
 
         localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
 
+        // Za Firestore koristimo FLATTEN objekt jer Firestore brani Nested Arrays
         if (db) {
-          db.collection("projekte").doc(currentObjId).set(objRecord)
+          const firestoreDoc = {
+            id: currentObjId,
+            project: { ...project },
+            rowCount,
+            railsData: convertRailsToFirestore(rails),
+            savedAt: new Date().toLocaleString('de-DE')
+          };
+
+          db.collection("projekte").doc(currentObjId).set(firestoreDoc)
             .then(() => {
               updateCloudBadge("☁️ Cloud Sync Aktiv", true);
             })
             .catch(err => {
-              console.warn("Firestore Sync Hinweis:", err);
+              console.warn("Firestore Sync Fehler:", err);
               updateCloudBadge("⚡ Lokal gespeichert", false);
             });
         }
@@ -1749,7 +1798,12 @@
     function getSavedObjectsList() {
       const str = localStorage.getItem('aprivina_saved_objects');
       if (!str) return [];
-      try { return JSON.parse(str); } catch (e) { return []; }
+      try { 
+        const res = JSON.parse(str);
+        return Array.isArray(res) ? res : [];
+      } catch (e) { 
+        return []; 
+      }
     }
 
     function openNewObjectModal(canCancel = true) {
@@ -1798,13 +1852,14 @@
         container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding:15px; text-align:center;">Noch keine gespeicherten Objekte vorhanden. Klicken Sie oben auf "Speichern".</div>`;
       } else {
         list.forEach(obj => {
+          if (!obj || !obj.project) return;
           const item = document.createElement('div');
           item.className = 'obj-list-item';
           const isCurrent = (obj.id === currentObjId);
           item.innerHTML = `
             <div class="obj-list-info">
-              <strong>${obj.project.name} ${isCurrent ? '<span style="color:#10b981; font-size:0.7rem;">(Aktiv)</span>' : ''}</strong>
-              <span>📍 ${obj.project.address} • Prüfer: ${obj.project.author || '-'} • ${obj.savedAt}</span>
+              <strong>${obj.project.name || 'Unbenannt'} ${isCurrent ? '<span style="color:#10b981; font-size:0.7rem;">(Aktiv)</span>' : ''}</strong>
+              <span>📍 ${obj.project.address || '-'} • Prüfer: ${obj.project.author || '-'} • ${obj.savedAt || ''}</span>
             </div>
             <div class="obj-list-actions">
               <button class="primary" style="padding:6px 10px;" onclick="loadSavedObject('${obj.id}')">Laden</button>
@@ -1824,14 +1879,22 @@
 
     function loadSavedObject(id) {
       const list = getSavedObjectsList();
-      const target = list.find(o => o.id === id);
+      const target = list.find(o => o && o.id === id);
       if (!target) return;
 
       currentObjId = target.id;
-      project = { ...target.project };
+      project = { ...(target.project || {}) };
       if (!project.author) project.author = "";
       rowCount = target.rowCount || 4;
-      rails = JSON.parse(JSON.stringify(target.rails));
+      
+      if (Array.isArray(target.rails)) {
+        rails = JSON.parse(JSON.stringify(target.rails));
+      } else if (target.railsData) {
+        rails = convertFirestoreToRails(target.railsData, rowCount);
+      } else {
+        rails = [[], [], [], []];
+      }
+
       while (rails.length < 4) rails.push([]);
       syncNextPhaseIndex();
 
@@ -1845,7 +1908,7 @@
     function deleteSavedObject(id) {
       if (!confirm("Möchten Sie dieses Objekt wirklich unwiderruflich löschen?")) return;
       let list = getSavedObjectsList();
-      list = list.filter(o => o.id !== id);
+      list = list.filter(o => o && o.id !== id);
       localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
 
       if (db) {
@@ -1857,16 +1920,16 @@
     }
 
     function updateProjectLabels() {
-      document.getElementById('lbl-obj-name').innerText = project.name;
-      document.getElementById('lbl-obj-addr').innerText = project.address;
+      document.getElementById('lbl-obj-name').innerText = project.name || "-";
+      document.getElementById('lbl-obj-addr').innerText = project.address || "-";
       document.getElementById('lbl-obj-author').innerText = project.author || "-";
-      document.getElementById('print-obj-name').innerText = project.name;
-      document.getElementById('print-obj-addr').innerText = project.address;
+      document.getElementById('print-obj-name').innerText = project.name || "-";
+      document.getElementById('print-obj-addr').innerText = project.address || "-";
       document.getElementById('print-obj-author').innerText = project.author || "-";
-      document.getElementById('print-obj-date').innerText = project.date;
-      document.getElementById('strip-obj-name').innerText = project.name + " (" + project.address + ")";
+      document.getElementById('print-obj-date').innerText = project.date || "-";
+      document.getElementById('strip-obj-name').innerText = (project.name || "-") + " (" + (project.address || "-") + ")";
       document.getElementById('strip-obj-author').innerText = project.author || "-";
-      document.getElementById('cab-title').innerText = "Unterverteiler - " + project.name;
+      document.getElementById('cab-title').innerText = "Unterverteiler - " + (project.name || "");
       updatePhaseBalanceBar();
     }
 
@@ -1888,7 +1951,7 @@
     function insertModuleRaw(railIdx, room, desc, type, te, phase, cable) {
       if (!rails[railIdx]) rails[railIdx] = [];
 
-      const currentTE = rails[railIdx].reduce((acc, m) => acc + (m ? m.te : 0), 0);
+      const currentTE = (rails[railIdx] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
       if (currentTE + te > 12) {
         triggerVibration([100, 50, 100]);
         alert("Nicht genügend Platz! Eine Reihe hat maximal 12 TE. Verfügbar: " + (12 - currentTE) + " TE.");
@@ -2271,7 +2334,7 @@
     function downloadBackupJSON() {
       const fullBackup = {
         app: "APrivina Unterverteiler Planer",
-        version: "2.5",
+        version: "2.6",
         backupDate: new Date().toISOString(),
         userPin: getStoredPin(),
         activeProject: { id: currentObjId, project, rowCount, rails },
