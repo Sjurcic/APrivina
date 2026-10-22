@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APrivina Unterverteiler Planer v2.4</title>
+  <title>APrivina Unterverteiler Planer v2.5</title>
   
   <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -947,7 +947,7 @@
             <strong>Hauptschalter 3P</strong>
             <span>3 TE • 63A</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')" onclick="quickAddFirstFree('Schutz', 'FI 40A/30mA', 'FI 4P', 4, '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')" onclick="quickAddFirstFree('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, '-')">
             <strong>FI 4-polig</strong>
             <span>4 TE • 30mA</span>
           </div>
@@ -1164,7 +1164,7 @@
 
   <script>
     /* =========================================================================
-       FIREBASE CLOUD INITIALISIERUNG
+       FIREBASE INITIALISIERUNG
        ========================================================================= */
     const firebaseConfig = {
       apiKey: "AIzaSyCshNR8QEoW3tdc_badc9UHZse5Oh7Z_kk",
@@ -1196,7 +1196,6 @@
       }
     }
 
-    /* RUČNI TEST VEZE S OBLAKOM */
     function testCloudConnectionManual() {
       if (!db) {
         alert("❌ Firebase baza nije dostupna! Provjerite internetsku vezu na uređaju.");
@@ -1455,11 +1454,10 @@
       triggerVibration([40, 60, 40]);
     }
 
-    /* AUTOMATSKO DODAVANJE U PRVI SLOBODNI RED S DOVOLJNO MJESTA */
     function quickAddFirstFree(room, desc, type, te, cable) {
       let placed = false;
       for (let r = 0; r < rowCount; r++) {
-        const usedTE = rails[r].reduce((acc, m) => acc + m.te, 0);
+        const usedTE = rails[r].reduce((acc, m) => acc + (m ? m.te : 0), 0);
         if (usedTE + te <= 12) {
           let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
           insertModuleRaw(r, room, desc, type, te, phase, cable);
@@ -1585,7 +1583,7 @@
         rails[fromRail].splice(toIdx, 0, temp);
       } else {
         const movingMod = rails[fromRail][fromIdx];
-        const targetRailTE = rails[toRail].reduce((acc, m) => acc + m.te, 0);
+        const targetRailTE = rails[toRail].reduce((acc, m) => acc + (m ? m.te : 0), 0);
 
         if (targetRailTE + movingMod.te > 12) {
           triggerVibration([100, 50, 100]);
@@ -1604,7 +1602,7 @@
 
     function moveModuleToRailEnd(fromRail, fromIdx, toRail) {
       const movingMod = rails[fromRail][fromIdx];
-      const targetRailTE = rails[toRail].reduce((acc, m) => acc + m.te, 0);
+      const targetRailTE = rails[toRail].reduce((acc, m) => acc + (m ? m.te : 0), 0);
 
       if (targetRailTE + movingMod.te > 12) {
         triggerVibration([100, 50, 100]);
@@ -1729,7 +1727,6 @@
 
         localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
 
-        // Pokušaj slanja u Firestore ako je baza aktivna
         if (db) {
           db.collection("projekte").doc(currentObjId).set(objRecord)
             .then(() => {
@@ -1891,7 +1888,7 @@
     function insertModuleRaw(railIdx, room, desc, type, te, phase, cable) {
       if (!rails[railIdx]) rails[railIdx] = [];
 
-      const currentTE = rails[railIdx].reduce((acc, m) => acc + m.te, 0);
+      const currentTE = rails[railIdx].reduce((acc, m) => acc + (m ? m.te : 0), 0);
       if (currentTE + te > 12) {
         triggerVibration([100, 50, 100]);
         alert("Nicht genügend Platz! Eine Reihe hat maximal 12 TE. Verfügbar: " + (12 - currentTE) + " TE.");
@@ -1984,7 +1981,7 @@
 
         const rowDiv = document.createElement('div');
         rowDiv.className = 'din-rail-row';
-        const usedTE = rails[r].reduce((acc, m) => acc + m.te, 0);
+        const usedTE = rails[r].reduce((acc, m) => acc + (m ? m.te : 0), 0);
         const freeTE = 12 - usedTE;
 
         rowDiv.innerHTML = `
@@ -2001,6 +1998,7 @@
 
         const grid = rowDiv.querySelector(`#rail-grid-${r}`);
         rails[r].forEach((mod, modIdx) => {
+          if (!mod) return;
           const modEl = document.createElement('div');
           modEl.className = `module-item mod-${mod.te}`;
           modEl.draggable = true;
@@ -2020,20 +2018,20 @@
           modEl.onclick = () => openEditModule(r, modIdx);
 
           let centerContent = `<div class="mod-toggle"></div>`;
-          if (mod.type.includes('FI')) {
+          if (mod.type && mod.type.includes('FI')) {
             centerContent = `<div class="btn-test">T</div><div class="mod-toggle"></div>`;
           }
 
           modEl.innerHTML = `
             <div class="mod-top">
-              <span class="mod-type">${mod.type}</span>
+              <span class="mod-type">${mod.type || ''}</span>
             </div>
             <div class="mod-center">
               ${centerContent}
             </div>
             <div class="mod-bottom">
-              <div class="mod-room">${mod.room}</div>
-              <div class="mod-desc">${mod.desc}</div>
+              <div class="mod-room">${mod.room || ''}</div>
+              <div class="mod-desc">${mod.desc || ''}</div>
             </div>
           `;
           grid.appendChild(modEl);
@@ -2065,12 +2063,12 @@
 
       for (let r = 0; r < rowCount; r++) {
         const railItems = rails[r] || [];
-        const validItems = railItems.filter(m => m.type !== 'Blind');
+        const validItems = railItems.filter(m => m && m.type !== 'Blind');
 
         if (validItems.length === 0) continue;
         totalBreakers += validItems.length;
 
-        const fiItem = validItems.find(m => m.type.includes('FI'));
+        const fiItem = validItems.find(m => m.type && m.type.includes('FI'));
         let groupTitle = `Hutschiene ${r + 1}`;
         if (fiItem) {
           groupTitle += ` • FI (${fiItem.desc || 'RCD'})`;
@@ -2113,7 +2111,7 @@
       for (let r = 0; r < rowCount; r++) {
         if (!rails[r]) continue;
         rails[r].forEach(m => {
-          if (m.type === 'Blind') return;
+          if (!m || m.type === 'Blind') return;
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>F${count++}</td>
@@ -2141,6 +2139,7 @@
 
         let curTE = 0;
         railItems.forEach(m => {
+          if (!m) return;
           const cell = document.createElement('div');
           const isSingle = (m.te === 1);
           cell.className = `strip-cell ${isSingle ? 'strip-cell-te-1' : 'strip-cell-te-multi'}`;
@@ -2211,7 +2210,7 @@
       const m = parseInt(document.getElementById('edit-mod-idx').value);
       const target = rails[r][m];
 
-      const currentTE = rails[r].reduce((acc, it) => acc + it.te, 0);
+      const currentTE = rails[r].reduce((acc, it) => acc + (it ? it.te : 0), 0);
       if (currentTE + target.te > 12) {
         triggerVibration([100, 50, 100]);
         alert("Nicht genügend freier Platz in dieser Reihe für ein Duplikat (max. 12 TE)!");
@@ -2253,7 +2252,7 @@
       let count = 1;
       for (let r = 0; r < rowCount; r++) {
         (rails[r] || []).forEach(m => {
-          if (m.type === 'Blind') return;
+          if (!m || m.type === 'Blind') return;
           csv += `F${count++};Reihe ${r + 1};"${m.room}";"${m.desc}";"${m.type}";${m.te};"${m.phase}";"${m.cable}";"${project.author || ''}"\r\n`;
         });
       }
@@ -2272,7 +2271,7 @@
     function downloadBackupJSON() {
       const fullBackup = {
         app: "APrivina Unterverteiler Planer",
-        version: "2.4",
+        version: "2.5",
         backupDate: new Date().toISOString(),
         userPin: getStoredPin(),
         activeProject: { id: currentObjId, project, rowCount, rails },
