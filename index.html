@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APrivina Unterverteiler Planer v2.3</title>
+  <title>APrivina Unterverteiler Planer v2.4</title>
   
   <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -943,19 +943,19 @@
       <div class="sidebar-section">
         <div class="section-title">Schutzorgane & Einspeisung (Drag & Drop)</div>
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')" onclick="quickAddFirstFree('Einspeisung', 'Hauptschalter', '3P 63A', 3, '-')">
             <strong>Hauptschalter 3P</strong>
             <span>3 TE • 63A</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')" onclick="quickAddFirstFree('Schutz', 'FI 40A/30mA', 'FI 4P', 4, '-')">
             <strong>FI 4-polig</strong>
             <span>4 TE • 30mA</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'auto', 'NYM-J 3x2.5')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'auto', 'NYM-J 3x2.5')" onclick="quickAddFirstFree('Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
             <strong>FI/LS B16</strong>
             <span>2 TE • 30mA</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')" onclick="quickAddFirstFree('Reserve', 'Blindabdeckung', 'Blind', 1, '-')">
             <strong>Blindabdeckung</strong>
             <span>1 TE</span>
           </div>
@@ -1179,11 +1179,13 @@
 
     try {
       if (typeof firebase !== 'undefined') {
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
         db = firebase.firestore();
       }
     } catch (e) {
-      console.warn("Firebase Init Fehler:", e);
+      console.warn("Firebase Init Hinweis:", e);
     }
 
     function updateCloudBadge(statusText, isOnline) {
@@ -1197,7 +1199,7 @@
     /* RUČNI TEST VEZE S OBLAKOM */
     function testCloudConnectionManual() {
       if (!db) {
-        alert("❌ Firebase SDK nije učitan! Provjerite internetsku vezu na uređaju.");
+        alert("❌ Firebase baza nije dostupna! Provjerite internetsku vezu na uređaju.");
         return;
       }
       updateCloudBadge("⏳ Testiere...", false);
@@ -1207,12 +1209,12 @@
         .then(() => {
           updateCloudBadge("☁️ Cloud Sync Aktiv", true);
           triggerVibration([30, 50, 30]);
-          alert("✅ CLOUD SYNC RADI SAVRŠENO!\n\nTablet se uspješno spojio na Firebase bazu 'aprivina-planer' i ima punu dozvolu za spremanje i čitanje.");
+          alert("✅ CLOUD SYNC RADI SAVRŠENO!\n\nTablet se uspješno spojio na Firebase bazu 'aprivina-planer'.");
         })
         .catch(err => {
-          updateCloudBadge("⚡ Fehler (" + err.code + ")", false);
+          updateCloudBadge("⚡ Fehler (" + (err.code || 'err') + ")", false);
           triggerVibration([100, 50, 100]);
-          alert("❌ GREŠKA KOD SPAJANJA NA CLOUD:\n\nKod greške: " + err.code + "\nPoruka: " + err.message + "\n\nAko piše 'permission-denied', provjerite pravila u Firestore bazi.");
+          alert("❌ GREŠKA KOD SPAJANJA NA CLOUD:\n\nKod greške: " + err.code + "\nPoruka: " + err.message);
         });
     }
 
@@ -1356,21 +1358,25 @@
         updateCloudBadge("⚡ Offline Modus", false);
         return;
       }
-      db.collection("projekte").onSnapshot(snapshot => {
-        updateCloudBadge("☁️ Cloud Sync Aktiv", true);
-        let cloudList = [];
-        snapshot.forEach(doc => {
-          if (doc.id !== "_ping_test_") {
-            cloudList.push(doc.data());
+      try {
+        db.collection("projekte").onSnapshot(snapshot => {
+          updateCloudBadge("☁️ Cloud Sync Aktiv", true);
+          let cloudList = [];
+          snapshot.forEach(doc => {
+            if (doc.id !== "_ping_test_") {
+              cloudList.push(doc.data());
+            }
+          });
+          if (cloudList.length > 0) {
+            localStorage.setItem('aprivina_saved_objects', JSON.stringify(cloudList));
           }
+        }, err => {
+          console.warn("Cloud Snapshot Hinweis:", err);
+          updateCloudBadge("⚡ Offline Modus", false);
         });
-        if (cloudList.length > 0) {
-          localStorage.setItem('aprivina_saved_objects', JSON.stringify(cloudList));
-        }
-      }, err => {
-        console.warn("Cloud Snapshot Fehler:", err);
-        updateCloudBadge("⚡ Cloud Fehler (" + err.code + ")", false);
-      });
+      } catch (e) {
+        updateCloudBadge("⚡ Offline Modus", false);
+      }
     }
 
     function toggleMobileSidebar() {
@@ -1661,70 +1667,85 @@
       let count1P = 0;
       for (let r = 0; r < rowCount; r++) {
         (rails[r] || []).forEach(m => {
-          if (m.type !== 'Blind' && m.phase !== 'L1-L3' && m.phase !== '-') count1P++;
+          if (m && m.type !== 'Blind' && m.phase !== 'L1-L3' && m.phase !== '-') count1P++;
         });
       }
       nextPhaseIdx = count1P;
     }
 
     function saveState() {
-      if (!currentObjId) currentObjId = "obj_" + Date.now();
-      const objData = { id: currentObjId, project, rowCount, rails, updatedAt: new Date().toISOString() };
-      localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
-      updatePhaseBalanceBar();
+      try {
+        if (!currentObjId) currentObjId = "obj_" + Date.now();
+        const objData = { id: currentObjId, project, rowCount, rails, updatedAt: new Date().toISOString() };
+        localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
+        updatePhaseBalanceBar();
+      } catch (e) {
+        console.error("saveState Fehler:", e);
+      }
     }
 
     function updatePhaseBalanceBar() {
       let l1 = 0, l2 = 0, l3 = 0;
       for (let r = 0; r < rowCount; r++) {
         (rails[r] || []).forEach(m => {
-          if (m.type === 'Blind') return;
+          if (!m || m.type === 'Blind') return;
           if (m.phase === 'L1') l1++;
           else if (m.phase === 'L2') l2++;
           else if (m.phase === 'L3') l3++;
           else if (m.phase === 'L1-L3') { l1++; l2++; l3++; }
         });
       }
-      document.getElementById('phase-balance-bar').innerHTML = `Phasen: <span style="color:#38bdf8; font-weight:bold;">L1: ${l1}</span> | <span style="color:#10b981; font-weight:bold;">L2: ${l2}</span> | <span style="color:#f59e0b; font-weight:bold;">L3: ${l3}</span>`;
+      const el = document.getElementById('phase-balance-bar');
+      if (el) {
+        el.innerHTML = `Phasen: <span style="color:#38bdf8; font-weight:bold;">L1: ${l1}</span> | <span style="color:#10b981; font-weight:bold;">L2: ${l2}</span> | <span style="color:#f59e0b; font-weight:bold;">L3: ${l3}</span>`;
+      }
     }
 
-    /* POUZDANO SPREMANJE (LOKALNO + CLOUD) S OBAVIJEŠĆU */
+    /* POUZDANO I ROBUSTNO SPREMANJE BEZ BLOKADA */
     function saveCurrentObject() {
-      saveState();
-      let list = getSavedObjectsList();
-      const existingIdx = list.findIndex(o => o.id === currentObjId);
-      const objRecord = {
-        id: currentObjId,
-        project: { ...project },
-        rowCount,
-        rails: JSON.parse(JSON.stringify(rails)),
-        savedAt: new Date().toLocaleString('de-DE')
-      };
+      try {
+        if (!currentObjId) currentObjId = "obj_" + Date.now();
+        if (!project.name) project.name = "Unbenanntes Objekt";
+        if (!project.address) project.address = "-";
+        if (!project.author) project.author = "Unbekannt";
 
-      if (existingIdx >= 0) {
-        list[existingIdx] = objRecord;
-      } else {
-        list.push(objRecord);
-      }
+        saveState();
 
-      localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
+        let list = getSavedObjectsList();
+        const existingIdx = list.findIndex(o => o.id === currentObjId);
+        const objRecord = {
+          id: currentObjId,
+          project: { ...project },
+          rowCount,
+          rails: JSON.parse(JSON.stringify(rails)),
+          savedAt: new Date().toLocaleString('de-DE')
+        };
 
-      if (db) {
-        db.collection("projekte").doc(currentObjId).set(objRecord)
-          .then(() => {
-            updateCloudBadge("☁️ Cloud Sync Aktiv", true);
-            triggerVibration([30, 50, 30]);
-            alert("✅ ERFOLGREICH GESPEICHERT!\n\nObjekt: " + project.name + "\nStandort: " + project.address + "\n\nGespeichert auf diesem Tablet und automatisch in der CLOUD synchronisiert.");
-          })
-          .catch(err => {
-            console.error("Firestore Save Fehler:", err);
-            updateCloudBadge("⚡ Cloud Fehler", false);
-            triggerVibration([100, 50, 100]);
-            alert("⚠️ LOKAL GESPEICHERT!\n\nAuf diesem Tablet gespeichert, aber CLOUD-Synchronisierung fehlgeschlagen:\n" + err.message);
-          });
-      } else {
+        if (existingIdx >= 0) {
+          list[existingIdx] = objRecord;
+        } else {
+          list.push(objRecord);
+        }
+
+        localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
+
+        // Pokušaj slanja u Firestore ako je baza aktivna
+        if (db) {
+          db.collection("projekte").doc(currentObjId).set(objRecord)
+            .then(() => {
+              updateCloudBadge("☁️ Cloud Sync Aktiv", true);
+            })
+            .catch(err => {
+              console.warn("Firestore Sync Hinweis:", err);
+              updateCloudBadge("⚡ Lokal gespeichert", false);
+            });
+        }
+
         triggerVibration([30, 50, 30]);
-        alert("✅ LOKAL GESPEICHERT!\n\nObjekt: " + project.name + " wurde erfolgreich im Speicher dieses Geräts gesichert.");
+        alert("✅ ERFOLGREICH GESPEICHERT!\n\nObjekt: " + project.name + "\nStandort: " + project.address + "\n\nDie Unterverteilung wurde gesichert.");
+      } catch (err) {
+        console.error("Kritischer Speicherfehler:", err);
+        alert("Fehler beim Speichern: " + err.message);
       }
     }
 
@@ -2251,7 +2272,7 @@
     function downloadBackupJSON() {
       const fullBackup = {
         app: "APrivina Unterverteiler Planer",
-        version: "2.3",
+        version: "2.4",
         backupDate: new Date().toISOString(),
         userPin: getStoredPin(),
         activeProject: { id: currentObjId, project, rowCount, rails },
