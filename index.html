@@ -3,12 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APrivina Unterverteiler Planer v2.6</title>
-  
-  <!-- Firebase SDK (Compat Version) -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
+  <title>APrivina Unterverteiler Planer</title>
   <style>
     :root {
       --bg: #1e293b;
@@ -20,9 +15,8 @@
       --text: #f8fafc;
       --text-muted: #94a3b8;
     }
-
     body.sun-mode {
-      --bg: #f1f5f9;
+      --bg: #f8fafc;
       --panel: #ffffff;
       --card: #ffffff;
       --border: #000000;
@@ -31,100 +25,37 @@
       --text: #000000;
       --text-muted: #334155;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* PIN Lock Screen */
+    /* PIN Lock */
     #pin-overlay {
-      position: fixed;
-      inset: 0;
-      background: #0f172a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      padding: 16px;
+      position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 16px;
     }
     .pin-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 26px;
-      width: 100%;
-      max-width: 340px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 26px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     }
     .pin-title { font-size: 1.25rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
     .pin-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; }
     .pin-input {
-      width: 100%;
-      font-size: 1.6rem;
-      letter-spacing: 12px;
-      text-align: center;
-      padding: 10px;
-      border-radius: 8px;
-      background: #0f172a;
-      border: 2px solid #334155;
-      color: #fff;
-      margin-bottom: 15px;
-      outline: none;
+      width: 100%; font-size: 1.6rem; letter-spacing: 12px; text-align: center; padding: 10px; border-radius: 8px; background: #0f172a; border: 2px solid #334155; color: #fff; margin-bottom: 15px; outline: none;
     }
     .pin-input:focus { border-color: #38bdf8; }
     .pin-error { color: #ef4444; font-size: 0.8rem; min-height: 20px; margin-bottom: 10px; font-weight: 600; }
 
     /* Header */
     header {
-      background: var(--panel);
-      border-bottom: 1.5px solid var(--border);
-      padding: 10px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      background: var(--panel); border-bottom: 1.5px solid var(--border); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
     }
     .brand { font-size: 1.15rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
     .project-meta { font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .project-meta strong { color: var(--text); }
     .phase-badge { background: #0f172a; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.75rem; white-space: nowrap; }
     body.sun-mode .phase-badge { background: #e2e8f0; border-color: #000; }
-    
-    .cloud-badge {
-      background: #064e3b;
-      color: #34d399;
-      border: 1px solid #059669;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .cloud-badge.offline {
-      background: #7f1d1d;
-      color: #fca5a5;
-      border-color: #dc2626;
-    }
-
     .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
 
     button {
-      background: #334155;
-      color: var(--text);
-      border: 1px solid #475569;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      font-weight: 500;
-      touch-action: manipulation;
+      background: #334155; color: var(--text); border: 1px solid #475569; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-weight: 500; touch-action: manipulation;
     }
     body.sun-mode button { border-color: #000; }
     button:hover { background: #475569; }
@@ -137,268 +68,87 @@
     button.danger { background: #991b1b; border-color: #b91c1c; }
     button.danger:hover { background: #b91c1c; }
 
-    /* Layout Desktop */
+    /* Layout */
     .app-container {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      flex: 1;
-      min-height: calc(100vh - 65px);
-      padding-bottom: 50px;
+      display: grid; grid-template-columns: 340px 1fr; flex: 1; min-height: calc(100vh - 65px); padding-bottom: 50px;
     }
-
     aside {
-      background: var(--panel);
-      border-right: 1.5px solid var(--border);
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      background: var(--panel); border-right: 1.5px solid var(--border); padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
     }
     .sidebar-section { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
     .sidebar-section:last-child { border-bottom: none; }
     .section-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; letter-spacing: 0.05em; }
 
-    .category-pills {
-      display: flex;
-      gap: 4px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-      -webkit-overflow-scrolling: touch;
-    }
+    .category-pills { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; -webkit-overflow-scrolling: touch; }
     .cat-pill {
-      background: #1e293b;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 5px 9px;
-      border-radius: 12px;
-      font-size: 0.72rem;
-      white-space: nowrap;
-      cursor: pointer;
+      background: #1e293b; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 9px; border-radius: 12px; font-size: 0.72rem; white-space: nowrap; cursor: pointer;
     }
     body.sun-mode .cat-pill { background: #e2e8f0; color: #000; }
-    .cat-pill.active {
-      background: #0284c7;
-      color: #fff;
-      border-color: #38bdf8;
-      font-weight: 600;
-    }
+    .cat-pill.active { background: #0284c7; color: #fff; border-color: #38bdf8; font-weight: 600; }
 
-    .component-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
-      max-height: 280px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
+    .component-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
     .btn-comp {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 8px;
-      background: #1e293b;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.75rem;
-      text-align: left;
-      cursor: grab;
-      touch-action: manipulation;
-      user-select: none;
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      display: flex; flex-direction: column; align-items: flex-start; padding: 8px; background: #1e293b; border: 1px solid var(--border); border-radius: 6px; font-size: 0.75rem; text-align: left; cursor: grab; touch-action: manipulation; user-select: none; transition: transform 0.15s ease;
     }
     body.sun-mode .btn-comp { background: #f8fafc; border-color: #94a3b8; }
     body.sun-mode .btn-comp strong { color: #000 !important; }
     .btn-comp:active { cursor: grabbing; transform: scale(0.97); }
-    .btn-comp:hover { border-color: #38bdf8; background: #334155; }
     .btn-comp strong { font-size: 0.78rem; color: #fff; margin-bottom: 2px; line-height: 1.1; }
     .btn-comp span { color: var(--text-muted); font-size: 0.65rem; }
 
-    /* Main Area */
-    main {
-      padding: 16px 20px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
+    main { padding: 16px 20px; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 16px; }
     .nav-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .nav-tab { background: transparent; border: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 6px 12px; white-space: nowrap; }
     .nav-tab.active { border-color: #38bdf8; color: #38bdf8; font-weight: 700; }
 
-    /* Cabinet View */
-    #view-verteiler {
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 8px;
-    }
+    /* Verteiler View */
+    #view-verteiler { width: 100%; overflow-x: auto; padding-bottom: 8px; }
     .cabinet-wrapper {
-      background: #e2e8f0;
-      border: 6px solid #94a3b8;
-      border-radius: 8px;
-      padding: 14px;
-      color: #0f172a;
-      min-width: 660px;
-      max-width: 980px;
-      margin: 0 auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      background: #e2e8f0; border: 6px solid #94a3b8; border-radius: 8px; padding: 14px; color: #0f172a; min-width: 660px; max-width: 980px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
     body.sun-mode .cabinet-wrapper { border-color: #000; background: #f8fafc; box-shadow: none; }
     .cabinet-header {
-      background: #cbd5e1;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      border: 1px solid #94a3b8;
+      background: #cbd5e1; padding: 8px 12px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; margin-bottom: 16px; display: flex; justify-content: space-between; border: 1px solid #94a3b8;
     }
-
-    .din-rail-row {
-      margin-bottom: 16px;
-      background: #cbd5e1;
-      border: 1px solid #94a3b8;
-      border-radius: 6px;
-      padding: 8px;
-    }
+    .din-rail-row { margin-bottom: 16px; background: #cbd5e1; border: 1px solid #94a3b8; border-radius: 6px; padding: 8px; }
     .rail-info { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
-
     .din-rail {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 4px;
-      background: #64748b;
-      padding: 5px;
-      border-radius: 4px;
-      min-height: 160px;
-      position: relative;
-      transition: background-color 0.2s ease, outline 0.2s ease;
+      display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; background: #64748b; padding: 5px; border-radius: 4px; min-height: 160px; position: relative;
     }
-    .din-rail.drag-over {
-      background-color: #334155;
-      outline: 2px dashed #38bdf8;
-    }
+    .din-rail.drag-over { background-color: #334155; outline: 2px dashed #38bdf8; }
 
-    /* Breaker Elements */
     .module-item {
-      background: #ffffff;
-      border: 1.5px solid #0f172a;
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 4px 2px 3px 2px;
-      font-size: 0.65rem;
-      cursor: grab;
-      position: relative;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
-      user-select: none;
-      touch-action: manipulation;
-      min-height: 148px;
-      transition: transform 0.1s ease, border-color 0.1s ease;
+      background: #ffffff; border: 1.5px solid #0f172a; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 2px 3px 2px; font-size: 0.65rem; cursor: grab; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.25); user-select: none; touch-action: manipulation; min-height: 148px;
     }
     .module-item:active { cursor: grabbing; }
-    .module-item.drag-target-over {
-      outline: 3px solid #f59e0b !important;
-      transform: scale(0.96);
-    }
-    .module-item:hover { outline: 2px solid #2563eb; }
     .mod-1 { grid-column: span 1; }
     .mod-2 { grid-column: span 2; }
     .mod-3 { grid-column: span 3; }
     .mod-4 { grid-column: span 4; }
-
     .mod-top { text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
     .mod-type { font-weight: 800; font-size: 0.72rem; color: #0f172a; line-height: 1.1; }
-    
-    .mod-center { display: flex; direction: column; align-items: center; justify-content: center; margin: 4px 0; }
+    .mod-center { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 4px 0; }
     .mod-toggle { width: 14px; height: 26px; background: #0f172a; border-radius: 2px; margin-bottom: 3px; }
     .btn-test { background: #2563eb; color: #fff; border-radius: 2px; font-size: 0.58rem; padding: 1px 4px; font-weight: 800; margin-bottom: 2px; }
     
     .mod-bottom {
-      background: #f8fafc;
-      padding: 3px 2px;
-      text-align: center;
-      border-top: 1.5px solid #cbd5e1;
-      border-radius: 0 0 3px 3px;
-      min-height: 44px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 1px;
+      background: #f8fafc; padding: 3px 2px; text-align: center; border-top: 1.5px solid #cbd5e1; border-radius: 0 0 3px 3px; min-height: 44px; display: flex; flex-direction: column; justify-content: center; gap: 1px;
     }
-    .mod-room {
-      font-weight: 800;
-      color: #0284c7;
-      font-size: 0.63rem;
-      line-height: 1.15;
-      white-space: normal;
-      word-break: break-word;
-      overflow-wrap: break-word;
-    }
-    .mod-desc {
-      font-weight: 600;
-      font-size: 0.60rem;
-      color: #1e293b;
-      line-height: 1.15;
-      white-space: normal;
-      word-break: break-word;
-      overflow-wrap: break-word;
-    }
+    .mod-room { font-weight: 800; color: #0284c7; font-size: 0.63rem; line-height: 1.15; word-break: break-word; }
+    .mod-desc { font-weight: 600; font-size: 0.60rem; color: #1e293b; line-height: 1.15; word-break: break-word; }
 
-    /* Touch Slot Button for Free TE */
     .touch-slot-empty {
-      border: 2px dashed #94a3b8;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.15);
-      color: #f8fafc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-      touch-action: manipulation;
-      transition: all 0.2s ease;
-      padding: 6px 4px;
-      text-align: center;
-      min-height: 148px;
+      border: 2px dashed #94a3b8; border-radius: 4px; background: rgba(255, 255, 255, 0.15); color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; user-select: none; touch-action: manipulation; padding: 6px 4px; text-align: center; min-height: 148px;
     }
     body.sun-mode .touch-slot-empty { color: #000; border-color: #000; }
-    .touch-slot-empty:hover, .touch-slot-empty:active {
-      background: rgba(56, 189, 248, 0.3);
-      border-color: #38bdf8;
-      color: #38bdf8;
-    }
+    .touch-slot-empty:hover { background: rgba(56, 189, 248, 0.3); border-color: #38bdf8; color: #38bdf8; }
     .touch-slot-icon { font-size: 1.6rem; font-weight: bold; line-height: 1; margin-bottom: 4px; }
     .touch-slot-label { font-size: 0.72rem; font-weight: 700; }
 
-    /* Topology */
-    .topology-container {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+    /* Topologie */
+    .topology-container { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 20px; overflow-x: auto; }
     body.sun-mode .topology-container { background: #ffffff; border-color: #000; }
-    .topo-node {
-      background: #1e293b;
-      border: 2px solid #38bdf8;
-      border-radius: 6px;
-      padding: 10px 14px;
-      display: inline-block;
-      text-align: center;
-      min-width: 180px;
-    }
+    .topo-node { background: #1e293b; border: 2px solid #38bdf8; border-radius: 6px; padding: 10px 14px; display: inline-block; text-align: center; min-width: 180px; }
     body.sun-mode .topo-node { background: #f8fafc; border-color: #0284c7; }
     .topo-node-title { font-weight: 700; font-size: 0.85rem; color: #38bdf8; }
     body.sun-mode .topo-node-title { color: #0284c7; }
@@ -408,12 +158,7 @@
     .topo-busbar::after { content: 'L1 / L2 / L3 / N / PE - Hauptverteilung'; position: absolute; top: -18px; left: 8px; font-size: 0.7rem; color: #eab308; font-weight: 700; }
     body.sun-mode .topo-busbar::after { color: #a16207; }
 
-    .topo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
-      align-items: start;
-    }
+    .topo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; align-items: start; }
     .topo-rail-card { background: #1e293b; border: 1px solid var(--border); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
     body.sun-mode .topo-rail-card { background: #f8fafc; border-color: #94a3b8; }
     .topo-rail-card-title { font-size: 0.82rem; font-weight: 700; color: #38bdf8; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; display: flex; justify-content: space-between; }
@@ -422,14 +167,13 @@
     body.sun-mode .topo-item { background: #ffffff; border: 1px solid #cbd5e1; border-left: 3px solid #10b981; }
 
     /* Tables */
-    .table-container { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-container { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; min-width: 600px; }
     th { background: #1e293b; padding: 10px 12px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
     body.sun-mode th { background: #e2e8f0; color: #000; }
     td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
-    tr:last-child td { border-bottom: none; }
 
-    /* Modals & Bottom Sheet */
+    /* Modals */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 12px;
     }
@@ -447,36 +191,14 @@
     body.sun-mode .form-group input, body.sun-mode .form-group select { background: #f8fafc; color: #000; border-color: #000; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 
-    .modal-selection-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-top: 10px;
-      max-height: 55vh;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
+    .modal-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; max-height: 55vh; overflow-y: auto; }
     .btn-select-comp {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 9px;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      cursor: pointer;
-      text-align: left;
+      display: flex; flex-direction: column; align-items: flex-start; padding: 9px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; cursor: pointer; text-align: left;
     }
     body.sun-mode .btn-select-comp { background: #f8fafc; border-color: #94a3b8; }
     body.sun-mode .btn-select-comp strong { color: #000 !important; }
-    .btn-select-comp:hover:not(:disabled) {
-      border-color: #38bdf8;
-      background: #1e293b;
-    }
-    .btn-select-comp:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+    .btn-select-comp:hover:not(:disabled) { border-color: #38bdf8; background: #1e293b; }
+    .btn-select-comp:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-select-comp strong { font-size: 0.82rem; color: #fff; margin-bottom: 2px; }
     .btn-select-comp span { color: var(--text-muted); font-size: 0.68rem; }
 
@@ -490,357 +212,60 @@
     .obj-list-info span { font-size: 0.75rem; color: var(--text-muted); }
     .obj-list-actions { display: flex; gap: 6px; }
 
-    /* Beschriftungsstreifen Ansicht */
+    /* Beschriftungsstreifen */
     .strip-row {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      border: 1.5px solid #000;
-      background: #fff;
-      color: #000;
-      height: 25mm;
-      margin-bottom: 6mm;
-      width: 100%;
+      display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); border: 1.5px solid #000; background: #fff; color: #000; height: 25mm; margin-bottom: 6mm; width: 100%;
     }
     .strip-cell {
-      border-right: 1px dashed #666;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 1mm 1.5mm;
-      overflow: hidden;
-      box-sizing: border-box;
-      line-height: 1.05;
-      word-break: break-word;
-      overflow-wrap: break-word;
-      hyphens: auto;
+      border-right: 1px dashed #666; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 1mm 1.5mm; overflow: hidden; box-sizing: border-box; line-height: 1.05; word-break: break-word;
     }
     .strip-cell:last-child { border-right: none; }
     .strip-cell-te-1 .strip-room { font-size: 5.8pt; font-weight: 800; color: #0284c7; }
     .strip-cell-te-1 .strip-desc { font-size: 5.4pt; font-weight: 700; color: #000; }
     .strip-cell-te-1 .strip-sub { font-size: 4.8pt; color: #444; }
-
     .strip-cell-te-multi .strip-room { font-size: 7.2pt; font-weight: 800; color: #0284c7; }
     .strip-cell-te-multi .strip-desc { font-size: 6.8pt; font-weight: 700; color: #000; }
     .strip-cell-te-multi .strip-sub { font-size: 5.8pt; color: #444; }
 
-    /* Mobile Toggle Button */
-    .mobile-sidebar-toggle {
-      display: none;
-      width: 100%;
-      background: #0f172a;
-      border: 1px dashed var(--border);
-      padding: 8px;
-      color: #38bdf8;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border-radius: 6px;
-      margin-bottom: 4px;
-    }
-
-    /* QUICK-ACTION BAR */
+    /* Mobile Quick Bar */
     .quick-mobile-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--panel);
-      border-top: 1.5px solid var(--border);
-      padding: 6px 10px;
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      z-index: 500;
-      -webkit-overflow-scrolling: touch;
+      position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1.5px solid var(--border); padding: 6px 10px; display: flex; gap: 6px; overflow-x: auto; z-index: 500; -webkit-overflow-scrolling: touch;
     }
-    .quick-mobile-bar button {
-      padding: 6px 10px;
-      white-space: nowrap;
-      font-size: 0.75rem;
-      flex-shrink: 0;
-      border-radius: 20px;
-    }
+    .quick-mobile-bar button { padding: 6px 10px; white-space: nowrap; font-size: 0.75rem; flex-shrink: 0; border-radius: 20px; }
 
-    /* DROP-TO-DELETE TRASH ZONE */
     #trash-drop-zone {
-      position: fixed;
-      bottom: 52px;
-      left: 50%;
-      transform: translateX(-50%) translateY(150%);
-      background: #dc2626;
-      color: #fff;
-      padding: 10px 24px;
-      border-radius: 30px;
-      font-weight: 800;
-      font-size: 0.85rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      z-index: 900;
-      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 2px solid #fff;
-      pointer-events: none;
+      position: fixed; bottom: 52px; left: 50%; transform: translateX(-50%) translateY(150%); background: #dc2626; color: #fff; padding: 10px 24px; border-radius: 30px; font-weight: 800; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 900; transition: transform 0.25s ease; display: flex; align-items: center; gap: 8px; border: 2px solid #fff; pointer-events: none;
     }
-    #trash-drop-zone.active {
-      transform: translateX(-50%) translateY(0);
-      pointer-events: all;
-    }
-    #trash-drop-zone.drag-over {
-      background: #7f1d1d;
-      transform: translateX(-50%) translateY(-5px) scale(1.05);
-    }
+    #trash-drop-zone.active { transform: translateX(-50%) translateY(0); pointer-events: all; }
 
-    /* RESPONSIVE */
     @media (max-width: 900px) {
       header { flex-direction: column; align-items: stretch; }
-      .project-meta { justify-content: space-between; }
-      .btn-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
-
-      .app-container {
-        display: flex;
-        flex-direction: column;
-        height: auto;
-        min-height: auto;
-        padding-bottom: 60px;
-      }
-
-      .mobile-sidebar-toggle { display: flex; }
-      aside {
-        border-right: none;
-        border-bottom: 2px solid var(--border);
-        padding: 12px;
-        max-height: 480px;
-      }
+      .app-container { display: flex; flex-direction: column; padding-bottom: 60px; }
+      aside { border-right: none; border-bottom: 2px solid var(--border); padding: 12px; max-height: 480px; }
       aside.collapsed { display: none; }
-      .component-grid { grid-template-columns: repeat(3, 1fr); }
-      main { padding: 12px; }
-
-      .modal-backdrop {
-        align-items: flex-end !important;
-        padding: 0 !important;
-      }
-      .modal {
-        border-radius: 16px 16px 0 0 !important;
-        max-width: 100% !important;
-        max-height: 85vh !important;
-        padding: 16px !important;
-        animation: slideUp 0.25s ease-out;
-      }
-      @keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-      }
+      .modal-backdrop { align-items: flex-end !important; padding: 0 !important; }
+      .modal { border-radius: 16px 16px 0 0 !important; max-width: 100% !important; max-height: 85vh !important; }
     }
-
-    @media (max-width: 600px) {
-      .component-grid { grid-template-columns: repeat(2, 1fr); }
-      .btn-comp { padding: 6px; }
-      .btn-comp strong { font-size: 0.75rem; }
-      .btn-group { grid-template-columns: repeat(2, 1fr); }
-      .modal-selection-grid { grid-template-columns: 1fr; }
-    }
-
-    /* PRINT */
     .print-only { display: none; }
     .print-strips-only { display: none; }
-
     @media print {
       @page { size: A4 portrait; margin: 6mm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { background: #ffffff !important; color: #0f172a !important; font-size: 9pt; }
-      #pin-overlay, header, aside, .mobile-sidebar-toggle, .quick-mobile-bar, #trash-drop-zone, .nav-tabs, .btn-group, button, .modal-backdrop, .touch-slot-empty { display: none !important; }
-      .app-container { display: block !important; height: auto !important; overflow: visible !important; padding-bottom: 0 !important; }
-      main { padding: 0 !important; overflow: visible !important; display: block !important; }
-
+      #pin-overlay, header, aside, .quick-mobile-bar, #trash-drop-zone, .nav-tabs, .btn-group, button, .modal-backdrop, .touch-slot-empty { display: none !important; }
+      .app-container { display: block !important; padding-bottom: 0 !important; }
+      main { padding: 0 !important; display: block !important; }
       body.print-mode-doc .print-only { display: block !important; }
-      body.print-mode-doc .print-strips-only { display: none !important; }
-      body.print-mode-strips .print-only { display: none !important; }
-      body.print-mode-strips #view-verteiler, 
-      body.print-mode-strips #view-topologie, 
-      body.print-mode-strips #view-tabelle { display: none !important; }
       body.print-mode-strips .print-strips-only { display: block !important; }
-
-      .doc-header {
-        border-bottom: 2.5px solid #0284c7;
-        padding-bottom: 4px;
-        margin-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-      }
-      .doc-header h1 { font-size: 14pt; margin: 0; color: #0369a1; font-weight: 800; }
-      .doc-meta { font-size: 8pt; text-align: right; line-height: 1.3; color: #334155; }
-
-      .section-heading-print {
-        font-size: 10pt;
-        font-weight: 800;
-        background: #f0f9ff;
-        border-left: 3.5px solid #0284c7;
-        margin: 10px 0 6px 0;
-        padding: 3px 8px;
-        text-transform: uppercase;
-        color: #0369a1;
-      }
-
-      #view-verteiler { page-break-after: always; break-after: page; }
-      .cabinet-wrapper {
-        box-shadow: none !important;
-        border: 1.5px solid #64748b !important;
-        max-width: 100% !important;
-        min-width: 100% !important;
-        background: #f8fafc !important;
-        padding: 6px !important;
-        border-radius: 4px;
-        margin: 0;
-      }
-      .cabinet-header {
-        background: #e2e8f0 !important;
-        border: 1px solid #94a3b8 !important;
-        color: #0f172a !important;
-        padding: 4px 8px !important;
-        font-size: 8.5pt !important;
-        margin-bottom: 6px !important;
-      }
-      .din-rail-row {
-        background: #f1f5f9 !important;
-        border: 1px solid #94a3b8 !important;
-        margin-bottom: 6px !important;
-        padding: 4px !important;
-        border-radius: 4px;
-      }
-      .rail-info { color: #334155 !important; font-size: 7.5pt !important; font-weight: bold; margin-bottom: 3px !important; }
-      .din-rail {
-        background: #cbd5e1 !important;
-        padding: 2px !important;
-        min-height: 125px !important;
-        gap: 2px !important;
-        border: 1px solid #94a3b8;
-      }
-      .module-item {
-        border: 1.2px solid #334155 !important;
-        background: #ffffff !important;
-        color: #0f172a !important;
-        box-shadow: none !important;
-        padding: 2px 1px !important;
-        min-height: 120px !important;
-      }
-      .mod-top { border-bottom: 1px solid #cbd5e1 !important; padding-bottom: 1px; }
-      .mod-type { font-size: 7pt !important; font-weight: 800 !important; color: #0f172a !important; }
-      .mod-toggle { background: #1e293b !important; width: 8px !important; height: 16px !important; margin-bottom: 2px; }
-      .btn-test { background: #2563eb !important; color: #ffffff !important; font-size: 5.5pt !important; padding: 1px 3px !important; }
-      
-      .mod-bottom {
-        background: #f0fdf4 !important;
-        border-top: 1px solid #94a3b8 !important;
-        padding: 2px 1px !important;
-        min-height: 40px !important;
-      }
-      .mod-room {
-        color: #0369a1 !important;
-        font-size: 6.2pt !important;
-        font-weight: 800 !important;
-        white-space: normal !important;
-        word-break: break-word !important;
-        line-height: 1.1 !important;
-      }
-      .mod-desc {
-        color: #1e293b !important;
-        font-size: 5.8pt !important;
-        font-weight: 700 !important;
-        white-space: normal !important;
-        word-break: break-word !important;
-        line-height: 1.1 !important;
-      }
-
-      #view-topologie {
-        page-break-before: always;
-        break-before: page;
-        page-break-after: always;
-        break-after: page;
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-      .topology-container {
-        background: #ffffff !important;
-        border: 1.5px solid #cbd5e1 !important;
-        padding: 6px !important;
-        color: #0f172a !important;
-        border-radius: 4px;
-      }
-      .topo-node {
-        background: #f8fafc !important;
-        border: 1.5px solid #0284c7 !important;
-        color: #0f172a !important;
-        padding: 3px 8px !important;
-        min-width: 140px;
-      }
-      .topo-node-title { color: #0284c7 !important; font-size: 8pt !important; font-weight: 800; }
-      .topo-node-sub { color: #475569 !important; font-size: 6.5pt !important; }
-      .topo-line-v { background: #0284c7 !important; height: 10px !important; }
-      .topo-busbar { background: #eab308 !important; height: 4px !important; margin: 4px 0 10px 0 !important; }
-      .topo-busbar::after { color: #a16207 !important; font-weight: bold; font-size: 6.5pt !important; top: -14px !important; }
-      
-      .topo-grid {
-        display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 6px !important;
-        align-items: start !important;
-      }
-      .topo-rail-card {
-        background: #f8fafc !important;
-        border: 1px solid #bae6fd !important;
-        color: #0f172a !important;
-        padding: 5px !important;
-        border-radius: 4px;
-        gap: 3px !important;
-      }
-      .topo-rail-card-title {
-        border-bottom: 1.5px solid #0284c7 !important;
-        color: #0369a1 !important;
-        font-size: 7.2pt !important;
-        font-weight: 800 !important;
-        padding-bottom: 2px !important;
-      }
-      .topo-item {
-        background: #ffffff !important;
-        border-left: 2.5px solid #10b981 !important;
-        border: 1px solid #e2e8f0;
-        color: #0f172a !important;
-        font-size: 6.2pt !important;
-        padding: 2px 3px !important;
-        line-height: 1.1 !important;
-      }
-      .topo-item strong { color: #0369a1 !important; }
-
-      #view-tabelle { page-break-before: always; break-before: page; }
-      .table-container {
-        background: #ffffff !important;
-        border: 1.5px solid #94a3b8 !important;
-        margin-top: 6px !important;
-        border-radius: 4px;
-        overflow: visible !important;
-      }
-      table { font-size: 7.8pt !important; width: 100%; border-collapse: collapse; min-width: 100% !important; }
-      th { background: #e0f2fe !important; color: #0369a1 !important; font-weight: 800 !important; border-bottom: 2px solid #0284c7 !important; padding: 4px 6px !important; }
-      td { border-bottom: 1px solid #cbd5e1 !important; padding: 3.5px 6px !important; color: #1e293b !important; }
-      tr:nth-child(even) td { background: #f8fafc !important; }
-
-      .strip-row {
-        height: 25mm !important;
-        border: 1.5px solid #000 !important;
-        margin-bottom: 6mm !important;
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-      .strip-cell { border-right: 1px dashed #666 !important; }
+      body.print-mode-strips #view-verteiler, body.print-mode-strips #view-topologie, body.print-mode-strips #view-tabelle { display: none !important; }
+      #view-topologie { page-break-before: always; break-before: page; page-break-after: always; break-after: page; }
+      .topo-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; }
     }
   </style>
 </head>
 <body class="print-mode-doc">
 
-  <!-- PIN Protection Overlay -->
+  <!-- PIN Screen -->
   <div id="pin-overlay">
     <div class="pin-card">
       <div style="font-size: 2.2rem; margin-bottom: 8px;">🔒</div>
@@ -852,182 +277,113 @@
     </div>
   </div>
 
-  <!-- Trash Zone for Drag to Delete -->
-  <div id="trash-drop-zone" ondragover="handleTrashDragOver(event)" ondragleave="handleTrashDragLeave(event)" ondrop="handleTrashDrop(event)">
-    🗑️ Hierhin ziehen zum Löschen
-  </div>
+  <div id="trash-drop-zone">🗑️ Hierhin ziehen zum Löschen</div>
 
-  <!-- Quick Action Mobile Bar -->
   <div class="quick-mobile-bar">
-    <span style="font-size:0.7rem; color:var(--text-muted); align-self:center; font-weight:bold; margin-right:4px;">⚡ Schnell-Einfügen:</span>
     <button class="primary" onclick="quickAddFirstFree('Wohnen', 'Steckdosen', '1P B16', 1, 'NYM-J 3x1.5')">+ Steckdose B16</button>
     <button class="primary" onclick="quickAddFirstFree('Allgemein', 'Licht', '1P B10', 1, 'NYM-J 3x1.5')">+ Licht B10</button>
     <button class="primary" onclick="quickAddFirstFree('Küche', 'Geschirrspüler', '1P B16', 1, 'NYM-J 3x2.5')">+ Spülm. B16</button>
-    <button class="primary" onclick="quickAddFirstFree('Schutz', 'FI 40A/30mA', 'FI 4P', 4, '-')">+ FI 4P (4TE)</button>
+    <button class="primary" onclick="quickAddFirstFree('Schutz', 'FI 40A/30mA', 'FI 4P', 4, '-')">+ FI 4P</button>
     <button class="warning" onclick="applyStandardEFHLayout()">🏠 1-Klick EFH Vorlage</button>
-  </div>
-
-  <!-- Dokumentations-Header (Druck) -->
-  <div class="print-only">
-    <div class="doc-header">
-      <div>
-        <h1>APrivina Unterverteiler Planer</h1>
-        <div style="font-size: 8.5pt; margin-top: 2px; color: #475569; font-weight: 600;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
-      </div>
-      <div class="doc-meta">
-        <div><strong>Objekt:</strong> <span id="print-obj-name">-</span></div>
-        <div><strong>Standort:</strong> <span id="print-obj-addr">-</span></div>
-        <div><strong>Erstellt von:</strong> <span id="print-obj-author">-</span></div>
-        <div><strong>Datum:</strong> <span id="print-obj-date">-</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Beschriftungsstreifen (Druck) -->
-  <div class="print-strips-only" style="padding: 6mm 4mm;">
-    <div style="border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 6mm; display:flex; justify-content:space-between; align-items:flex-end;">
-      <div>
-        <h2 style="font-size: 13pt;">Beschriftungsstreifen nach DIN 18015 (18 mm je TE)</h2>
-        <p style="font-size: 8pt; color: #666;"><span id="strip-obj-name">-</span> | Ausschneiden und einlegen.</p>
-      </div>
-      <div style="font-size: 8pt; text-align:right;">
-        <strong>Monteur:</strong> <span id="strip-obj-author">-</span>
-      </div>
-    </div>
-    <div id="strips-render-container"></div>
   </div>
 
   <header>
     <div class="brand">⚡ APrivina Unterverteiler Planer</div>
     <div class="project-meta">
-      <div>Objekt: <strong id="lbl-obj-name">-</strong> | <span id="lbl-obj-addr">-</span> | Prüfer: <strong id="lbl-obj-author">-</strong></div>
+      <div>Objekt: <strong id="lbl-obj-name">-</strong> | Prüfer: <strong id="lbl-obj-author">-</strong></div>
       <div class="phase-badge" id="phase-balance-bar">L1: 0 | L2: 0 | L3: 0</div>
-      <div class="cloud-badge" id="cloud-status-badge">☁️ Cloud prüfen...</div>
     </div>
     <div class="btn-group">
       <button class="success" onclick="saveCurrentObject()">💾 Speichern</button>
       <button onclick="openNewObjectModal()">➕ Neu</button>
       <button onclick="openSavedObjectsModal()">📁 Objekte</button>
-      <button onclick="testCloudConnectionManual()">🔍 Cloud Sync testen</button>
       <button onclick="toggleSunMode()" id="btn-sun-mode">☀️ Baustelle</button>
-      <button class="warning" onclick="exportToCSV()">📊 Excel/CSV</button>
+      <button class="warning" onclick="exportToCSV()">📊 CSV</button>
       <button onclick="printStrips()">🏷️ Beschriftung</button>
-      <button class="primary" onclick="printDoc()">🖨️ Drucken / PDF</button>
+      <button class="primary" onclick="printDoc()">🖨️ Drucken</button>
       <button onclick="openSettingsModal()">⚙️ Optionen</button>
     </div>
   </header>
 
   <div class="app-container">
-    <button class="mobile-sidebar-toggle" onclick="toggleMobileSidebar()">
-      ⚡ Raum-Katalog anzeigen / ausblenden
-    </button>
-
     <aside id="app-sidebar">
       <div class="sidebar-section">
-        <div class="section-title">Reihenanzahl (Verteilergröße)</div>
+        <div class="section-title">Reihenanzahl</div>
         <div style="display: flex; gap: 4px;">
-          <button style="flex:1" onclick="setRows(1)">1R (12 TE)</button>
-          <button style="flex:1" onclick="setRows(2)">2R (24 TE)</button>
-          <button style="flex:1" onclick="setRows(3)">3R (36 TE)</button>
-          <button style="flex:1" onclick="setRows(4)">4R (48 TE)</button>
+          <button style="flex:1" onclick="setRows(1)">1R</button>
+          <button style="flex:1" onclick="setRows(2)">2R</button>
+          <button style="flex:1" onclick="setRows(3)">3R</button>
+          <button style="flex:1" onclick="setRows(4)">4R</button>
         </div>
       </div>
-
       <div class="sidebar-section">
-        <div class="section-title">Standard-Belegung</div>
-        <button class="warning" style="width: 100%; justify-content: center;" onclick="applyStandardEFHLayout()">
-          🏠 1-Klick EFH Vorlage laden
-        </button>
-      </div>
-
-      <div class="sidebar-section">
-        <div class="section-title">Schutzorgane & Einspeisung (Drag & Drop)</div>
+        <div class="section-title">Schutzorgane & Einspeisung</div>
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')" onclick="quickAddFirstFree('Einspeisung', 'Hauptschalter', '3P 63A', 3, '-')">
-            <strong>Hauptschalter 3P</strong>
-            <span>3 TE • 63A</span>
+          <div class="btn-comp" onclick="quickAddFirstFree('Einspeisung', 'Hauptschalter', '3P 63A', 3, '-')">
+            <strong>Hauptschalter</strong><span>3 TE • 63A</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')" onclick="quickAddFirstFree('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, '-')">
-            <strong>FI 4-polig</strong>
-            <span>4 TE • 30mA</span>
+          <div class="btn-comp" onclick="quickAddFirstFree('Schutz', 'FI 40A/30mA', 'FI 4P', 4, '-')">
+            <strong>FI 4-polig</strong><span>4 TE • 30mA</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'auto', 'NYM-J 3x2.5')" onclick="quickAddFirstFree('Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
-            <strong>FI/LS B16</strong>
-            <span>2 TE • 30mA</span>
+          <div class="btn-comp" onclick="quickAddFirstFree('Schutz', 'FI/LS B16', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
+            <strong>FI/LS B16</strong><span>2 TE</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')" onclick="quickAddFirstFree('Reserve', 'Blindabdeckung', 'Blind', 1, '-')">
-            <strong>Blindabdeckung</strong>
-            <span>1 TE</span>
+          <div class="btn-comp" onclick="quickAddFirstFree('Reserve', 'Blindabdeckung', 'Blind', 1, '-')">
+            <strong>Blindabdeckung</strong><span>1 TE</span>
           </div>
         </div>
       </div>
-
       <div class="sidebar-section">
-        <div class="section-title">Kompletter EFH-Katalog (Drag & Drop)</div>
+        <div class="section-title">EFH Katalog</div>
         <div class="category-pills" id="aside-cat-pills"></div>
         <div class="component-grid" id="aside-comp-grid"></div>
       </div>
-
-      <div class="sidebar-section" style="display:flex; flex-direction:column; gap:6px;">
-        <button class="danger" style="width: 100%; padding: 8px; background:#7f1d1d;" onclick="clearAllRails()">⚠️ Kompletten Schrank leeren</button>
+      <div class="sidebar-section">
+        <button class="danger" style="width: 100%;" onclick="clearAllRails()">⚠️ Schrank leeren</button>
       </div>
     </aside>
 
     <main>
       <div class="nav-tabs">
-        <button class="nav-tab active" onclick="switchView('verteiler')">Verteiler-Ansicht</button>
-        <button class="nav-tab" onclick="switchView('topologie')">Topologie (Einpolig)</button>
+        <button class="nav-tab active" onclick="switchView('verteiler')">Verteiler</button>
+        <button class="nav-tab" onclick="switchView('topologie')">Topologie</button>
         <button class="nav-tab" onclick="switchView('tabelle')">Stromkreisliste</button>
       </div>
 
       <div id="view-verteiler">
-        <div class="print-only section-heading-print">1. Verteiler-Bestückungsplan (Hutschienen 1–4)</div>
         <div class="cabinet-wrapper">
           <div class="cabinet-header">
             <span id="cab-title">Unterverteilung</span>
-            <span>DIN 18015 / DIN EN 60898</span>
+            <span>DIN 18015</span>
           </div>
           <div id="cabinet-rows"></div>
         </div>
       </div>
 
       <div id="view-topologie" style="display: none;">
-        <div class="print-only section-heading-print">2. Einpolige Übersicht (Topologie)</div>
         <div class="topology-container">
           <div style="text-align: center; margin-bottom: 6px;">
             <div class="topo-node">
               <div class="topo-node-title">⚡ Hauseinspeisung</div>
-              <div class="topo-node-sub">3~ 400V TN-S / 50 Hz</div>
+              <div class="topo-node-sub">3~ 400V TN-S</div>
             </div>
             <div class="topo-line-v"></div>
             <div class="topo-node">
               <div class="topo-node-title">Hauptschalter</div>
-              <div class="topo-node-sub">IS-63 / 3-polig 63A</div>
+              <div class="topo-node-sub">IS-63 / 3P 63A</div>
             </div>
             <div class="topo-line-v"></div>
           </div>
-
           <div class="topo-busbar"></div>
-
           <div class="topo-grid" id="topo-branches-container"></div>
         </div>
       </div>
 
       <div id="view-tabelle" style="display: none;">
-        <div class="print-only section-heading-print">3. Stromkreisliste nach DIN 18015</div>
         <div class="table-container">
           <table>
             <thead>
-              <tr>
-                <th>Nr.</th>
-                <th>Hutschiene</th>
-                <th>Raum</th>
-                <th>Verbraucher / Funktion</th>
-                <th>Schutzorgan</th>
-                <th>Breite</th>
-                <th>Phase</th>
-                <th>Kabeltyp</th>
-              </tr>
+              <tr><th>Nr.</th><th>Reihe</th><th>Raum</th><th>Verbraucher</th><th>Typ</th><th>TE</th><th>Phase</th><th>Kabel</th></tr>
             </thead>
             <tbody id="table-body"></tbody>
           </table>
@@ -1036,43 +392,10 @@
     </main>
   </div>
 
-  <!-- Modal: Neuer Objektstart / Eingabe -->
-  <div class="modal-backdrop" id="modal-project">
-    <div class="modal">
-      <h3 id="modal-project-title">Objekt auswählen oder anlegen</h3>
-      <div style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155; margin-bottom:14px; text-align:center;">
-        <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:10px;">Möchten Sie ein bereits gespeichertes Projekt öffnen?</p>
-        <button type="button" class="primary" style="width:100%; justify-content:center; padding:10px;" onclick="switchFromStartToSaved()">📁 Gespeichertes Objekt öffnen</button>
-      </div>
-
-      <div style="position:relative; text-align:center; margin:16px 0;">
-        <hr style="border:0; border-top:1px solid #334155;">
-        <span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:#1e293b; padding:0 10px; font-size:0.75rem; color:#94a3b8; font-weight:bold;">ODER NEUES OBJEKT STARTEN</span>
-      </div>
-
-      <div class="form-group">
-        <label>Objekt / Bauvorhaben:</label>
-        <input type="text" id="inp-obj-name" placeholder="z.B. Neubau EFH Maier">
-      </div>
-      <div class="form-group">
-        <label>Adresse / Standort:</label>
-        <input type="text" id="inp-obj-addr" placeholder="z.B. Musterstraße 12, München">
-      </div>
-      <div class="form-group">
-        <label>Erstellt von / Geprüft durch (Monteur/Elektriker):</label>
-        <input type="text" id="inp-obj-author" placeholder="z.B. M. Mustermann">
-      </div>
-      <div class="modal-actions">
-        <button id="btn-cancel-project" onclick="closeProjectModal()">Abbrechen</button>
-        <button class="success" onclick="confirmProjectData()">Objekt starten</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal: Liste gespeicherter Objekte -->
+  <!-- Modal: Objekte -->
   <div class="modal-backdrop" id="modal-saved-list">
     <div class="modal">
-      <h3>📁 Gespeicherte Objekte (Cloud & Lokal)</h3>
+      <h3>📁 Gespeicherte Objekte</h3>
       <div id="saved-objects-container" style="margin-top: 12px; max-height: 50vh; overflow-y: auto;"></div>
       <div class="modal-actions">
         <button onclick="closeSavedObjectsModal()">Schließen</button>
@@ -1080,54 +403,58 @@
     </div>
   </div>
 
-  <!-- Modal: Modul bearbeiten / löschen / duplizieren -->
+  <!-- Modal: Neu -->
+  <div class="modal-backdrop" id="modal-project">
+    <div class="modal">
+      <h3 id="modal-project-title">Neues Objekt starten</h3>
+      <div class="form-group">
+        <label>Objektname:</label>
+        <input type="text" id="inp-obj-name" placeholder="z.B. EFH Maier">
+      </div>
+      <div class="form-group">
+        <label>Standort:</label>
+        <input type="text" id="inp-obj-addr" placeholder="München">
+      </div>
+      <div class="form-group">
+        <label>Prüfer / Elektriker:</label>
+        <input type="text" id="inp-obj-author" placeholder="M. Mustermann">
+      </div>
+      <div class="modal-actions">
+        <button id="btn-cancel-project" onclick="closeProjectModal()">Abbrechen</button>
+        <button class="success" onclick="confirmProjectData()">Starten</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Modul Touch -->
+  <div class="modal-backdrop" id="modal-touch-select">
+    <div class="modal">
+      <h3 id="touch-select-title">Verbraucher wählen</h3>
+      <div class="category-pills" id="modal-cat-pills"></div>
+      <div class="modal-selection-grid" id="touch-select-grid"></div>
+      <div class="modal-actions">
+        <button onclick="closeTouchSelectModal()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Module -->
   <div class="modal-backdrop" id="modal-module">
     <div class="modal">
       <h3>Modul bearbeiten</h3>
       <input type="hidden" id="edit-rail-idx">
       <input type="hidden" id="edit-mod-idx">
-      <div class="form-group">
-        <label>Raum:</label>
-        <input type="text" id="edit-room">
-      </div>
-      <div class="form-group">
-        <label>Bezeichnung / Verbraucher:</label>
-        <input type="text" id="edit-desc">
-      </div>
+      <div class="form-group"><label>Raum:</label><input type="text" id="edit-room"></div>
+      <div class="form-group"><label>Verbraucher:</label><input type="text" id="edit-desc"></div>
       <div class="form-group">
         <label>Phase:</label>
-        <select id="edit-phase">
-          <option value="L1">L1</option>
-          <option value="L2">L2</option>
-          <option value="L3">L3</option>
-          <option value="L1-L3">L1-L3 (Drehstrom)</option>
-          <option value="-">-</option>
-        </select>
+        <select id="edit-phase"><option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L1-L3">L1-L3</option><option value="-">-</option></select>
       </div>
-      <div class="form-group">
-        <label>Kabeltyp:</label>
-        <input type="text" id="edit-cable">
-      </div>
+      <div class="form-group"><label>Kabel:</label><input type="text" id="edit-cable"></div>
       <div class="modal-actions">
-        <button class="warning" onclick="duplicateCurrentModule()">📋 Duplizieren</button>
         <button class="danger" onclick="deleteCurrentModule()">Löschen</button>
         <button onclick="closeModuleModal()">Abbrechen</button>
         <button class="primary" onclick="saveModuleEdit()">Speichern</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal: Direkt-Auswahl per Touch -->
-  <div class="modal-backdrop" id="modal-touch-select">
-    <div class="modal">
-      <h3 id="touch-select-title">Verbraucher nach Raum wählen</h3>
-      <p id="touch-select-subtitle" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;"></p>
-      
-      <div class="category-pills" id="modal-cat-pills"></div>
-      <div class="modal-selection-grid" id="touch-select-grid"></div>
-
-      <div class="modal-actions">
-        <button onclick="closeTouchSelectModal()">Abbrechen</button>
       </div>
     </div>
   </div>
@@ -1136,26 +463,14 @@
   <div class="modal-backdrop" id="modal-settings">
     <div class="modal">
       <h3>⚙️ Optionen & Datensicherung</h3>
-      
-      <div style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155; margin-bottom:14px;">
-        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">💾 Manuelles Projekt-Backup (JSON)</strong>
-        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:10px;">Laden Sie alle Objekte als Datei herunter oder importieren Sie diese offline.</p>
+      <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:14px;">
+        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">💾 Manuelles Backup</strong>
         <div style="display:flex; gap:8px;">
           <button class="primary" style="flex:1;" onclick="downloadBackupJSON()">Export Datei</button>
           <button style="flex:1;" onclick="document.getElementById('inp-file-import').click()">Import Datei</button>
           <input type="file" id="inp-file-import" style="display:none;" accept=".json" onchange="importBackupJSON(event)">
         </div>
       </div>
-
-      <div style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155;">
-        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">🔑 PIN-Code ändern</strong>
-        <div class="form-group" style="margin-bottom:8px;">
-          <label>Neuer 4-stelliger PIN:</label>
-          <input type="password" id="inp-new-pin" maxlength="4" placeholder="z.B. 1234">
-        </div>
-        <button class="success" style="width:100%; justify-content:center; padding:9px;" onclick="changePinCode()">PIN aktualisieren</button>
-      </div>
-
       <div class="modal-actions">
         <button onclick="closeSettingsModal()">Schließen</button>
       </div>
@@ -1163,174 +478,40 @@
   </div>
 
   <script>
-    /* =========================================================================
-       FIREBASE INITIALISIERUNG
-       ========================================================================= */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCshNR8QEoW3tdc_badc9UHZse5Oh7Z_kk",
-      authDomain: "aprivina-planer.firebaseapp.com",
-      projectId: "aprivina-planer",
-      storageBucket: "aprivina-planer.firebasestorage.app",
-      messagingSenderId: "482031449397",
-      appId: "1:482031449397:web:462c769b95d2dab6da887c"
-    };
-
-    let db = null;
-
-    try {
-      if (typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-        }
-        db = firebase.firestore();
-      }
-    } catch (e) {
-      console.warn("Firebase Init Hinweis:", e);
-    }
-
-    function updateCloudBadge(statusText, isOnline) {
-      const badge = document.getElementById('cloud-status-badge');
-      if (badge) {
-        badge.className = isOnline ? 'cloud-badge' : 'cloud-badge offline';
-        badge.innerHTML = statusText;
-      }
-    }
-
-    function testCloudConnectionManual() {
-      if (!db) {
-        alert("❌ Firebase baza nije dostupna! Provjerite internetsku vezu na uređaju.");
-        return;
-      }
-      updateCloudBadge("⏳ Testiere...", false);
-      const testDoc = { testTime: new Date().toISOString(), status: "active" };
-
-      db.collection("projekte").doc("_ping_test_").set(testDoc)
-        .then(() => {
-          updateCloudBadge("☁️ Cloud Sync Aktiv", true);
-          triggerVibration([30, 50, 30]);
-          alert("✅ CLOUD SYNC RADI SAVRŠENO!\n\nTablet se uspješno spojio na Firebase bazu 'aprivina-planer'.");
-        })
-        .catch(err => {
-          updateCloudBadge("⚡ Fehler (" + (err.code || 'err') + ")", false);
-          triggerVibration([100, 50, 100]);
-          alert("❌ GREŠKA KOD SPAJANJA NA CLOUD:\n\nKod greške: " + err.code + "\nPoruka: " + err.message);
-        });
-    }
-
-    function triggerVibration(pattern = 25) {
-      if ('vibrate' in navigator) {
-        try { navigator.vibrate(pattern); } catch (e) {}
-      }
-    }
-
-    function toggleSunMode() {
-      document.body.classList.toggle('sun-mode');
-      const isSun = document.body.classList.contains('sun-mode');
-      document.getElementById('btn-sun-mode').innerText = isSun ? '🌙 Normal' : '☀️ Baustelle';
-      triggerVibration(30);
-    }
-
-    function getStoredPin() {
-      return localStorage.getItem('aprivina_user_pin') || "0104";
-    }
-
+    function getStoredPin() { return localStorage.getItem('aprivina_user_pin') || "0104"; }
     function verifyPin() {
       const entered = document.getElementById('inp-pin').value.trim();
-      const errBox = document.getElementById('pin-error-msg');
       if (entered === getStoredPin()) {
         sessionStorage.setItem('aprivina_auth', 'true');
         document.getElementById('pin-overlay').style.display = 'none';
-        triggerVibration([30, 50, 30]);
         initApp();
       } else {
-        errBox.innerText = "Falscher PIN! Bitte erneut versuchen.";
-        triggerVibration([100, 50, 100]);
+        document.getElementById('pin-error-msg').innerText = "Falscher PIN!";
         document.getElementById('inp-pin').value = "";
-        document.getElementById('inp-pin').focus();
       }
     }
 
     let currentObjId = null;
-    let project = {
-      name: "",
-      address: "",
-      author: "",
-      date: new Date().toLocaleDateString('de-DE')
-    };
-
+    let project = { name: "EFH Standard", address: "Musterstraße 1", author: "Monteur", date: new Date().toLocaleDateString('de-DE') };
     let rowCount = 4;
     let rails = [[], [], [], []];
     let nextPhaseIdx = 0;
     let touchTargetRail = 0;
-
     let activeAsideCategory = 'Küche';
     let activeModalCategory = 'Küche';
 
-    /* EFH KATALOG */
     const ROOM_CATEGORIES = ['Küche', 'Bad', 'Technik', 'Wohnen', 'Schlafen/Büro', 'Keller/HWR', 'Außen/Garage', 'Flur/Allg'];
-
     const EFH_CATALOG = [
       { cat: 'Küche', room: 'Küche', desc: 'E-Herd', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
       { cat: 'Küche', room: 'Küche', desc: 'Backofen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Küche', room: 'Küche', desc: 'Geschirrspüler', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Küche', room: 'Küche', desc: 'Mikrowelle', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Küche', room: 'Küche', desc: 'Dunstabzugshaube', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Küche', room: 'Küche', desc: 'Kühlschrank/Gefrierschr.', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Küche', room: 'Küche', desc: 'Arbeitsplatte Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Küche', room: 'Küche', desc: 'Küche Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-
+      { cat: 'Küche', room: 'Küche', desc: 'Kühlschrank', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
+      { cat: 'Küche', room: 'Küche', desc: 'Arbeitsplatte', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Bad', room: 'Bad', desc: 'Waschmaschine', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Bad', room: 'Bad', desc: 'Wäschetrockner', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Bad', room: 'Bad', desc: 'Durchlauferhitzer 24kW', type: '3P B32', te: 3, cable: 'NYM-J 5x6.0', is3P: true },
-      { cat: 'Bad', room: 'Bad', desc: 'Whirlpool / Sauna', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
-      { cat: 'Bad', room: 'Bad', desc: 'Spiegelschrank / Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Bad', room: 'Bad', desc: 'Fußbodenheizung Bad', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Bad', room: 'Bad', desc: 'Bad Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Bad', room: 'Gäste-WC', desc: 'Gäste-WC Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-
-      { cat: 'Technik', room: 'Technik', desc: 'Wärmepumpe Kompressor', type: '3P C16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
-      { cat: 'Technik', room: 'Technik', desc: 'Wärmepumpe Heizstab', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
-      { cat: 'Technik', room: 'Technik', desc: 'Lüftungsanlage (KWL)', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Technik', room: 'Technik', desc: 'PV-Wechselrichter', type: '3P B20', te: 3, cable: 'NYM-J 5x4.0', is3P: true },
-      { cat: 'Technik', room: 'Technik', desc: 'Heizung / Steuerung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Technik', room: 'Technik', desc: 'Hebeanlage Pumpe', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Technik', room: 'Technik', desc: 'Wasserenthärtung / Filter', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-
-      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'TV / Audio / Hifi', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Wohnen Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Wohnen Deckenlicht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Wohnen', room: 'Esszimmer', desc: 'Esszimmer Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Wohnen', room: 'Esszimmer', desc: 'Esszimmer Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Jalousien / Rollos', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-
-      { cat: 'Schlafen/Büro', room: 'Schlafzimmer', desc: 'Schlafen Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Schlafen/Büro', room: 'Schlafzimmer', desc: 'Schlafen Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Schlafen/Büro', room: 'Kinderzimmer 1', desc: 'Kind 1 Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Schlafen/Büro', room: 'Kinderzimmer 2', desc: 'Kind 2 Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Schlafen/Büro', room: 'Büro', desc: 'Büro / PC / Homeoffice', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Schlafen/Büro', room: 'Büro', desc: 'Büro Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Schlafen/Büro', room: 'Dachboden', desc: 'Dachboden Steckd./Licht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-
-      { cat: 'Keller/HWR', room: 'HWR', desc: 'HWR Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Keller/HWR', room: 'Keller', desc: 'Keller Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Keller/HWR', room: 'Keller', desc: 'Keller Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Keller/HWR', room: 'Keller', desc: 'Tiefkühltruhe separat', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Keller/HWR', room: 'Werkstatt', desc: 'Werkbank Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Keller/HWR', room: 'Werkstatt', desc: 'CEE-Steckdose 16A', type: '3P C16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
-
-      { cat: 'Außen/Garage', room: 'Garage', desc: 'Wallbox 11kW (E-Auto)', type: '3P B16', te: 3, cable: 'NYM-J 5x6.0', is3P: true },
-      { cat: 'Außen/Garage', room: 'Garage', desc: 'Garage Steckd./Torantrieb', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Außen/Garage', room: 'Garage', desc: 'Garage Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Außen/Garage', room: 'Außen', desc: 'Terrasse Steckdosen', type: 'RCBO 1P', te: 2, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Außen/Garage', room: 'Außen', desc: 'Gartenbeleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Außen/Garage', room: 'Außen', desc: 'Gartenhaus / Schuppen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
-      { cat: 'Außen/Garage', room: 'Außen', desc: 'Balkon Steckdose', type: 'RCBO 1P', te: 2, cable: 'NYM-J 3x2.5', is3P: false },
-
-      { cat: 'Flur/Allg', room: 'Flur', desc: 'Flur EG Licht/Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Flur/Allg', room: 'Flur', desc: 'Flur OG / Treppe Licht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Flur/Allg', room: 'Allgemein', desc: 'Klingeltrafo / Gong', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Flur/Allg', room: 'Allgemein', desc: 'Rauchwarnmelder Zentrale', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
-      { cat: 'Flur/Allg', room: 'Allgemein', desc: 'Serverschrank / Router', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false }
+      { cat: 'Technik', room: 'Technik', desc: 'Wärmepumpe', type: '3P C16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
+      { cat: 'Außen/Garage', room: 'Garage', desc: 'Wallbox 11kW', type: '3P B16', te: 3, cable: 'NYM-J 5x6.0', is3P: true }
     ];
 
     window.onload = function() {
@@ -1339,385 +520,72 @@
         initApp();
       } else {
         document.getElementById('pin-overlay').style.display = 'flex';
-        document.getElementById('inp-pin').focus();
       }
-
-      if (window.innerWidth <= 900) {
-        const sb = document.getElementById('app-sidebar');
-        if (sb) sb.classList.add('collapsed');
-      }
-
       renderAsideCategoryPills();
       renderAsideComponents();
-      initCloudSyncListener();
     };
-
-    /* SPREMANJE I PRETVARANJE U FLATTEN FORMAT ZA FIRESTORE */
-    function convertRailsToFirestore(railsArray) {
-      const obj = {};
-      for (let i = 0; i < railsArray.length; i++) {
-        obj['row_' + i] = railsArray[i] || [];
-      }
-      return obj;
-    }
-
-    function convertFirestoreToRails(dataObj, count) {
-      const arr = [];
-      for (let i = 0; i < (count || 4); i++) {
-        arr.push(dataObj['row_' + i] || []);
-      }
-      return arr;
-    }
-
-    function initCloudSyncListener() {
-      if (!db) {
-        updateCloudBadge("⚡ Offline Modus", false);
-        return;
-      }
-      try {
-        db.collection("projekte").onSnapshot(snapshot => {
-          updateCloudBadge("☁️ Cloud Sync Aktiv", true);
-          let cloudList = [];
-          snapshot.forEach(doc => {
-            if (doc.id !== "_ping_test_") {
-              const data = doc.data();
-              // Ako dolazi iz Firestorea u objekt obliku, pretvori u nizove
-              if (data.railsData && !Array.isArray(data.rails)) {
-                data.rails = convertFirestoreToRails(data.railsData, data.rowCount || 4);
-              }
-              cloudList.push(data);
-            }
-          });
-          if (cloudList.length > 0) {
-            localStorage.setItem('aprivina_saved_objects', JSON.stringify(cloudList));
-          }
-        }, err => {
-          console.warn("Cloud Snapshot Hinweis:", err);
-          updateCloudBadge("⚡ Offline Modus", false);
-        });
-      } catch (e) {
-        updateCloudBadge("⚡ Offline Modus", false);
-      }
-    }
-
-    function toggleMobileSidebar() {
-      const sb = document.getElementById('app-sidebar');
-      if (sb) sb.classList.toggle('collapsed');
-      triggerVibration(20);
-    }
 
     function initApp() {
       try {
-        const activeData = localStorage.getItem('aprivina_active_obj');
-        if (activeData) {
-          const parsed = JSON.parse(activeData);
+        const raw = localStorage.getItem('aprivina_active_obj');
+        if (raw) {
+          const parsed = JSON.parse(raw);
           currentObjId = parsed.id || ("obj_" + Date.now());
           project = parsed.project || project;
-          if (!project.author) project.author = "";
           rowCount = parsed.rowCount || 4;
-          
-          if (Array.isArray(parsed.rails)) {
-            rails = parsed.rails;
-          } else if (parsed.railsData) {
-            rails = convertFirestoreToRails(parsed.railsData, rowCount);
-          } else {
-            rails = [[], [], [], []];
-          }
-
+          rails = Array.isArray(parsed.rails) ? parsed.rails : [[], [], [], []];
           while (rails.length < 4) rails.push([]);
           syncNextPhaseIndex();
           updateProjectLabels();
           renderCabinet();
           return;
         }
-      } catch (e) {
-        console.warn("initApp parsing:", e);
-      }
-      openNewObjectModal(false);
+      } catch (e) {}
+      confirmProjectData();
     }
 
-    function applyStandardEFHLayout() {
-      if (!confirm("Möchten Sie die 4 Reihen mit der Standard-EFH-Konfiguration belegen? (Bestehende Einträge werden überschrieben)")) return;
-      rowCount = 4;
-      rails = [
-        [
-          { room: 'Einspeisung', desc: 'Hauptschalter', type: '3P 63A', te: 3, phase: 'L1-L3', cable: '-' },
-          { room: 'Schutz', desc: 'FI Gruppe 1', type: 'FI 4P', te: 4, phase: 'L1-L3', cable: '-' },
-          { room: 'Küche', desc: 'E-Herd', type: '3P B16', te: 3, phase: 'L1-L3', cable: 'NYM-J 5x2.5' },
-          { room: 'Küche', desc: 'Backofen', type: '1P B16', te: 1, phase: 'L1', cable: 'NYM-J 3x2.5' },
-          { room: 'Küche', desc: 'Geschirrspüler', type: '1P B16', te: 1, phase: 'L2', cable: 'NYM-J 3x2.5' }
-        ],
-        [
-          { room: 'Schutz', desc: 'FI Gruppe 2', type: 'FI 4P', te: 4, phase: 'L1-L3', cable: '-' },
-          { room: 'Küche', desc: 'Arbeitsplatte', type: '1P B16', te: 1, phase: 'L3', cable: 'NYM-J 3x2.5' },
-          { room: 'Wohnzimmer', desc: 'TV / Steckd.', type: '1P B16', te: 1, phase: 'L1', cable: 'NYM-J 3x1.5' },
-          { room: 'Wohnzimmer', desc: 'Deckenlicht', type: '1P B10', te: 1, phase: 'L2', cable: 'NYM-J 3x1.5' },
-          { room: 'Esszimmer', desc: 'Steckdosen', type: '1P B16', te: 1, phase: 'L3', cable: 'NYM-J 3x1.5' },
-          { room: 'Flur', desc: 'EG Beleuchtung', type: '1P B10', te: 1, phase: 'L1', cable: 'NYM-J 3x1.5' },
-          { room: 'Technik', desc: 'Heizung / KWL', type: '1P B10', te: 1, phase: 'L2', cable: 'NYM-J 3x1.5' },
-          { room: 'Technik', desc: 'Internet / Server', type: '1P B16', te: 1, phase: 'L3', cable: 'NYM-J 3x2.5' },
-          { room: 'Reserve', desc: 'Blindabdeckung', type: 'Blind', te: 1, phase: '-', cable: '-' }
-        ],
-        [
-          { room: 'Schutz', desc: 'FI Gruppe 3', type: 'FI 4P', te: 4, phase: 'L1-L3', cable: '-' },
-          { room: 'Bad', desc: 'Waschmaschine', type: '1P B16', te: 1, phase: 'L1', cable: 'NYM-J 3x2.5' },
-          { room: 'Bad', desc: 'Wäschetrockner', type: '1P B16', te: 1, phase: 'L2', cable: 'NYM-J 3x2.5' },
-          { room: 'Bad', desc: 'Steckdosen / Licht', type: '1P B16', te: 1, phase: 'L3', cable: 'NYM-J 3x2.5' },
-          { room: 'Schlafzimmer', desc: 'Steckd./Licht', type: '1P B16', te: 1, phase: 'L1', cable: 'NYM-J 3x1.5' },
-          { room: 'Kinderzimmer 1', desc: 'Steckd./Licht', type: '1P B16', te: 1, phase: 'L2', cable: 'NYM-J 3x1.5' },
-          { room: 'Kinderzimmer 2', desc: 'Steckd./Licht', type: '1P B16', te: 1, phase: 'L3', cable: 'NYM-J 3x1.5' },
-          { room: 'Büro', desc: 'Homeoffice PC', type: '1P B16', te: 1, phase: 'L1', cable: 'NYM-J 3x1.5' },
-          { room: 'Reserve', desc: 'Blindabdeckung', type: 'Blind', te: 1, phase: '-', cable: '-' }
-        ],
-        [
-          { room: 'Technik', desc: 'Wärmepumpe', type: '3P C16', te: 3, phase: 'L1-L3', cable: 'NYM-J 5x2.5' },
-          { room: 'Garage', desc: 'Wallbox 11kW', type: '3P B16', te: 3, phase: 'L1-L3', cable: 'NYM-J 5x6.0' },
-          { room: 'Außen', desc: 'Terrasse (RCBO)', type: 'RCBO 1P', te: 2, phase: 'L2', cable: 'NYM-J 3x2.5' },
-          { room: 'Keller', desc: 'Keller Steckd./Licht', type: '1P B16', te: 1, phase: 'L3', cable: 'NYM-J 3x1.5' },
-          { room: 'HWR', desc: 'HWR Steckdosen', type: '1P B16', te: 1, phase: 'L1', cable: 'NYM-J 3x2.5' },
-          { room: 'Außen', desc: 'Gartenbeleuchtung', type: '1P B10', te: 1, phase: 'L2', cable: 'NYM-J 3x1.5' },
-          { room: 'Reserve', desc: 'Blindabdeckung', type: 'Blind', te: 1, phase: '-', cable: '-' }
-        ]
-      ];
-      syncNextPhaseIndex();
-      updateProjectLabels();
-      saveState();
-      renderCabinet();
-      triggerVibration([40, 60, 40]);
-    }
+    function toggleSunMode() { document.body.classList.toggle('sun-mode'); }
+    function setRows(num) { rowCount = num; while (rails.length < rowCount) rails.push([]); saveState(); renderCabinet(); }
 
-    function quickAddFirstFree(room, desc, type, te, cable) {
-      let placed = false;
-      for (let r = 0; r < rowCount; r++) {
-        const usedTE = (rails[r] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
-        if (usedTE + te <= 12) {
-          let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
-          insertModuleRaw(r, room, desc, type, te, phase, cable);
-          placed = true;
-          break;
-        }
-      }
-      if (!placed) {
-        triggerVibration([100, 50, 100]);
-        alert("Kein Platz mehr auf den vorhandenen Hutschienen für " + desc + " (" + te + " TE)!");
-      }
-    }
-
-    function handleCatalogDragStart(e, room, desc, type, te, phase, cable) {
-      const payload = { action: 'insert_new', room, desc, type, te, phase, cable };
-      e.dataTransfer.setData('text/plain', JSON.stringify(payload));
-      e.dataTransfer.effectAllowed = 'copy';
-      document.getElementById('trash-drop-zone').classList.add('active');
-    }
-
-    function handleModuleDragStart(e, railIdx, modIdx) {
-      e.stopPropagation();
-      const payload = { action: 'reorder', fromRail: railIdx, fromIdx: modIdx };
-      e.dataTransfer.setData('text/plain', JSON.stringify(payload));
-      e.dataTransfer.effectAllowed = 'move';
-      document.getElementById('trash-drop-zone').classList.add('active');
-    }
-
-    window.addEventListener('dragend', () => {
-      document.getElementById('trash-drop-zone').classList.remove('active', 'drag-over');
-    });
-
-    function handleTrashDragOver(e) {
-      e.preventDefault();
-      document.getElementById('trash-drop-zone').classList.add('drag-over');
-    }
-
-    function handleTrashDragLeave(e) {
-      document.getElementById('trash-drop-zone').classList.remove('drag-over');
-    }
-
-    function handleTrashDrop(e) {
-      e.preventDefault();
-      document.getElementById('trash-drop-zone').classList.remove('active', 'drag-over');
-      try {
-        const raw = e.dataTransfer.getData('text/plain');
-        if (!raw) return;
-        const payload = JSON.parse(raw);
-        if (payload.action === 'reorder') {
-          rails[payload.fromRail].splice(payload.fromIdx, 1);
-          syncNextPhaseIndex();
-          saveState();
-          renderCabinet();
-          triggerVibration([50, 50]);
-        }
-      } catch (err) {}
-    }
-
-    function handleDragOverRail(e) {
-      e.preventDefault();
-      e.currentTarget.classList.add('drag-over');
-    }
-
-    function handleDragLeaveRail(e) {
-      e.currentTarget.classList.remove('drag-over');
-    }
-
-    function handleDropOnRail(e, targetRail) {
-      e.preventDefault();
-      e.currentTarget.classList.remove('drag-over');
-      document.getElementById('trash-drop-zone').classList.remove('active');
-      try {
-        const raw = e.dataTransfer.getData('text/plain');
-        if (!raw) return;
-        const payload = JSON.parse(raw);
-
-        if (payload.action === 'insert_new') {
-          let finalPhase = payload.phase;
-          if (finalPhase === 'auto') {
-            finalPhase = (payload.te >= 3) ? 'L1-L3' : getNextRotatedPhase();
-          }
-          insertModuleRaw(targetRail, payload.room, payload.desc, payload.type, payload.te, finalPhase, payload.cable);
-        } else if (payload.action === 'reorder') {
-          if (payload.fromRail !== targetRail) {
-            moveModuleToRailEnd(payload.fromRail, payload.fromIdx, targetRail);
-          }
-        }
-      } catch (err) {
-        console.error("Drop Fehler:", err);
-      }
-    }
-
-    function handleDropOnModule(e, targetRail, targetIdx) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.currentTarget.classList.remove('drag-target-over');
-      document.getElementById('trash-drop-zone').classList.remove('active');
-      try {
-        const raw = e.dataTransfer.getData('text/plain');
-        if (!raw) return;
-        const payload = JSON.parse(raw);
-
-        if (payload.action === 'reorder') {
-          swapOrMoveModules(payload.fromRail, payload.fromIdx, targetRail, targetIdx);
-        } else if (payload.action === 'insert_new') {
-          let finalPhase = payload.phase;
-          if (finalPhase === 'auto') {
-            finalPhase = (payload.te >= 3) ? 'L1-L3' : getNextRotatedPhase();
-          }
-          insertModuleRaw(targetRail, payload.room, payload.desc, payload.type, payload.te, finalPhase, payload.cable);
-        }
-      } catch (err) {
-        console.error("Reorder Drop Fehler:", err);
-      }
-    }
-
-    function swapOrMoveModules(fromRail, fromIdx, toRail, toIdx) {
-      if (fromRail === toRail && fromIdx === toIdx) return;
-
-      if (fromRail === toRail) {
-        const temp = rails[fromRail][fromIdx];
-        rails[fromRail].splice(fromIdx, 1);
-        rails[fromRail].splice(toIdx, 0, temp);
-      } else {
-        const movingMod = rails[fromRail][fromIdx];
-        const targetRailTE = (rails[toRail] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
-
-        if (targetRailTE + movingMod.te > 12) {
-          triggerVibration([100, 50, 100]);
-          alert(`Nicht genügend Platz auf Hutschiene ${toRail + 1}! Max. 12 TE.`);
-          return;
-        }
-
-        rails[fromRail].splice(fromIdx, 1);
-        rails[toRail].splice(toIdx, 0, movingMod);
-      }
-
-      triggerVibration(30);
-      saveState();
-      renderCabinet();
-    }
-
-    function moveModuleToRailEnd(fromRail, fromIdx, toRail) {
-      const movingMod = rails[fromRail][fromIdx];
-      const targetRailTE = (rails[toRail] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
-
-      if (targetRailTE + movingMod.te > 12) {
-        triggerVibration([100, 50, 100]);
-        alert(`Nicht genügend Platz auf Hutschiene ${toRail + 1}! Max. 12 TE.`);
-        return;
-      }
-
-      rails[fromRail].splice(fromIdx, 1);
-      rails[toRail].push(movingMod);
-      triggerVibration(30);
-      saveState();
-      renderCabinet();
-    }
-
-    function renderAsideCategoryPills() {
-      const container = document.getElementById('aside-cat-pills');
-      container.innerHTML = "";
-      ROOM_CATEGORIES.forEach(cat => {
-        const pill = document.createElement('div');
-        pill.className = `cat-pill ${cat === activeAsideCategory ? 'active' : ''}`;
-        pill.innerText = cat;
-        pill.onclick = () => {
-          activeAsideCategory = cat;
-          renderAsideCategoryPills();
-          renderAsideComponents();
-        };
-        container.appendChild(pill);
-      });
-    }
-
-    function renderAsideComponents() {
-      const grid = document.getElementById('aside-comp-grid');
-      grid.innerHTML = "";
-      const filtered = EFH_CATALOG.filter(it => it.cat === activeAsideCategory);
-
-      filtered.forEach(item => {
-        const btn = document.createElement('div');
-        btn.className = 'btn-comp';
-        btn.draggable = true;
-        
-        btn.ondragstart = (e) => {
-          const autoPhase = item.is3P ? 'L1-L3' : 'auto';
-          handleCatalogDragStart(e, item.room, item.desc, item.type, item.te, autoPhase, item.cable);
-        };
-
-        btn.innerHTML = `
-          <strong>${item.desc}</strong>
-          <span>${item.type} • ${item.te} TE ${item.is3P ? '(3P)' : ''}</span>
-        `;
-
-        btn.onclick = () => {
-          quickAddFirstFree(item.room, item.desc, item.type, item.te, item.cable);
-        };
-
-        grid.appendChild(btn);
-      });
+    function getNextRotatedPhase() {
+      const p = ['L1', 'L2', 'L3'];
+      const chosen = p[nextPhaseIdx % 3];
+      nextPhaseIdx++;
+      return chosen;
     }
 
     function syncNextPhaseIndex() {
-      let count1P = 0;
+      let count = 0;
       for (let r = 0; r < rowCount; r++) {
-        (rails[r] || []).forEach(m => {
-          if (m && m.type !== 'Blind' && m.phase !== 'L1-L3' && m.phase !== '-') count1P++;
-        });
+        (rails[r] || []).forEach(m => { if (m && m.type !== 'Blind' && m.phase !== 'L1-L3' && m.phase !== '-') count++; });
       }
-      nextPhaseIdx = count1P;
+      nextPhaseIdx = count;
+    }
+
+    function quickAddFirstFree(room, desc, type, te, cable) {
+      for (let r = 0; r < rowCount; r++) {
+        const used = (rails[r] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
+        if (used + te <= 12) {
+          let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
+          insertModuleRaw(r, room, desc, type, te, phase, cable);
+          return;
+        }
+      }
+      alert("Kein Platz frei für " + desc + " (" + te + " TE)!");
+    }
+
+    function insertModuleRaw(r, room, desc, type, te, phase, cable) {
+      if (!rails[r]) rails[r] = [];
+      rails[r].push({ room, desc, type, te, phase, cable });
+      saveState();
+      renderCabinet();
     }
 
     function saveState() {
-      try {
-        if (!currentObjId) currentObjId = "obj_" + Date.now();
-        const objData = { 
-          id: currentObjId, 
-          project, 
-          rowCount, 
-          rails: JSON.parse(JSON.stringify(rails)),
-          updatedAt: new Date().toISOString() 
-        };
-        localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
-        updatePhaseBalanceBar();
-      } catch (e) {
-        console.error("saveState Fehler:", e);
-      }
+      if (!currentObjId) currentObjId = "obj_" + Date.now();
+      const objData = { id: currentObjId, project, rowCount, rails, updatedAt: new Date().toISOString() };
+      localStorage.setItem('aprivina_active_obj', JSON.stringify(objData));
+      updatePhaseBalanceBar();
     }
 
     function updatePhaseBalanceBar() {
@@ -1731,116 +599,41 @@
           else if (m.phase === 'L1-L3') { l1++; l2++; l3++; }
         });
       }
-      const el = document.getElementById('phase-balance-bar');
-      if (el) {
-        el.innerHTML = `Phasen: <span style="color:#38bdf8; font-weight:bold;">L1: ${l1}</span> | <span style="color:#10b981; font-weight:bold;">L2: ${l2}</span> | <span style="color:#f59e0b; font-weight:bold;">L3: ${l3}</span>`;
-      }
+      document.getElementById('phase-balance-bar').innerHTML = `Phasen: <span style="color:#38bdf8;">L1: ${l1}</span> | <span style="color:#10b981;">L2: ${l2}</span> | <span style="color:#f59e0b;">L3: ${l3}</span>`;
     }
 
-    /* POUZDANO I ROBUSTNO SPREMANJE (FIRESTORE COMPLIANT) */
+    /* 100% POUZDANO SPREMANJE */
     function saveCurrentObject() {
-      try {
-        if (!currentObjId) currentObjId = "obj_" + Date.now();
-        if (!project.name) project.name = "Unbenanntes Objekt";
-        if (!project.address) project.address = "-";
-        if (!project.author) project.author = "Unbekannt";
+      saveState();
+      let list = getSavedObjectsList();
+      const existingIdx = list.findIndex(o => o && o.id === currentObjId);
+      const objRecord = {
+        id: currentObjId,
+        project: { ...project },
+        rowCount,
+        rails: JSON.parse(JSON.stringify(rails)),
+        savedAt: new Date().toLocaleString('de-DE')
+      };
 
-        saveState();
-
-        let list = getSavedObjectsList();
-        const existingIdx = list.findIndex(o => o.id === currentObjId);
-        
-        // Za lokalnu memoriju koristimo niz
-        const objRecord = {
-          id: currentObjId,
-          project: { ...project },
-          rowCount,
-          rails: JSON.parse(JSON.stringify(rails)),
-          savedAt: new Date().toLocaleString('de-DE')
-        };
-
-        if (existingIdx >= 0) {
-          list[existingIdx] = objRecord;
-        } else {
-          list.push(objRecord);
-        }
-
-        localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
-
-        // Za Firestore koristimo FLATTEN objekt jer Firestore brani Nested Arrays
-        if (db) {
-          const firestoreDoc = {
-            id: currentObjId,
-            project: { ...project },
-            rowCount,
-            railsData: convertRailsToFirestore(rails),
-            savedAt: new Date().toLocaleString('de-DE')
-          };
-
-          db.collection("projekte").doc(currentObjId).set(firestoreDoc)
-            .then(() => {
-              updateCloudBadge("☁️ Cloud Sync Aktiv", true);
-            })
-            .catch(err => {
-              console.warn("Firestore Sync Fehler:", err);
-              updateCloudBadge("⚡ Lokal gespeichert", false);
-            });
-        }
-
-        triggerVibration([30, 50, 30]);
-        alert("✅ ERFOLGREICH GESPEICHERT!\n\nObjekt: " + project.name + "\nStandort: " + project.address + "\n\nDie Unterverteilung wurde gesichert.");
-      } catch (err) {
-        console.error("Kritischer Speicherfehler:", err);
-        alert("Fehler beim Speichern: " + err.message);
+      if (existingIdx >= 0) {
+        list[existingIdx] = objRecord;
+      } else {
+        list.push(objRecord);
       }
+
+      localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
+      alert("✅ ERFOLGREICH GESPEICHERT!\n\nObjekt: " + project.name + "\nGespeichert auf diesem Gerät.");
     }
 
     function getSavedObjectsList() {
-      const str = localStorage.getItem('aprivina_saved_objects');
-      if (!str) return [];
-      try { 
-        const res = JSON.parse(str);
+      try {
+        const raw = localStorage.getItem('aprivina_saved_objects');
+        if (!raw) return [];
+        const res = JSON.parse(raw);
         return Array.isArray(res) ? res : [];
-      } catch (e) { 
-        return []; 
+      } catch (e) {
+        return [];
       }
-    }
-
-    function openNewObjectModal(canCancel = true) {
-      document.getElementById('inp-obj-name').value = "";
-      document.getElementById('inp-obj-addr').value = "";
-      document.getElementById('inp-obj-author').value = project.author || "";
-      document.getElementById('modal-project-title').innerText = "Objekt auswählen oder anlegen";
-      document.getElementById('btn-cancel-project').style.display = canCancel ? 'inline-flex' : 'none';
-      document.getElementById('modal-project').style.display = 'flex';
-    }
-
-    function closeProjectModal() {
-      if (!project.name) return;
-      document.getElementById('modal-project').style.display = 'none';
-    }
-
-    function switchFromStartToSaved() {
-      document.getElementById('modal-project').style.display = 'none';
-      openSavedObjectsModal();
-    }
-
-    function confirmProjectData() {
-      const name = document.getElementById('inp-obj-name').value.trim() || "Unbenanntes Objekt";
-      const addr = document.getElementById('inp-obj-addr').value.trim() || "-";
-      const author = document.getElementById('inp-obj-author').value.trim() || "Unbekannt";
-
-      currentObjId = "obj_" + Date.now();
-      project = { name, address: addr, author: author, date: new Date().toLocaleDateString('de-DE') };
-      rowCount = 4;
-      rails = [[], [], [], []];
-      nextPhaseIdx = 0;
-
-      document.getElementById('modal-project').style.display = 'none';
-      updateProjectLabels();
-      saveState();
-      renderCabinet();
-      triggerVibration(30);
     }
 
     function openSavedObjectsModal() {
@@ -1849,7 +642,7 @@
       container.innerHTML = "";
 
       if (list.length === 0) {
-        container.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding:15px; text-align:center;">Noch keine gespeicherten Objekte vorhanden. Klicken Sie oben auf "Speichern".</div>`;
+        container.innerHTML = `<div style="padding:15px; text-align:center; color:#94a3b8;">Noch keine Objekte gespeichert.</div>`;
       } else {
         list.forEach(obj => {
           if (!obj || !obj.project) return;
@@ -1858,12 +651,12 @@
           const isCurrent = (obj.id === currentObjId);
           item.innerHTML = `
             <div class="obj-list-info">
-              <strong>${obj.project.name || 'Unbenannt'} ${isCurrent ? '<span style="color:#10b981; font-size:0.7rem;">(Aktiv)</span>' : ''}</strong>
+              <strong>${obj.project.name || 'Unbenannt'} ${isCurrent ? '<span style="color:#10b981;">(Aktiv)</span>' : ''}</strong>
               <span>📍 ${obj.project.address || '-'} • Prüfer: ${obj.project.author || '-'} • ${obj.savedAt || ''}</span>
             </div>
             <div class="obj-list-actions">
-              <button class="primary" style="padding:6px 10px;" onclick="loadSavedObject('${obj.id}')">Laden</button>
-              <button class="danger" style="padding:6px 10px;" onclick="deleteSavedObject('${obj.id}')">Löschen</button>
+              <button class="primary" onclick="loadSavedObject('${obj.id}')">Laden</button>
+              <button class="danger" onclick="deleteSavedObject('${obj.id}')">Löschen</button>
             </div>
           `;
           container.appendChild(item);
@@ -1872,582 +665,256 @@
       document.getElementById('modal-saved-list').style.display = 'flex';
     }
 
-    function closeSavedObjectsModal() {
-      document.getElementById('modal-saved-list').style.display = 'none';
-      if (!project.name) openNewObjectModal(false);
-    }
+    function closeSavedObjectsModal() { document.getElementById('modal-saved-list').style.display = 'none'; }
 
     function loadSavedObject(id) {
       const list = getSavedObjectsList();
       const target = list.find(o => o && o.id === id);
       if (!target) return;
-
       currentObjId = target.id;
       project = { ...(target.project || {}) };
-      if (!project.author) project.author = "";
       rowCount = target.rowCount || 4;
-      
-      if (Array.isArray(target.rails)) {
-        rails = JSON.parse(JSON.stringify(target.rails));
-      } else if (target.railsData) {
-        rails = convertFirestoreToRails(target.railsData, rowCount);
-      } else {
-        rails = [[], [], [], []];
-      }
-
+      rails = JSON.parse(JSON.stringify(target.rails || [[],[],[],[]]));
       while (rails.length < 4) rails.push([]);
       syncNextPhaseIndex();
-
       updateProjectLabels();
       saveState();
       renderCabinet();
       closeSavedObjectsModal();
-      triggerVibration(30);
     }
 
     function deleteSavedObject(id) {
-      if (!confirm("Möchten Sie dieses Objekt wirklich unwiderruflich löschen?")) return;
-      let list = getSavedObjectsList();
-      list = list.filter(o => o && o.id !== id);
+      if (!confirm("Objekt wirklich löschen?")) return;
+      let list = getSavedObjectsList().filter(o => o && o.id !== id);
       localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
-
-      if (db) {
-        db.collection("projekte").doc(id).delete().catch(e => console.warn(e));
-      }
-
       openSavedObjectsModal();
-      triggerVibration(50);
+    }
+
+    function openNewObjectModal() { document.getElementById('modal-project').style.display = 'flex'; }
+    function closeProjectModal() { document.getElementById('modal-project').style.display = 'none'; }
+
+    function confirmProjectData() {
+      const name = document.getElementById('inp-obj-name').value.trim() || "Neubau EFH";
+      const addr = document.getElementById('inp-obj-addr').value.trim() || "Musterstraße 1";
+      const author = document.getElementById('inp-obj-author').value.trim() || "Elektriker";
+
+      currentObjId = "obj_" + Date.now();
+      project = { name, address: addr, author, date: new Date().toLocaleDateString('de-DE') };
+      rowCount = 4;
+      rails = [[], [], [], []];
+      nextPhaseIdx = 0;
+      closeProjectModal();
+      updateProjectLabels();
+      saveState();
+      renderCabinet();
     }
 
     function updateProjectLabels() {
       document.getElementById('lbl-obj-name').innerText = project.name || "-";
-      document.getElementById('lbl-obj-addr').innerText = project.address || "-";
       document.getElementById('lbl-obj-author').innerText = project.author || "-";
-      document.getElementById('print-obj-name').innerText = project.name || "-";
-      document.getElementById('print-obj-addr').innerText = project.address || "-";
-      document.getElementById('print-obj-author').innerText = project.author || "-";
-      document.getElementById('print-obj-date').innerText = project.date || "-";
-      document.getElementById('strip-obj-name').innerText = (project.name || "-") + " (" + (project.address || "-") + ")";
-      document.getElementById('strip-obj-author').innerText = project.author || "-";
       document.getElementById('cab-title').innerText = "Unterverteiler - " + (project.name || "");
       updatePhaseBalanceBar();
     }
 
-    function setRows(num) {
-      rowCount = num;
-      while (rails.length < rowCount) rails.push([]);
-      saveState();
-      renderCabinet();
-      triggerVibration(20);
-    }
-
-    function getNextRotatedPhase() {
-      const phases = ['L1', 'L2', 'L3'];
-      const chosen = phases[nextPhaseIdx % 3];
-      nextPhaseIdx++;
-      return chosen;
-    }
-
-    function insertModuleRaw(railIdx, room, desc, type, te, phase, cable) {
-      if (!rails[railIdx]) rails[railIdx] = [];
-
-      const currentTE = (rails[railIdx] || []).reduce((acc, m) => acc + (m ? m.te : 0), 0);
-      if (currentTE + te > 12) {
-        triggerVibration([100, 50, 100]);
-        alert("Nicht genügend Platz! Eine Reihe hat maximal 12 TE. Verfügbar: " + (12 - currentTE) + " TE.");
-        return;
-      }
-
-      rails[railIdx].push({ room, desc, type, te, phase, cable });
-      triggerVibration(25);
-      saveState();
-      renderCabinet();
-    }
-
     function clearAllRails() {
-      if (!confirm("Möchten Sie wirklich den KOMPLETTEN Schrank (alle Reihen 1-4) leeren? Alle bestückten Module werden entfernt!")) return;
+      if (!confirm("Kompletten Schrank wirklich leeren?")) return;
       rails = [[], [], [], []];
       nextPhaseIdx = 0;
       saveState();
       renderCabinet();
-      triggerVibration([80, 50, 80]);
-    }
-
-    function openTouchSelectModal(railIdx, freeTE) {
-      touchTargetRail = railIdx;
-      document.getElementById('touch-select-title').innerText = `Verbraucher auf Hutschiene ${railIdx + 1} einsetzen`;
-      document.getElementById('touch-select-subtitle').innerText = `Verfügbarer Platz: ${freeTE} von 12 TE`;
-
-      renderModalCategoryPills(freeTE);
-      renderModalSelectionGrid(freeTE);
-
-      document.getElementById('modal-touch-select').style.display = 'flex';
-      triggerVibration(20);
-    }
-
-    function renderModalCategoryPills(freeTE) {
-      const container = document.getElementById('modal-cat-pills');
-      container.innerHTML = "";
-      ROOM_CATEGORIES.forEach(cat => {
-        const pill = document.createElement('div');
-        pill.className = `cat-pill ${cat === activeModalCategory ? 'active' : ''}`;
-        pill.innerText = cat;
-        pill.onclick = () => {
-          activeModalCategory = cat;
-          renderModalCategoryPills(freeTE);
-          renderModalSelectionGrid(freeTE);
-        };
-        container.appendChild(pill);
-      });
-    }
-
-    function renderModalSelectionGrid(freeTE) {
-      const grid = document.getElementById('touch-select-grid');
-      grid.innerHTML = "";
-
-      const filtered = EFH_CATALOG.filter(it => it.cat === activeModalCategory);
-
-      filtered.forEach(item => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'btn-select-comp';
-        const isTooBig = item.te > freeTE;
-        btn.disabled = isTooBig;
-
-        btn.innerHTML = `
-          <strong>${item.desc}</strong>
-          <span>${item.room} • ${item.type} (${item.te} TE)</span>
-          <span style="color:#0284c7; font-size:0.65rem;">${item.cable}</span>
-          ${isTooBig ? '<span style="color:#ef4444; font-size:0.65rem; font-weight:bold;">Zu wenig Platz</span>' : ''}
-        `;
-
-        btn.onclick = () => {
-          let phase = item.is3P ? 'L1-L3' : getNextRotatedPhase();
-          insertModuleRaw(touchTargetRail, item.room, item.desc, item.type, item.te, phase, item.cable);
-          closeTouchSelectModal();
-        };
-
-        grid.appendChild(btn);
-      });
-    }
-
-    function closeTouchSelectModal() {
-      document.getElementById('modal-touch-select').style.display = 'none';
     }
 
     function renderCabinet() {
       const container = document.getElementById('cabinet-rows');
       container.innerHTML = "";
-
       for (let r = 0; r < rowCount; r++) {
         if (!rails[r]) rails[r] = [];
-
+        const used = rails[r].reduce((acc, m) => acc + (m ? m.te : 0), 0);
+        const free = 12 - used;
         const rowDiv = document.createElement('div');
         rowDiv.className = 'din-rail-row';
-        const usedTE = rails[r].reduce((acc, m) => acc + (m ? m.te : 0), 0);
-        const freeTE = 12 - usedTE;
-
         rowDiv.innerHTML = `
-          <div class="rail-info">
-            <span>Hutschiene ${r + 1}</span>
-            <span>Belegt: ${usedTE} / 12 TE (${freeTE} TE frei)</span>
-          </div>
-          <div class="din-rail" id="rail-grid-${r}" 
-               ondragover="handleDragOverRail(event)" 
-               ondragleave="handleDragLeaveRail(event)" 
-               ondrop="handleDropOnRail(event, ${r})"></div>
+          <div class="rail-info"><span>Hutschiene ${r + 1}</span><span>Belegt: ${used} / 12 TE</span></div>
+          <div class="din-rail" id="rail-${r}"></div>
         `;
         container.appendChild(rowDiv);
+        const grid = rowDiv.querySelector(`#rail-${r}`);
 
-        const grid = rowDiv.querySelector(`#rail-grid-${r}`);
-        rails[r].forEach((mod, modIdx) => {
+        rails[r].forEach((mod, idx) => {
           if (!mod) return;
-          const modEl = document.createElement('div');
-          modEl.className = `module-item mod-${mod.te}`;
-          modEl.draggable = true;
-
-          modEl.ondragstart = (e) => handleModuleDragStart(e, r, modIdx);
-          modEl.ondragover = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            modEl.classList.add('drag-target-over');
-          };
-          modEl.ondragleave = (e) => {
-            e.stopPropagation();
-            modEl.classList.remove('drag-target-over');
-          };
-          modEl.ondrop = (e) => handleDropOnModule(e, r, modIdx);
-
-          modEl.onclick = () => openEditModule(r, modIdx);
-
-          let centerContent = `<div class="mod-toggle"></div>`;
-          if (mod.type && mod.type.includes('FI')) {
-            centerContent = `<div class="btn-test">T</div><div class="mod-toggle"></div>`;
-          }
-
-          modEl.innerHTML = `
-            <div class="mod-top">
-              <span class="mod-type">${mod.type || ''}</span>
-            </div>
-            <div class="mod-center">
-              ${centerContent}
-            </div>
-            <div class="mod-bottom">
-              <div class="mod-room">${mod.room || ''}</div>
-              <div class="mod-desc">${mod.desc || ''}</div>
-            </div>
+          const el = document.createElement('div');
+          el.className = `module-item mod-${mod.te}`;
+          el.onclick = () => openEditModule(r, idx);
+          el.innerHTML = `
+            <div class="mod-top"><span class="mod-type">${mod.type}</span></div>
+            <div class="mod-center"><div class="mod-toggle"></div></div>
+            <div class="mod-bottom"><div class="mod-room">${mod.room}</div><div class="mod-desc">${mod.desc}</div></div>
           `;
-          grid.appendChild(modEl);
+          grid.appendChild(el);
         });
 
-        if (freeTE > 0) {
-          const emptySlot = document.createElement('div');
-          emptySlot.className = 'touch-slot-empty';
-          emptySlot.style.gridColumn = `span ${freeTE}`;
-          emptySlot.innerHTML = `
-            <div class="touch-slot-icon">+</div>
-            <div class="touch-slot-label">Hier tippen (${freeTE} TE frei)</div>
-          `;
-          emptySlot.onclick = () => openTouchSelectModal(r, freeTE);
-          grid.appendChild(emptySlot);
+        if (free > 0) {
+          const empty = document.createElement('div');
+          empty.className = 'touch-slot-empty';
+          empty.style.gridColumn = `span ${free}`;
+          empty.innerHTML = `<div class="touch-slot-icon">+</div><div class="touch-slot-label">${free} TE frei</div>`;
+          empty.onclick = () => openTouchSelectModal(r, free);
+          grid.appendChild(empty);
         }
       }
-
       renderTable();
       renderTopology();
-      renderStrips();
     }
 
-    function renderTopology() {
-      const branchesContainer = document.getElementById('topo-branches-container');
-      branchesContainer.innerHTML = "";
-
-      let totalBreakers = 0;
-
-      for (let r = 0; r < rowCount; r++) {
-        const railItems = rails[r] || [];
-        const validItems = railItems.filter(m => m && m.type !== 'Blind');
-
-        if (validItems.length === 0) continue;
-        totalBreakers += validItems.length;
-
-        const fiItem = validItems.find(m => m.type && m.type.includes('FI'));
-        let groupTitle = `Hutschiene ${r + 1}`;
-        if (fiItem) {
-          groupTitle += ` • FI (${fiItem.desc || 'RCD'})`;
-        }
-
-        const col = document.createElement('div');
-        col.className = 'topo-rail-card';
-        col.innerHTML = `
-          <div class="topo-rail-card-title">
-            <span>⚡ ${groupTitle}</span>
-            <span style="font-size:0.7rem; color:#0284c7; font-weight:bold;">${validItems.length} Mod.</span>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            ${validItems.map(it => `
-              <div class="topo-item">
-                <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:65%;">
-                  <strong>${it.room}:</strong> ${it.desc}
-                </div>
-                <div style="text-align:right; white-space:nowrap;">
-                  <span style="font-weight:bold; color:#0284c7;">${it.type}</span>
-                  <span style="font-size:0.65rem; color:#475569; font-weight:600;">(${it.phase})</span>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-        branchesContainer.appendChild(col);
-      }
-
-      if (totalBreakers === 0) {
-        branchesContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Keine Stromkreise vorhanden. Bitte Verbraucher über das Menü links hinzufügen.</div>';
-      }
+    function openTouchSelectModal(railIdx, freeTE) {
+      touchTargetRail = railIdx;
+      document.getElementById('touch-select-title').innerText = `Hutschiene ${railIdx + 1} (${freeTE} TE frei)`;
+      renderModalCategoryPills(freeTE);
+      renderModalSelectionGrid(freeTE);
+      document.getElementById('modal-touch-select').style.display = 'flex';
     }
 
-    function renderTable() {
-      const tbody = document.getElementById('table-body');
-      tbody.innerHTML = "";
-      let count = 1;
-
-      for (let r = 0; r < rowCount; r++) {
-        if (!rails[r]) continue;
-        rails[r].forEach(m => {
-          if (!m || m.type === 'Blind') return;
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>F${count++}</td>
-            <td><strong>Reihe ${r + 1}</strong></td>
-            <td><strong style="color:#0284c7;">${m.room}</strong></td>
-            <td>${m.desc}</td>
-            <td><strong>${m.type}</strong></td>
-            <td>${m.te} TE</td>
-            <td><span style="font-weight:bold; color:#047857;">${m.phase}</span></td>
-            <td>${m.cable}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
+    function renderModalCategoryPills(freeTE) {
+      const c = document.getElementById('modal-cat-pills');
+      c.innerHTML = "";
+      ROOM_CATEGORIES.forEach(cat => {
+        const p = document.createElement('div');
+        p.className = `cat-pill ${cat === activeModalCategory ? 'active' : ''}`;
+        p.innerText = cat;
+        p.onclick = () => { activeModalCategory = cat; renderModalCategoryPills(freeTE); renderModalSelectionGrid(freeTE); };
+        c.appendChild(p);
+      });
     }
 
-    function renderStrips() {
-      const container = document.getElementById('strips-render-container');
-      container.innerHTML = "";
-
-      for (let r = 0; r < rowCount; r++) {
-        const railItems = rails[r] || [];
-        const stripRow = document.createElement('div');
-        stripRow.className = 'strip-row';
-
-        let curTE = 0;
-        railItems.forEach(m => {
-          if (!m) return;
-          const cell = document.createElement('div');
-          const isSingle = (m.te === 1);
-          cell.className = `strip-cell ${isSingle ? 'strip-cell-te-1' : 'strip-cell-te-multi'}`;
-          cell.style.gridColumn = `span ${m.te}`;
-          
-          cell.innerHTML = `
-            <div class="strip-room">${m.room}</div>
-            <div class="strip-desc">${m.desc}</div>
-            <div class="strip-sub">${m.type} (${m.phase})</div>
-          `;
-          stripRow.appendChild(cell);
-          curTE += m.te;
-        });
-
-        while (curTE < 12) {
-          const emptyCell = document.createElement('div');
-          emptyCell.className = 'strip-cell strip-cell-te-1';
-          emptyCell.style.gridColumn = `span 1`;
-          emptyCell.innerHTML = `<span style="color:#bbb; font-size:5.5pt;">Reserve</span>`;
-          stripRow.appendChild(emptyCell);
-          curTE++;
-        }
-
-        const title = document.createElement('div');
-        title.style.fontSize = '8.5pt';
-        title.style.fontWeight = 'bold';
-        title.style.marginBottom = '1.5mm';
-        title.innerText = `Reihe ${r + 1} (Hutschiene ${r + 1}):`;
-
-        container.appendChild(title);
-        container.appendChild(stripRow);
-      }
+    function renderModalSelectionGrid(freeTE) {
+      const g = document.getElementById('touch-select-grid');
+      g.innerHTML = "";
+      EFH_CATALOG.filter(i => i.cat === activeModalCategory).forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-select-comp';
+        btn.disabled = (item.te > freeTE);
+        btn.innerHTML = `<strong>${item.desc}</strong><span>${item.type} (${item.te} TE)</span>`;
+        btn.onclick = () => {
+          let phase = item.is3P ? 'L1-L3' : getNextRotatedPhase();
+          insertModuleRaw(touchTargetRail, item.room, item.desc, item.type, item.te, phase, item.cable);
+          closeTouchSelectModal();
+        };
+        g.appendChild(btn);
+      });
     }
 
-    function openEditModule(railIdx, modIdx) {
-      const mod = rails[railIdx][modIdx];
-      document.getElementById('edit-rail-idx').value = railIdx;
-      document.getElementById('edit-mod-idx').value = modIdx;
-      document.getElementById('edit-room').value = mod.room;
-      document.getElementById('edit-desc').value = mod.desc;
-      document.getElementById('edit-phase').value = mod.phase;
-      document.getElementById('edit-cable').value = mod.cable;
+    function closeTouchSelectModal() { document.getElementById('modal-touch-select').style.display = 'none'; }
+
+    function openEditModule(r, idx) {
+      const m = rails[r][idx];
+      document.getElementById('edit-rail-idx').value = r;
+      document.getElementById('edit-mod-idx').value = idx;
+      document.getElementById('edit-room').value = m.room;
+      document.getElementById('edit-desc').value = m.desc;
+      document.getElementById('edit-phase').value = m.phase;
+      document.getElementById('edit-cable').value = m.cable;
       document.getElementById('modal-module').style.display = 'flex';
-      triggerVibration(20);
     }
 
-    function closeModuleModal() {
-      document.getElementById('modal-module').style.display = 'none';
-    }
+    function closeModuleModal() { document.getElementById('modal-module').style.display = 'none'; }
 
     function saveModuleEdit() {
-      const r = parseInt(document.getElementById('edit-rail-idx').value);
-      const m = parseInt(document.getElementById('edit-mod-idx').value);
-
-      rails[r][m].room = document.getElementById('edit-room').value;
-      rails[r][m].desc = document.getElementById('edit-desc').value;
-      rails[r][m].phase = document.getElementById('edit-phase').value;
-      rails[r][m].cable = document.getElementById('edit-cable').value;
-
+      const r = document.getElementById('edit-rail-idx').value;
+      const idx = document.getElementById('edit-mod-idx').value;
+      rails[r][idx].room = document.getElementById('edit-room').value;
+      rails[r][idx].desc = document.getElementById('edit-desc').value;
+      rails[r][idx].phase = document.getElementById('edit-phase').value;
+      rails[r][idx].cable = document.getElementById('edit-cable').value;
       closeModuleModal();
       saveState();
       renderCabinet();
-      triggerVibration(25);
-    }
-
-    function duplicateCurrentModule() {
-      const r = parseInt(document.getElementById('edit-rail-idx').value);
-      const m = parseInt(document.getElementById('edit-mod-idx').value);
-      const target = rails[r][m];
-
-      const currentTE = rails[r].reduce((acc, it) => acc + (it ? it.te : 0), 0);
-      if (currentTE + target.te > 12) {
-        triggerVibration([100, 50, 100]);
-        alert("Nicht genügend freier Platz in dieser Reihe für ein Duplikat (max. 12 TE)!");
-        return;
-      }
-
-      let dupPhase = (target.te === 1) ? getNextRotatedPhase() : target.phase;
-
-      rails[r].push({
-        room: target.room,
-        desc: target.desc,
-        type: target.type,
-        te: target.te,
-        phase: dupPhase,
-        cable: target.cable
-      });
-
-      closeModuleModal();
-      saveState();
-      renderCabinet();
-      triggerVibration(30);
     }
 
     function deleteCurrentModule() {
-      const r = parseInt(document.getElementById('edit-rail-idx').value);
-      const m = parseInt(document.getElementById('edit-mod-idx').value);
-      rails[r].splice(m, 1);
+      const r = document.getElementById('edit-rail-idx').value;
+      const idx = document.getElementById('edit-mod-idx').value;
+      rails[r].splice(idx, 1);
       closeModuleModal();
       syncNextPhaseIndex();
       saveState();
       renderCabinet();
-      triggerVibration([40, 40]);
     }
 
-    function exportToCSV() {
-      let csv = "\uFEFF";
-      csv += "Nr;Hutschiene;Raum;Verbraucher / Funktion;Schutzorgan;Breite (TE);Phase;Kabeltyp;Monteur\r\n";
+    function renderAsideCategoryPills() {
+      const c = document.getElementById('aside-cat-pills');
+      c.innerHTML = "";
+      ROOM_CATEGORIES.forEach(cat => {
+        const p = document.createElement('div');
+        p.className = `cat-pill ${cat === activeAsideCategory ? 'active' : ''}`;
+        p.innerText = cat;
+        p.onclick = () => { activeAsideCategory = cat; renderAsideCategoryPills(); renderAsideComponents(); };
+        c.appendChild(p);
+      });
+    }
 
+    function renderAsideComponents() {
+      const g = document.getElementById('aside-comp-grid');
+      g.innerHTML = "";
+      EFH_CATALOG.filter(i => i.cat === activeAsideCategory).forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'btn-comp';
+        btn.innerHTML = `<strong>${item.desc}</strong><span>${item.type} (${item.te} TE)</span>`;
+        btn.onclick = () => quickAddFirstFree(item.room, item.desc, item.type, item.te, item.cable);
+        g.appendChild(btn);
+      });
+    }
+
+    function applyStandardEFHLayout() {
+      if (!confirm("Standard-EFH laden?")) return;
+      rails = [
+        [{room:'Einspeisung',desc:'Hauptschalter',type:'3P 63A',te:3,phase:'L1-L3',cable:'-'},{room:'Schutz',desc:'FI 1',type:'FI 4P',te:4,phase:'L1-L3',cable:'-'},{room:'Küche',desc:'E-Herd',type:'3P B16',te:3,phase:'L1-L3',cable:'NYM-J 5x2.5'}],
+        [{room:'Schutz',desc:'FI 2',type:'FI 4P',te:4,phase:'L1-L3',cable:'-'},{room:'Küche',desc:'Geschirrspüler',type:'1P B16',te:1,phase:'L1',cable:'NYM-J 3x2.5'},{room:'Küche',desc:'Backofen',type:'1P B16',te:1,phase:'L2',cable:'NYM-J 3x2.5'}],
+        [{room:'Schutz',desc:'FI 3',type:'FI 4P',te:4,phase:'L1-L3',cable:'-'},{room:'Bad',desc:'Waschmaschine',type:'1P B16',te:1,phase:'L1',cable:'NYM-J 3x2.5'},{room:'Bad',desc:'Trockner',type:'1P B16',te:1,phase:'L2',cable:'NYM-J 3x2.5'}],
+        [{room:'Technik',desc:'Wärmepumpe',type:'3P C16',te:3,phase:'L1-L3',cable:'NYM-J 5x2.5'},{room:'Garage',desc:'Wallbox',type:'3P B16',te:3,phase:'L1-L3',cable:'NYM-J 5x6.0'}]
+      ];
+      syncNextPhaseIndex();
+      saveState();
+      renderCabinet();
+    }
+
+    function renderTopology() {
+      const c = document.getElementById('topo-branches-container');
+      c.innerHTML = "";
+      for (let r = 0; r < rowCount; r++) {
+        const items = (rails[r] || []).filter(m => m && m.type !== 'Blind');
+        if (items.length === 0) continue;
+        const col = document.createElement('div');
+        col.className = 'topo-rail-card';
+        col.innerHTML = `
+          <div class="topo-rail-card-title"><span>Hutschiene ${r + 1}</span><span>${items.length} Mod.</span></div>
+          ${items.map(it => `<div class="topo-item"><span>${it.room}: ${it.desc}</span><strong>${it.type} (${it.phase})</strong></div>`).join('')}
+        `;
+        c.appendChild(col);
+      }
+    }
+
+    function renderTable() {
+      const tb = document.getElementById('table-body');
+      tb.innerHTML = "";
       let count = 1;
       for (let r = 0; r < rowCount; r++) {
         (rails[r] || []).forEach(m => {
           if (!m || m.type === 'Blind') return;
-          csv += `F${count++};Reihe ${r + 1};"${m.room}";"${m.desc}";"${m.type}";${m.te};"${m.phase}";"${m.cable}";"${project.author || ''}"\r\n`;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>F${count++}</td><td>Reihe ${r + 1}</td><td>${m.room}</td><td>${m.desc}</td><td>${m.type}</td><td>${m.te}</td><td>${m.phase}</td><td>${m.cable}</td>`;
+          tb.appendChild(tr);
         });
       }
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `${project.name.replace(/[^a-zA-Z0-9]/g, '_')}_Stromkreisliste.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      triggerVibration(30);
     }
 
-    function downloadBackupJSON() {
-      const fullBackup = {
-        app: "APrivina Unterverteiler Planer",
-        version: "2.6",
-        backupDate: new Date().toISOString(),
-        userPin: getStoredPin(),
-        activeProject: { id: currentObjId, project, rowCount, rails },
-        savedProjects: getSavedObjectsList()
-      };
-
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullBackup, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `APrivina_Backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      triggerVibration(30);
-    }
-
-    function importBackupJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (parsed.savedProjects) {
-            localStorage.setItem('aprivina_saved_objects', JSON.stringify(parsed.savedProjects));
-          }
-          if (parsed.activeProject) {
-            localStorage.setItem('aprivina_active_obj', JSON.stringify(parsed.activeProject));
-            currentObjId = parsed.activeProject.id;
-            project = parsed.activeProject.project;
-            rowCount = parsed.activeProject.rowCount;
-            rails = parsed.activeProject.rails;
-          }
-          if (parsed.userPin) {
-            localStorage.setItem('aprivina_user_pin', parsed.userPin);
-          }
-          alert("Backup erfolgreich importiert!");
-          closeSettingsModal();
-          syncNextPhaseIndex();
-          updateProjectLabels();
-          renderCabinet();
-          triggerVibration([30, 50, 30]);
-        } catch (err) {
-          triggerVibration([100, 50, 100]);
-          alert("Fehler beim Lesen der Backup-Datei! Bitte gültiges JSON wählen.");
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function openSettingsModal() {
-      document.getElementById('inp-new-pin').value = "";
-      document.getElementById('modal-settings').style.display = 'flex';
-      triggerVibration(20);
-    }
-
-    function closeSettingsModal() {
-      document.getElementById('modal-settings').style.display = 'none';
-    }
-
-    function changePinCode() {
-      const newPin = document.getElementById('inp-new-pin').value.trim();
-      if (!/^\d{4}$/.test(newPin)) {
-        triggerVibration([100, 50, 100]);
-        alert("Der PIN muss aus genau 4 Ziffern bestehen!");
-        return;
-      }
-      localStorage.setItem('aprivina_user_pin', newPin);
-      triggerVibration([30, 50, 30]);
-      alert(`PIN erfolgreich geändert auf: ${newPin}`);
-      closeSettingsModal();
-    }
-
-    function printDoc() {
-      document.body.className = "print-mode-doc";
-      document.getElementById('view-verteiler').style.display = 'block';
-      document.getElementById('view-topologie').style.display = 'block';
-      document.getElementById('view-tabelle').style.display = 'block';
-      window.print();
-    }
-
-    function printStrips() {
-      document.body.className = "print-mode-strips";
-      renderStrips();
-      window.print();
-    }
-
-    window.onafterprint = function() {
-      document.body.className = "print-mode-doc";
-      const activeIdx = Array.from(document.querySelectorAll('.nav-tab')).findIndex(b => b.classList.contains('active'));
-      if (activeIdx === 0) switchView('verteiler');
-      else if (activeIdx === 1) switchView('topologie');
-      else switchView('tabelle');
-    };
-
-    function switchView(view) {
+    function openSettingsModal() { document.getElementById('modal-settings').style.display = 'flex'; }
+    function closeSettingsModal() { document.getElementById('modal-settings').style.display = 'none'; }
+    function printDoc() { window.print(); }
+    function switchView(v) {
       document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-      document.getElementById('view-verteiler').style.display = 'none';
-      document.getElementById('view-topologie').style.display = 'none';
-      document.getElementById('view-tabelle').style.display = 'none';
-
-      if (view === 'verteiler') {
-        document.querySelectorAll('.nav-tab')[0].classList.add('active');
-        document.getElementById('view-verteiler').style.display = 'block';
-      } else if (view === 'topologie') {
-        document.querySelectorAll('.nav-tab')[1].classList.add('active');
-        document.getElementById('view-topologie').style.display = 'block';
-      } else {
-        document.querySelectorAll('.nav-tab')[2].classList.add('active');
-        document.getElementById('view-tabelle').style.display = 'block';
-      }
-      triggerVibration(15);
+      document.getElementById('view-verteiler').style.display = (v === 'verteiler') ? 'block' : 'none';
+      document.getElementById('view-topologie').style.display = (v === 'topologie') ? 'block' : 'none';
+      document.getElementById('view-tabelle').style.display = (v === 'tabelle') ? 'block' : 'none';
     }
   </script>
 </body>
