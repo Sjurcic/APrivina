@@ -154,6 +154,7 @@
       overflow-y: auto;
       padding-right: 4px;
     }
+
     .btn-comp {
       display: flex;
       flex-direction: column;
@@ -164,9 +165,12 @@
       border-radius: 6px;
       font-size: 0.75rem;
       text-align: left;
-      cursor: pointer;
+      cursor: grab;
       touch-action: manipulation;
+      user-select: none;
+      transition: transform 0.15s ease, border-color 0.15s ease;
     }
+    .btn-comp:active { cursor: grabbing; transform: scale(0.97); }
     .btn-comp:hover { border-color: #38bdf8; background: #334155; }
     .btn-comp strong { font-size: 0.78rem; color: #fff; margin-bottom: 2px; line-height: 1.1; }
     .btn-comp span { color: var(--text-muted); font-size: 0.65rem; }
@@ -199,7 +203,7 @@
       padding: 14px;
       color: #0f172a;
       min-width: 660px;
-      max-width: 950px;
+      max-width: 980px;
       margin: 0 auto;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
@@ -227,29 +231,41 @@
     .din-rail {
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 3px;
+      gap: 4px;
       background: #64748b;
-      padding: 4px;
+      padding: 5px;
       border-radius: 4px;
-      min-height: 140px;
+      min-height: 160px;
       position: relative;
+      transition: background-color 0.2s ease, outline 0.2s ease;
+    }
+    .din-rail.drag-over {
+      background-color: #334155;
+      outline: 2px dashed #38bdf8;
     }
 
     /* Breaker Elements */
     .module-item {
       background: #ffffff;
-      border: 1px solid #0f172a;
-      border-radius: 3px;
+      border: 1.5px solid #0f172a;
+      border-radius: 4px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 4px 2px;
+      padding: 4px 2px 3px 2px;
       font-size: 0.65rem;
-      cursor: pointer;
+      cursor: grab;
       position: relative;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
       user-select: none;
       touch-action: manipulation;
+      min-height: 148px;
+      transition: transform 0.1s ease, border-color 0.1s ease;
+    }
+    .module-item:active { cursor: grabbing; }
+    .module-item.drag-target-over {
+      outline: 3px solid #f59e0b !important;
+      transform: scale(0.96);
     }
     .module-item:hover { outline: 2px solid #2563eb; }
     .mod-1 { grid-column: span 1; }
@@ -258,13 +274,42 @@
     .mod-4 { grid-column: span 4; }
 
     .mod-top { text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
-    .mod-type { font-weight: 700; font-size: 0.7rem; color: #0f172a; }
-    .mod-center { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 6px 0; }
-    .mod-toggle { width: 14px; height: 26px; background: #0f172a; border-radius: 2px; margin-bottom: 4px; }
-    .btn-test { background: #2563eb; color: #fff; border-radius: 2px; font-size: 0.55rem; padding: 1px 3px; font-weight: 700; margin-bottom: 2px; }
-    .mod-bottom { background: #f1f5f9; padding: 2px; text-align: center; border-top: 1px solid #cbd5e1; }
-    .mod-room { font-weight: 700; color: #0284c7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.6rem; }
-    .mod-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.55rem; color: #334155; }
+    .mod-type { font-weight: 800; font-size: 0.72rem; color: #0f172a; line-height: 1.1; }
+    
+    .mod-center { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 4px 0; }
+    .mod-toggle { width: 14px; height: 26px; background: #0f172a; border-radius: 2px; margin-bottom: 3px; }
+    .btn-test { background: #2563eb; color: #fff; border-radius: 2px; font-size: 0.58rem; padding: 1px 4px; font-weight: 800; margin-bottom: 2px; }
+    
+    .mod-bottom {
+      background: #f8fafc;
+      padding: 3px 2px;
+      text-align: center;
+      border-top: 1.5px solid #cbd5e1;
+      border-radius: 0 0 3px 3px;
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1px;
+    }
+    .mod-room {
+      font-weight: 800;
+      color: #0284c7;
+      font-size: 0.63rem;
+      line-height: 1.15;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .mod-desc {
+      font-weight: 600;
+      font-size: 0.60rem;
+      color: #1e293b;
+      line-height: 1.15;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
 
     /* Touch Slot Button for Free TE */
     .touch-slot-empty {
@@ -282,16 +327,17 @@
       transition: all 0.2s ease;
       padding: 6px 4px;
       text-align: center;
+      min-height: 148px;
     }
     .touch-slot-empty:hover, .touch-slot-empty:active {
       background: rgba(56, 189, 248, 0.3);
       border-color: #38bdf8;
       color: #38bdf8;
     }
-    .touch-slot-icon { font-size: 1.4rem; font-weight: bold; line-height: 1; margin-bottom: 4px; }
-    .touch-slot-label { font-size: 0.7rem; font-weight: 700; }
+    .touch-slot-icon { font-size: 1.6rem; font-weight: bold; line-height: 1; margin-bottom: 4px; }
+    .touch-slot-label { font-size: 0.72rem; font-weight: 700; }
 
-    /* Topology */
+    /* Topology (Desktop / Screen) */
     .topology-container {
       background: #0f172a;
       border: 1px solid var(--border);
@@ -311,13 +357,19 @@
     }
     .topo-node-title { font-weight: 700; font-size: 0.85rem; color: #38bdf8; }
     .topo-node-sub { font-size: 0.75rem; color: var(--text-muted); }
-    .topo-line-v { width: 2px; height: 20px; background: #475569; margin: 0 auto; }
-    .topo-busbar { height: 6px; background: #eab308; border-radius: 3px; margin: 12px 0 20px 0; position: relative; }
+    .topo-line-v { width: 2px; height: 18px; background: #475569; margin: 0 auto; }
+    .topo-busbar { height: 6px; background: #eab308; border-radius: 3px; margin: 10px 0 16px 0; position: relative; }
     .topo-busbar::after { content: 'L1 / L2 / L3 / N / PE - Hauptverteilung'; position: absolute; top: -18px; left: 8px; font-size: 0.7rem; color: #eab308; font-weight: 700; }
-    .topo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-    .topo-rail-card { background: #1e293b; border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .topo-rail-card-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; display: flex; justify-content: space-between; }
-    .topo-item { background: #0f172a; border-left: 3px solid #10b981; padding: 6px 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; }
+    
+    .topo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+    .topo-rail-card { background: #1e293b; border: 1px solid var(--border); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .topo-rail-card-title { font-size: 0.82rem; font-weight: 700; color: #38bdf8; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; display: flex; justify-content: space-between; }
+    .topo-item { background: #0f172a; border-left: 3px solid #10b981; padding: 5px 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; }
 
     /* Tables */
     .table-container { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -341,7 +393,6 @@
     }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 
-    /* Selection Grid in Touch Modal */
     .modal-selection-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -385,10 +436,10 @@
     .strip-row {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      border: 1px solid #000;
+      border: 1.5px solid #000;
       background: #fff;
       color: #000;
-      height: 20mm;
+      height: 24mm;
       margin-bottom: 8mm;
     }
     .strip-cell {
@@ -398,10 +449,11 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 1mm;
+      padding: 1.5mm;
       font-size: 7pt;
       overflow: hidden;
-      line-height: 1.1;
+      line-height: 1.15;
+      word-break: break-word;
     }
     .strip-cell:last-child { border-right: none; }
     .strip-cell strong { font-size: 7.5pt; color: #000; }
@@ -464,10 +516,6 @@
       main {
         padding: 12px;
       }
-
-      .module-item {
-        min-height: 130px;
-      }
     }
 
     @media (max-width: 600px) {
@@ -488,14 +536,26 @@
       }
     }
 
-    /* Print Preview & Styles */
+    /* =========================================================================
+       PRINT STYLES: OPTIMIERT FÜR A4 EINZELSEITEN
+       ========================================================================= */
     .print-only { display: none; }
     .print-strips-only { display: none; }
 
     @media print {
-      @page { size: A4 portrait; margin: 8mm; }
-      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      body { background: #ffffff !important; color: #0f172a !important; font-size: 10pt; }
+      @page {
+        size: A4 portrait;
+        margin: 6mm 6mm 6mm 6mm;
+      }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 9pt;
+      }
       #pin-overlay, header, aside, .mobile-sidebar-toggle, .nav-tabs, .btn-group, button, .modal-backdrop, .touch-slot-empty { display: none !important; }
       .app-container { display: block !important; height: auto !important; overflow: visible !important; }
       main { padding: 0 !important; overflow: visible !important; display: block !important; }
@@ -508,43 +568,180 @@
       body.print-mode-strips #view-tabelle { display: none !important; }
       body.print-mode-strips .print-strips-only { display: block !important; }
 
-      .doc-header { border-bottom: 3px solid #0284c7; padding-bottom: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-end; }
-      .doc-header h1 { font-size: 18pt; margin: 0; color: #0369a1; font-weight: 800; }
-      .doc-meta { font-size: 9.5pt; text-align: right; line-height: 1.4; color: #334155; }
+      /* Technical Header */
+      .doc-header {
+        border-bottom: 2.5px solid #0284c7;
+        padding-bottom: 4px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .doc-header h1 { font-size: 14pt; margin: 0; color: #0369a1; font-weight: 800; }
+      .doc-meta { font-size: 8pt; text-align: right; line-height: 1.3; color: #334155; }
 
-      .section-heading-print { font-size: 12pt; font-weight: 800; background: #f0f9ff; border-left: 4px solid #0284c7; margin: 16px 0 8px 0; padding: 5px 10px; text-transform: uppercase; color: #0369a1; }
+      .section-heading-print {
+        font-size: 10pt;
+        font-weight: 800;
+        background: #f0f9ff;
+        border-left: 3.5px solid #0284c7;
+        margin: 10px 0 6px 0;
+        padding: 3px 8px;
+        text-transform: uppercase;
+        color: #0369a1;
+      }
 
-      .cabinet-wrapper { box-shadow: none !important; border: 2px solid #64748b !important; max-width: 100% !important; min-width: 100% !important; background: #f8fafc !important; padding: 8px !important; page-break-inside: avoid; border-radius: 6px; margin: 0; }
-      .cabinet-header { background: #e2e8f0 !important; border: 1.5px solid #94a3b8 !important; color: #0f172a !important; padding: 6px 10px !important; font-size: 10pt !important; margin-bottom: 8px !important; }
-      .din-rail-row { background: #f1f5f9 !important; border: 1.5px solid #94a3b8 !important; margin-bottom: 10px !important; padding: 6px !important; border-radius: 4px; }
-      .rail-info { color: #334155 !important; font-size: 8.5pt !important; font-weight: bold; margin-bottom: 4px !important; }
-      .din-rail { background: #cbd5e1 !important; padding: 3px !important; min-height: 110px !important; gap: 3px !important; border: 1px solid #94a3b8; }
-      .module-item { border: 1.5px solid #334155 !important; background: #ffffff !important; color: #0f172a !important; box-shadow: none !important; padding: 3px 2px !important; }
-      .mod-top { border-bottom: 1px solid #cbd5e1 !important; padding-bottom: 2px; }
-      .mod-type { font-size: 8pt !important; font-weight: 800 !important; color: #0f172a !important; }
-      .mod-toggle { background: #1e293b !important; width: 10px !important; height: 20px !important; }
-      .btn-test { background: #2563eb !important; color: #ffffff !important; font-size: 6.5pt !important; padding: 1px 4px !important; }
-      .mod-bottom { background: #f0fdf4 !important; border-top: 1px solid #94a3b8 !important; padding: 2px !important; }
-      .mod-room { color: #0369a1 !important; font-size: 7pt !important; font-weight: 800 !important; }
-      .mod-desc { color: #1e293b !important; font-size: 6.5pt !important; font-weight: 600 !important; }
+      /* 1. VERTEILER ANSICHT IM DRUCK */
+      #view-verteiler {
+        page-break-after: always;
+        break-after: page;
+      }
+      .cabinet-wrapper {
+        box-shadow: none !important;
+        border: 1.5px solid #64748b !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        background: #f8fafc !important;
+        padding: 6px !important;
+        border-radius: 4px;
+        margin: 0;
+      }
+      .cabinet-header {
+        background: #e2e8f0 !important;
+        border: 1px solid #94a3b8 !important;
+        color: #0f172a !important;
+        padding: 4px 8px !important;
+        font-size: 8.5pt !important;
+        margin-bottom: 6px !important;
+      }
+      .din-rail-row {
+        background: #f1f5f9 !important;
+        border: 1px solid #94a3b8 !important;
+        margin-bottom: 6px !important;
+        padding: 4px !important;
+        border-radius: 4px;
+      }
+      .rail-info { color: #334155 !important; font-size: 7.5pt !important; font-weight: bold; margin-bottom: 3px !important; }
+      .din-rail {
+        background: #cbd5e1 !important;
+        padding: 2px !important;
+        min-height: 125px !important;
+        gap: 2px !important;
+        border: 1px solid #94a3b8;
+      }
+      .module-item {
+        border: 1.2px solid #334155 !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        box-shadow: none !important;
+        padding: 2px 1px !important;
+        min-height: 120px !important;
+      }
+      .mod-top { border-bottom: 1px solid #cbd5e1 !important; padding-bottom: 1px; }
+      .mod-type { font-size: 7pt !important; font-weight: 800 !important; color: #0f172a !important; }
+      .mod-toggle { background: #1e293b !important; width: 8px !important; height: 16px !important; margin-bottom: 2px; }
+      .btn-test { background: #2563eb !important; color: #ffffff !important; font-size: 5.5pt !important; padding: 1px 3px !important; }
+      
+      .mod-bottom {
+        background: #f0fdf4 !important;
+        border-top: 1px solid #94a3b8 !important;
+        padding: 2px 1px !important;
+        min-height: 40px !important;
+      }
+      .mod-room {
+        color: #0369a1 !important;
+        font-size: 6.2pt !important;
+        font-weight: 800 !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        line-height: 1.1 !important;
+      }
+      .mod-desc {
+        color: #1e293b !important;
+        font-size: 5.8pt !important;
+        font-weight: 700 !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        line-height: 1.1 !important;
+      }
 
-      .page-break { page-break-before: always; }
-      .topology-container { background: #ffffff !important; border: 2px solid #cbd5e1 !important; padding: 12px !important; color: #0f172a !important; page-break-inside: avoid; border-radius: 6px; }
-      .topo-node { background: #f8fafc !important; border: 2px solid #0284c7 !important; color: #0f172a !important; padding: 8px 14px !important; }
-      .topo-node-title { color: #0284c7 !important; font-size: 9.5pt !important; font-weight: 800; }
-      .topo-node-sub { color: #475569 !important; font-size: 8pt !important; }
-      .topo-line-v { background: #0284c7 !important; }
-      .topo-busbar { background: #eab308 !important; height: 6px !important; }
-      .topo-busbar::after { color: #a16207 !important; font-weight: bold; font-size: 8pt !important; }
-      .topo-rail-card { background: #f8fafc !important; border: 1.5px solid #bae6fd !important; color: #0f172a !important; padding: 8px !important; border-radius: 6px; }
-      .topo-rail-card-title { border-bottom: 2px solid #0284c7 !important; color: #0369a1 !important; font-size: 9pt !important; font-weight: 800 !important; }
-      .topo-item { background: #ffffff !important; border-left: 3.5px solid #10b981 !important; border: 1px solid #e2e8f0; color: #0f172a !important; font-size: 8pt !important; padding: 4px 6px !important; }
+      /* 2. TOPOLOGIE IM DRUCK: GARANTIERT GENAU 1 A4 SEITE */
+      #view-topologie {
+        page-break-before: always;
+        break-before: page;
+        page-break-after: always;
+        break-after: page;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .topology-container {
+        background: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        padding: 6px !important;
+        color: #0f172a !important;
+        border-radius: 4px;
+      }
+      .topo-node {
+        background: #f8fafc !important;
+        border: 1.5px solid #0284c7 !important;
+        color: #0f172a !important;
+        padding: 3px 8px !important;
+        min-width: 140px;
+      }
+      .topo-node-title { color: #0284c7 !important; font-size: 8pt !important; font-weight: 800; }
+      .topo-node-sub { color: #475569 !important; font-size: 6.5pt !important; }
+      .topo-line-v { background: #0284c7 !important; height: 10px !important; }
+      .topo-busbar { background: #eab308 !important; height: 4px !important; margin: 4px 0 10px 0 !important; }
+      .topo-busbar::after { color: #a16207 !important; font-weight: bold; font-size: 6.5pt !important; top: -14px !important; }
+      
+      /* 4-spaltiges Layout für bis zu 4 Reihen nebeneinander auf A4 */
+      .topo-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 6px !important;
+        align-items: start !important;
+      }
+      .topo-rail-card {
+        background: #f8fafc !important;
+        border: 1px solid #bae6fd !important;
+        color: #0f172a !important;
+        padding: 5px !important;
+        border-radius: 4px;
+        gap: 3px !important;
+      }
+      .topo-rail-card-title {
+        border-bottom: 1.5px solid #0284c7 !important;
+        color: #0369a1 !important;
+        font-size: 7.2pt !important;
+        font-weight: 800 !important;
+        padding-bottom: 2px !important;
+      }
+      .topo-item {
+        background: #ffffff !important;
+        border-left: 2.5px solid #10b981 !important;
+        border: 1px solid #e2e8f0;
+        color: #0f172a !important;
+        font-size: 6.2pt !important;
+        padding: 2px 3px !important;
+        line-height: 1.1 !important;
+      }
       .topo-item strong { color: #0369a1 !important; }
 
-      .table-container { background: #ffffff !important; border: 1.5px solid #94a3b8 !important; margin-top: 10px !important; page-break-inside: avoid; border-radius: 4px; overflow: visible !important; }
-      table { font-size: 8.5pt !important; width: 100%; border-collapse: collapse; min-width: 100% !important; }
-      th { background: #e0f2fe !important; color: #0369a1 !important; font-weight: 800 !important; border-bottom: 2px solid #0284c7 !important; padding: 6px 8px !important; }
-      td { border-bottom: 1px solid #cbd5e1 !important; padding: 5px 8px !important; color: #1e293b !important; }
+      /* 3. STROMKREISLISTE IM DRUCK */
+      #view-tabelle {
+        page-break-before: always;
+        break-before: page;
+      }
+      .table-container {
+        background: #ffffff !important;
+        border: 1.5px solid #94a3b8 !important;
+        margin-top: 6px !important;
+        border-radius: 4px;
+        overflow: visible !important;
+      }
+      table { font-size: 7.8pt !important; width: 100%; border-collapse: collapse; min-width: 100% !important; }
+      th { background: #e0f2fe !important; color: #0369a1 !important; font-weight: 800 !important; border-bottom: 2px solid #0284c7 !important; padding: 4px 6px !important; }
+      td { border-bottom: 1px solid #cbd5e1 !important; padding: 3.5px 6px !important; color: #1e293b !important; }
       tr:nth-child(even) td { background: #f8fafc !important; }
     }
   </style>
@@ -568,7 +765,7 @@
     <div class="doc-header">
       <div>
         <h1>APrivina Unterverteiler Planer</h1>
-        <div style="font-size: 9.5pt; margin-top: 4px; color: #475569; font-weight: 600;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
+        <div style="font-size: 8.5pt; margin-top: 2px; color: #475569; font-weight: 600;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
       </div>
       <div class="doc-meta">
         <div><strong>Objekt:</strong> <span id="print-obj-name">-</span></div>
@@ -626,31 +823,31 @@
       </div>
 
       <div class="sidebar-section">
-        <div class="section-title">Kompletter EFH-Katalog nach Räumen</div>
-        <div class="category-pills" id="aside-cat-pills"></div>
-        <div class="component-grid" id="aside-comp-grid"></div>
-      </div>
-
-      <div class="sidebar-section">
-        <div class="section-title">Schutzorgane & Einspeisung</div>
+        <div class="section-title">Schutzorgane & Einspeisung (Drag & Drop)</div>
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
-          <div class="btn-comp" onclick="addPresetManual('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')" onclick="addPresetManual('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
             <strong>Hauptschalter 3P</strong>
             <span>3 TE • 63A</span>
           </div>
-          <div class="btn-comp" onclick="addPresetManual('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')" onclick="addPresetManual('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
             <strong>FI 4-polig</strong>
             <span>4 TE • 30mA</span>
           </div>
-          <div class="btn-comp" onclick="addAutoPreset('Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'auto', 'NYM-J 3x2.5')" onclick="addAutoPreset('Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
             <strong>FI/LS B16</strong>
             <span>2 TE • 30mA</span>
           </div>
-          <div class="btn-comp" onclick="addPresetManual('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')" onclick="addPresetManual('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
             <strong>Blindabdeckung</strong>
             <span>1 TE</span>
           </div>
         </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">Kompletter EFH-Katalog (Drag & Drop)</div>
+        <div class="category-pills" id="aside-cat-pills"></div>
+        <div class="component-grid" id="aside-comp-grid"></div>
       </div>
 
       <div class="sidebar-section">
@@ -677,9 +874,9 @@
       </div>
 
       <div id="view-topologie" style="display: none;">
-        <div class="print-only section-heading-print page-break">2. Einpolige Übersicht (Topologie)</div>
+        <div class="print-only section-heading-print">2. Einpolige Übersicht (Topologie)</div>
         <div class="topology-container">
-          <div style="text-align: center; margin-bottom: 10px;">
+          <div style="text-align: center; margin-bottom: 6px;">
             <div class="topo-node">
               <div class="topo-node-title">⚡ Hauseinspeisung</div>
               <div class="topo-node-sub">3~ 400V TN-S / 50 Hz</div>
@@ -699,7 +896,7 @@
       </div>
 
       <div id="view-tabelle" style="display: none;">
-        <div class="print-only section-heading-print page-break">3. Stromkreisliste nach DIN 18015</div>
+        <div class="print-only section-heading-print">3. Stromkreisliste nach DIN 18015</div>
         <div class="table-container">
           <table>
             <thead>
@@ -877,11 +1074,10 @@
     let activeAsideCategory = 'Küche';
     let activeModalCategory = 'Küche';
 
-    /* KOMPLETNA BAZA PROSTORIJA I POTROŠAČA ZA NJEMAČKU OBITELJSKU KUĆU (DIN 18015) */
+    /* EFH KATALOG */
     const ROOM_CATEGORIES = ['Küche', 'Bad', 'Technik', 'Wohnen', 'Schlafen/Büro', 'Keller/HWR', 'Außen/Garage', 'Flur/Allg'];
 
     const EFH_CATALOG = [
-      // KÜCHE
       { cat: 'Küche', room: 'Küche', desc: 'E-Herd', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
       { cat: 'Küche', room: 'Küche', desc: 'Backofen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Küche', room: 'Küche', desc: 'Geschirrspüler', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
@@ -891,7 +1087,6 @@
       { cat: 'Küche', room: 'Küche', desc: 'Arbeitsplatte Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Küche', room: 'Küche', desc: 'Küche Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
 
-      // BAD / SANITÄR
       { cat: 'Bad', room: 'Bad', desc: 'Waschmaschine', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Bad', room: 'Bad', desc: 'Wäschetrockner', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Bad', room: 'Bad', desc: 'Durchlauferhitzer 24kW', type: '3P B32', te: 3, cable: 'NYM-J 5x6.0', is3P: true },
@@ -901,7 +1096,6 @@
       { cat: 'Bad', room: 'Bad', desc: 'Bad Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Bad', room: 'Gäste-WC', desc: 'Gäste-WC Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
 
-      // HAUSTECHNIK / HEIZUNG
       { cat: 'Technik', room: 'Technik', desc: 'Wärmepumpe Kompressor', type: '3P C16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
       { cat: 'Technik', room: 'Technik', desc: 'Wärmepumpe Heizstab', type: '3P B16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
       { cat: 'Technik', room: 'Technik', desc: 'Lüftungsanlage (KWL)', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
@@ -910,7 +1104,6 @@
       { cat: 'Technik', room: 'Technik', desc: 'Hebeanlage Pumpe', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Technik', room: 'Technik', desc: 'Wasserenthärtung / Filter', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
 
-      // WOHN- & ESSZIMMER
       { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'TV / Audio / Hifi', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Wohnen Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Wohnen Deckenlicht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
@@ -918,7 +1111,6 @@
       { cat: 'Wohnen', room: 'Esszimmer', desc: 'Esszimmer Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Wohnen', room: 'Wohnzimmer', desc: 'Jalousien / Rollos', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
 
-      // SCHLAFEN & BÜRO
       { cat: 'Schlafen/Büro', room: 'Schlafzimmer', desc: 'Schlafen Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Schlafen/Büro', room: 'Schlafzimmer', desc: 'Schlafen Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Schlafen/Büro', room: 'Kinderzimmer 1', desc: 'Kind 1 Steckd./Licht', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
@@ -927,7 +1119,6 @@
       { cat: 'Schlafen/Büro', room: 'Büro', desc: 'Büro Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Schlafen/Büro', room: 'Dachboden', desc: 'Dachboden Steckd./Licht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
 
-      // KELLER & HWR
       { cat: 'Keller/HWR', room: 'HWR', desc: 'HWR Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Keller/HWR', room: 'Keller', desc: 'Keller Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Keller/HWR', room: 'Keller', desc: 'Keller Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
@@ -935,7 +1126,6 @@
       { cat: 'Keller/HWR', room: 'Werkstatt', desc: 'Werkbank Steckdosen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Keller/HWR', room: 'Werkstatt', desc: 'CEE-Steckdose 16A', type: '3P C16', te: 3, cable: 'NYM-J 5x2.5', is3P: true },
 
-      // AUSSENBEREICH & GARAGE
       { cat: 'Außen/Garage', room: 'Garage', desc: 'Wallbox 11kW (E-Auto)', type: '3P B16', te: 3, cable: 'NYM-J 5x6.0', is3P: true },
       { cat: 'Außen/Garage', room: 'Garage', desc: 'Garage Steckd./Torantrieb', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Außen/Garage', room: 'Garage', desc: 'Garage Beleuchtung', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
@@ -944,7 +1134,6 @@
       { cat: 'Außen/Garage', room: 'Außen', desc: 'Gartenhaus / Schuppen', type: '1P B16', te: 1, cable: 'NYM-J 3x2.5', is3P: false },
       { cat: 'Außen/Garage', room: 'Außen', desc: 'Balkon Steckdose', type: 'RCBO 1P', te: 2, cable: 'NYM-J 3x2.5', is3P: false },
 
-      // FLUR & ALLGEMEIN
       { cat: 'Flur/Allg', room: 'Flur', desc: 'Flur EG Licht/Steckd.', type: '1P B16', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Flur/Allg', room: 'Flur', desc: 'Flur OG / Treppe Licht', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
       { cat: 'Flur/Allg', room: 'Allgemein', desc: 'Klingeltrafo / Gong', type: '1P B10', te: 1, cable: 'NYM-J 3x1.5', is3P: false },
@@ -995,6 +1184,121 @@
       openNewObjectModal(false);
     }
 
+    /* =========================================================================
+       DRAG & DROP SYSTEM (KATALOG -> ŠINA & PREMJEŠTANJE POZICIJE)
+       ========================================================================= */
+    function handleCatalogDragStart(e, room, desc, type, te, phase, cable) {
+      const payload = { action: 'insert_new', room, desc, type, te, phase, cable };
+      e.dataTransfer.setData('text/plain', JSON.stringify(payload));
+      e.dataTransfer.effectAllowed = 'copy';
+    }
+
+    function handleModuleDragStart(e, railIdx, modIdx) {
+      e.stopPropagation();
+      const payload = { action: 'reorder', fromRail: railIdx, fromIdx: modIdx };
+      e.dataTransfer.setData('text/plain', JSON.stringify(payload));
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOverRail(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeaveRail(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDropOnRail(e, targetRail) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      try {
+        const raw = e.dataTransfer.getData('text/plain');
+        if (!raw) return;
+        const payload = JSON.parse(raw);
+
+        if (payload.action === 'insert_new') {
+          let finalPhase = payload.phase;
+          if (finalPhase === 'auto') {
+            finalPhase = (payload.te >= 3) ? 'L1-L3' : getNextRotatedPhase();
+          }
+          insertModuleRaw(targetRail, payload.room, payload.desc, payload.type, payload.te, finalPhase, payload.cable);
+        } else if (payload.action === 'reorder') {
+          // Prebacivanje modula na kraj druge šine
+          if (payload.fromRail !== targetRail) {
+            moveModuleToRailEnd(payload.fromRail, payload.fromIdx, targetRail);
+          }
+        }
+      } catch (err) {
+        console.error("Drop Fehler:", err);
+      }
+    }
+
+    function handleDropOnModule(e, targetRail, targetIdx) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.currentTarget.classList.remove('drag-target-over');
+      try {
+        const raw = e.dataTransfer.getData('text/plain');
+        if (!raw) return;
+        const payload = JSON.parse(raw);
+
+        if (payload.action === 'reorder') {
+          swapOrMoveModules(payload.fromRail, payload.fromIdx, targetRail, targetIdx);
+        } else if (payload.action === 'insert_new') {
+          let finalPhase = payload.phase;
+          if (finalPhase === 'auto') {
+            finalPhase = (payload.te >= 3) ? 'L1-L3' : getNextRotatedPhase();
+          }
+          insertModuleRaw(targetRail, payload.room, payload.desc, payload.type, payload.te, finalPhase, payload.cable);
+        }
+      } catch (err) {
+        console.error("Reorder Drop Fehler:", err);
+      }
+    }
+
+    /* Zamjena mjesta osigurača povlačenjem */
+    function swapOrMoveModules(fromRail, fromIdx, toRail, toIdx) {
+      if (fromRail === toRail && fromIdx === toIdx) return;
+
+      if (fromRail === toRail) {
+        // Ista šina: jednostavna zamjena pozicije
+        const temp = rails[fromRail][fromIdx];
+        rails[fromRail].splice(fromIdx, 1);
+        rails[fromRail].splice(toIdx, 0, temp);
+      } else {
+        // Između dvije šine: provjeri stane li modul po širini TE
+        const movingMod = rails[fromRail][fromIdx];
+        const targetRailTE = rails[toRail].reduce((acc, m) => acc + m.te, 0);
+
+        if (targetRailTE + movingMod.te > 12) {
+          alert(`Nicht genügend Platz auf Hutschiene ${toRail + 1}! Max. 12 TE.`);
+          return;
+        }
+
+        rails[fromRail].splice(fromIdx, 1);
+        rails[toRail].splice(toIdx, 0, movingMod);
+      }
+
+      saveState();
+      renderCabinet();
+    }
+
+    function moveModuleToRailEnd(fromRail, fromIdx, toRail) {
+      const movingMod = rails[fromRail][fromIdx];
+      const targetRailTE = rails[toRail].reduce((acc, m) => acc + m.te, 0);
+
+      if (targetRailTE + movingMod.te > 12) {
+        alert(`Nicht genügend Platz auf Hutschiene ${toRail + 1}! Max. 12 TE.`);
+        return;
+      }
+
+      rails[fromRail].splice(fromIdx, 1);
+      rails[toRail].push(movingMod);
+      saveState();
+      renderCabinet();
+    }
+
     function renderAsideCategoryPills() {
       const container = document.getElementById('aside-cat-pills');
       container.innerHTML = "";
@@ -1019,10 +1323,18 @@
       filtered.forEach(item => {
         const btn = document.createElement('div');
         btn.className = 'btn-comp';
+        btn.draggable = true;
+        
+        btn.ondragstart = (e) => {
+          const autoPhase = item.is3P ? 'L1-L3' : 'auto';
+          handleCatalogDragStart(e, item.room, item.desc, item.type, item.te, autoPhase, item.cable);
+        };
+
         btn.innerHTML = `
           <strong>${item.desc}</strong>
           <span>${item.type} • ${item.te} TE ${item.is3P ? '(3P)' : ''}</span>
         `;
+
         btn.onclick = () => {
           if (item.is3P) {
             addPresetManual(item.room, item.desc, item.type, item.te, 'L1-L3', item.cable);
@@ -1030,6 +1342,7 @@
             addAutoPreset(item.room, item.desc, item.type, item.te, item.cable);
           }
         };
+
         grid.appendChild(btn);
       });
     }
@@ -1266,7 +1579,7 @@
       }
     }
 
-    /* TOUCH TO PLACE NA ŠINI S KATEGORIJAMA PROSTORIJA */
+    /* TOUCH TO PLACE NA ŠINI S KATEGORIJAMA */
     function openTouchSelectModal(railIdx, freeTE) {
       touchTargetRail = railIdx;
       document.getElementById('touch-select-title').innerText = `Verbraucher auf Hutschiene ${railIdx + 1} einsetzen`;
@@ -1345,7 +1658,10 @@
             <span>Hutschiene ${r + 1}</span>
             <span>Belegt: ${usedTE} / 12 TE (${freeTE} TE frei)</span>
           </div>
-          <div class="din-rail" id="rail-grid-${r}"></div>
+          <div class="din-rail" id="rail-grid-${r}" 
+               ondragover="handleDragOverRail(event)" 
+               ondragleave="handleDragLeaveRail(event)" 
+               ondrop="handleDropOnRail(event, ${r})"></div>
         `;
         container.appendChild(rowDiv);
 
@@ -1353,6 +1669,22 @@
         rails[r].forEach((mod, modIdx) => {
           const modEl = document.createElement('div');
           modEl.className = `module-item mod-${mod.te}`;
+          modEl.draggable = true;
+
+          // Drag and drop reordering
+          modEl.ondragstart = (e) => handleModuleDragStart(e, r, modIdx);
+          modEl.ondragover = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            modEl.classList.add('drag-target-over');
+          };
+          modEl.ondragleave = (e) => {
+            e.stopPropagation();
+            modEl.classList.remove('drag-target-over');
+          };
+          modEl.ondrop = (e) => handleDropOnModule(e, r, modIdx);
+
+          // Klik za uređivanje
           modEl.onclick = () => openEditModule(r, modIdx);
 
           let centerContent = `<div class="mod-toggle"></div>`;
@@ -1409,7 +1741,7 @@
         const fiItem = validItems.find(m => m.type.includes('FI'));
         let groupTitle = `Hutschiene ${r + 1}`;
         if (fiItem) {
-          groupTitle += ` • FI-Schutz (${fiItem.desc || 'RCD'})`;
+          groupTitle += ` • FI (${fiItem.desc || 'RCD'})`;
         }
 
         const col = document.createElement('div');
@@ -1417,17 +1749,17 @@
         col.innerHTML = `
           <div class="topo-rail-card-title">
             <span>⚡ ${groupTitle}</span>
-            <span style="font-size:0.75rem; color:#0284c7; font-weight:bold;">${validItems.length} Module</span>
+            <span style="font-size:0.7rem; color:#0284c7; font-weight:bold;">${validItems.length} Mod.</span>
           </div>
-          <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
             ${validItems.map(it => `
               <div class="topo-item">
-                <div>
+                <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:65%;">
                   <strong>${it.room}:</strong> ${it.desc}
                 </div>
-                <div style="text-align:right;">
+                <div style="text-align:right; white-space:nowrap;">
                   <span style="font-weight:bold; color:#0284c7;">${it.type}</span>
-                  <div style="font-size:0.7rem; color:#475569; font-weight:600;">${it.phase} • ${it.cable}</div>
+                  <span style="font-size:0.65rem; color:#475569; font-weight:600;">(${it.phase})</span>
                 </div>
               </div>
             `).join('')}
@@ -1499,7 +1831,7 @@
         }
 
         const title = document.createElement('div');
-        title.style.fontSize = '8pt';
+        title.style.fontSize = '8.5pt';
         title.style.fontWeight = 'bold';
         title.style.marginBottom = '2mm';
         title.innerText = `Reihe ${r + 1} (Hutschiene ${r + 1}):`;
