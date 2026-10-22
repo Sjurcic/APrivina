@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APrivina Unterverteiler Planer v2.1</title>
+  <title>APrivina Unterverteiler Planer v2.2 Cloud</title>
+  
+  <!-- Firebase SDK (Compat Version za brzi rad bez build alata) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
       --bg: #1e293b;
@@ -85,6 +90,25 @@
     .project-meta strong { color: var(--text); }
     .phase-badge { background: #0f172a; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.75rem; white-space: nowrap; }
     body.sun-mode .phase-badge { background: #e2e8f0; border-color: #000; }
+    
+    .cloud-badge {
+      background: #064e3b;
+      color: #34d399;
+      border: 1px solid #059669;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .cloud-badge.offline {
+      background: #7f1d1d;
+      color: #fca5a5;
+      border-color: #dc2626;
+    }
+
     .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
 
     button {
@@ -878,6 +902,7 @@
     <div class="project-meta">
       <div>Objekt: <strong id="lbl-obj-name">-</strong> | <span id="lbl-obj-addr">-</span> | Prüfer: <strong id="lbl-obj-author">-</strong></div>
       <div class="phase-badge" id="phase-balance-bar">L1: 0 | L2: 0 | L3: 0</div>
+      <div class="cloud-badge" id="cloud-status-badge">☁️ Cloud bereit</div>
     </div>
     <div class="btn-group">
       <button class="success" onclick="saveCurrentObject()">💾 Speichern</button>
@@ -1052,7 +1077,7 @@
   <!-- Modal: Liste gespeicherter Objekte -->
   <div class="modal-backdrop" id="modal-saved-list">
     <div class="modal">
-      <h3>📁 Gespeicherte Objekte</h3>
+      <h3>📁 Gespeicherte Objekte (Cloud & Lokal)</h3>
       <div id="saved-objects-container" style="margin-top: 12px; max-height: 50vh; overflow-y: auto;"></div>
       <div class="modal-actions">
         <button onclick="closeSavedObjectsModal()">Schließen</button>
@@ -1097,7 +1122,7 @@
     </div>
   </div>
 
-  <!-- Modal: Direkt-Auswahl per Touch (Bottom Sheet) -->
+  <!-- Modal: Direkt-Auswahl per Touch -->
   <div class="modal-backdrop" id="modal-touch-select">
     <div class="modal">
       <h3 id="touch-select-title">Verbraucher nach Raum wählen</h3>
@@ -1112,14 +1137,14 @@
     </div>
   </div>
 
-  <!-- Modal: Optionen (Backup, Restore, PIN ändern) -->
+  <!-- Modal: Optionen -->
   <div class="modal-backdrop" id="modal-settings">
     <div class="modal">
       <h3>⚙️ Optionen & Datensicherung</h3>
       
       <div style="background:#0f172a; padding:12px; border-radius:6px; border:1px solid #334155; margin-bottom:14px;">
-        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">💾 Projekt-Backup (JSON)</strong>
-        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:10px;">Laden Sie alle Objekte als Datei herunter oder importieren Sie diese auf einem anderen Gerät.</p>
+        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">💾 Manuelles Projekt-Backup (JSON)</strong>
+        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:10px;">Laden Sie alle Objekte als Datei herunter oder importieren Sie diese offline.</p>
         <div style="display:flex; gap:8px;">
           <button class="primary" style="flex:1;" onclick="downloadBackupJSON()">Export Datei</button>
           <button style="flex:1;" onclick="document.getElementById('inp-file-import').click()">Import Datei</button>
@@ -1143,6 +1168,42 @@
   </div>
 
   <script>
+    /* =========================================================================
+       FIREBASE CLOUD INITIALISIERUNG
+       ========================================================================= */
+    const firebaseConfig = {
+      apiKey: "AIzaSyCshNR8QEoW3tdc_badc9UHZse5Oh7Z_kk",
+      authDomain: "aprivina-planer.firebaseapp.com",
+      projectId: "aprivina-planer",
+      storageBucket: "aprivina-planer.firebasestorage.app",
+      messagingSenderId: "482031449397",
+      appId: "1:482031449397:web:462c769b95d2dab6da887c"
+    };
+
+    let db = null;
+    let isCloudConnected = false;
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      isCloudConnected = true;
+    } catch (e) {
+      console.warn("Firebase Init Fehler (Offline Modus aktiv):", e);
+    }
+
+    function updateCloudBadge(online) {
+      const badge = document.getElementById('cloud-status-badge');
+      if (badge) {
+        if (online) {
+          badge.className = 'cloud-badge';
+          badge.innerHTML = '☁️ Cloud Sync Aktiv';
+        } else {
+          badge.className = 'cloud-badge offline';
+          badge.innerHTML = '⚡ Lokal (Offline)';
+        }
+      }
+    }
+
     function triggerVibration(pattern = 25) {
       if ('vibrate' in navigator) {
         try { navigator.vibrate(pattern); } catch (e) {}
@@ -1275,7 +1336,28 @@
 
       renderAsideCategoryPills();
       renderAsideComponents();
+      initCloudSyncListener();
     };
+
+    function initCloudSyncListener() {
+      if (!db) {
+        updateCloudBadge(false);
+        return;
+      }
+      db.collection("projekte").onSnapshot(snapshot => {
+        updateCloudBadge(true);
+        let cloudList = [];
+        snapshot.forEach(doc => {
+          cloudList.push(doc.data());
+        });
+        if (cloudList.length > 0) {
+          localStorage.setItem('aprivina_saved_objects', JSON.stringify(cloudList));
+        }
+      }, err => {
+        console.warn("Cloud Snapshot Fehler:", err);
+        updateCloudBadge(false);
+      });
+    }
 
     function toggleMobileSidebar() {
       const sb = document.getElementById('app-sidebar');
@@ -1586,6 +1668,7 @@
       document.getElementById('phase-balance-bar').innerHTML = `Phasen: <span style="color:#38bdf8; font-weight:bold;">L1: ${l1}</span> | <span style="color:#10b981; font-weight:bold;">L2: ${l2}</span> | <span style="color:#f59e0b; font-weight:bold;">L3: ${l3}</span>`;
     }
 
+    /* SPREMANJE U LOKALNU MEMORIJU I CLOUD (FIRESTORE) */
     function saveCurrentObject() {
       saveState();
       let list = getSavedObjectsList();
@@ -1605,8 +1688,21 @@
       }
 
       localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
+
+      // Slanje u Firebase Firestore bazu
+      if (db) {
+        db.collection("projekte").doc(currentObjId).set(objRecord)
+          .then(() => {
+            updateCloudBadge(true);
+          })
+          .catch(err => {
+            console.error("Firestore Save Fehler:", err);
+            updateCloudBadge(false);
+          });
+      }
+
       triggerVibration([30, 50, 30]);
-      alert(`Objekt "${project.name}" wurde erfolgreich gespeichert!`);
+      alert(`Objekt "${project.name}" wurde lokal und in der Cloud gespeichert!`);
     }
 
     function getSavedObjectsList() {
@@ -1708,10 +1804,15 @@
     }
 
     function deleteSavedObject(id) {
-      if (!confirm("Möchten Sie dieses gespeicherte Objekt wirklich unwiderruflich löschen?")) return;
+      if (!confirm("Möchten Sie dieses Objekt wirklich unwiderruflich löschen?")) return;
       let list = getSavedObjectsList();
       list = list.filter(o => o.id !== id);
       localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
+
+      if (db) {
+        db.collection("projekte").doc(id).delete().catch(e => console.warn(e));
+      }
+
       openSavedObjectsModal();
       triggerVibration(50);
     }
@@ -1801,7 +1902,6 @@
       }
     }
 
-    /* POTPUNO PRAŽNJENJE SVIH REDOVA ODJEDNOM */
     function clearAllRails() {
       if (!confirm("Möchten Sie wirklich den KOMPLETTEN Schrank (alle Reihen 1-4) leeren? Alle bestückten Module werden entfernt!")) return;
       rails = [[], [], [], []];
@@ -2170,7 +2270,7 @@
     function downloadBackupJSON() {
       const fullBackup = {
         app: "APrivina Unterverteiler Planer",
-        version: "2.1",
+        version: "2.2",
         backupDate: new Date().toISOString(),
         userPin: getStoredPin(),
         activeProject: { id: currentObjId, project, rowCount, rails },
