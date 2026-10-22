@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APrivina Unterverteiler Planer v2.2 Cloud</title>
+  <title>APrivina Unterverteiler Planer v2.3</title>
   
-  <!-- Firebase SDK (Compat Version za brzi rad bez build alata) -->
+  <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -860,10 +860,10 @@
   <!-- Quick Action Mobile Bar -->
   <div class="quick-mobile-bar">
     <span style="font-size:0.7rem; color:var(--text-muted); align-self:center; font-weight:bold; margin-right:4px;">⚡ Schnell-Einfügen:</span>
-    <button class="primary" onclick="quickAdd('Wohnen', 'Steckdosen', '1P B16', 1, 'NYM-J 3x1.5')">+ Steckdose B16</button>
-    <button class="primary" onclick="quickAdd('Allgemein', 'Licht', '1P B10', 1, 'NYM-J 3x1.5')">+ Licht B10</button>
-    <button class="primary" onclick="quickAdd('Küche', 'Geschirrspüler', '1P B16', 1, 'NYM-J 3x2.5')">+ Spülm. B16</button>
-    <button class="primary" onclick="quickAdd('Schutz', 'FI 40A/30mA', 'FI 4P', 4, '-')">+ FI 4P (4TE)</button>
+    <button class="primary" onclick="quickAddFirstFree('Wohnen', 'Steckdosen', '1P B16', 1, 'NYM-J 3x1.5')">+ Steckdose B16</button>
+    <button class="primary" onclick="quickAddFirstFree('Allgemein', 'Licht', '1P B10', 1, 'NYM-J 3x1.5')">+ Licht B10</button>
+    <button class="primary" onclick="quickAddFirstFree('Küche', 'Geschirrspüler', '1P B16', 1, 'NYM-J 3x2.5')">+ Spülm. B16</button>
+    <button class="primary" onclick="quickAddFirstFree('Schutz', 'FI 40A/30mA', 'FI 4P', 4, '-')">+ FI 4P (4TE)</button>
     <button class="warning" onclick="applyStandardEFHLayout()">🏠 1-Klick EFH Vorlage</button>
   </div>
 
@@ -902,12 +902,13 @@
     <div class="project-meta">
       <div>Objekt: <strong id="lbl-obj-name">-</strong> | <span id="lbl-obj-addr">-</span> | Prüfer: <strong id="lbl-obj-author">-</strong></div>
       <div class="phase-badge" id="phase-balance-bar">L1: 0 | L2: 0 | L3: 0</div>
-      <div class="cloud-badge" id="cloud-status-badge">☁️ Cloud bereit</div>
+      <div class="cloud-badge" id="cloud-status-badge">☁️ Cloud prüfen...</div>
     </div>
     <div class="btn-group">
       <button class="success" onclick="saveCurrentObject()">💾 Speichern</button>
       <button onclick="openNewObjectModal()">➕ Neu</button>
       <button onclick="openSavedObjectsModal()">📁 Objekte</button>
+      <button onclick="testCloudConnectionManual()">🔍 Cloud Sync testen</button>
       <button onclick="toggleSunMode()" id="btn-sun-mode">☀️ Baustelle</button>
       <button class="warning" onclick="exportToCSV()">📊 Excel/CSV</button>
       <button onclick="printStrips()">🏷️ Beschriftung</button>
@@ -940,26 +941,21 @@
       </div>
 
       <div class="sidebar-section">
-        <div class="section-title">Aktive Hutschiene zum Einfügen</div>
-        <select id="sel-active-rail" style="width: 100%; padding: 8px; background: #1e293b; color: #fff; border: 1px solid var(--border); border-radius: 4px;"></select>
-      </div>
-
-      <div class="sidebar-section">
         <div class="section-title">Schutzorgane & Einspeisung (Drag & Drop)</div>
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')" onclick="addPresetManual('Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Einspeisung', 'Hauptschalter', '3P 63A', 3, 'L1-L3', '-')">
             <strong>Hauptschalter 3P</strong>
             <span>3 TE • 63A</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')" onclick="addPresetManual('Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI-Schalter 40A/30mA', 'FI 4P', 4, 'L1-L3', '-')">
             <strong>FI 4-polig</strong>
             <span>4 TE • 30mA</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'auto', 'NYM-J 3x2.5')" onclick="addAutoPreset('Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'NYM-J 3x2.5')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Schutz', 'FI/LS (RCBO)', 'RCBO 1P', 2, 'auto', 'NYM-J 3x2.5')">
             <strong>FI/LS B16</strong>
             <span>2 TE • 30mA</span>
           </div>
-          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')" onclick="addPresetManual('Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
+          <div class="btn-comp" draggable="true" ondragstart="handleCatalogDragStart(event, 'Reserve', 'Blindabdeckung', 'Blind', 1, '-', '-')">
             <strong>Blindabdeckung</strong>
             <span>1 TE</span>
           </div>
@@ -973,7 +969,6 @@
       </div>
 
       <div class="sidebar-section" style="display:flex; flex-direction:column; gap:6px;">
-        <button class="danger" style="width: 100%; padding: 8px;" onclick="clearActiveRail()">Aktive Reihe leeren</button>
         <button class="danger" style="width: 100%; padding: 8px; background:#7f1d1d;" onclick="clearAllRails()">⚠️ Kompletten Schrank leeren</button>
       </div>
     </aside>
@@ -1181,27 +1176,44 @@
     };
 
     let db = null;
-    let isCloudConnected = false;
 
     try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-      isCloudConnected = true;
+      if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+      }
     } catch (e) {
-      console.warn("Firebase Init Fehler (Offline Modus aktiv):", e);
+      console.warn("Firebase Init Fehler:", e);
     }
 
-    function updateCloudBadge(online) {
+    function updateCloudBadge(statusText, isOnline) {
       const badge = document.getElementById('cloud-status-badge');
       if (badge) {
-        if (online) {
-          badge.className = 'cloud-badge';
-          badge.innerHTML = '☁️ Cloud Sync Aktiv';
-        } else {
-          badge.className = 'cloud-badge offline';
-          badge.innerHTML = '⚡ Lokal (Offline)';
-        }
+        badge.className = isOnline ? 'cloud-badge' : 'cloud-badge offline';
+        badge.innerHTML = statusText;
       }
+    }
+
+    /* RUČNI TEST VEZE S OBLAKOM */
+    function testCloudConnectionManual() {
+      if (!db) {
+        alert("❌ Firebase SDK nije učitan! Provjerite internetsku vezu na uređaju.");
+        return;
+      }
+      updateCloudBadge("⏳ Testiere...", false);
+      const testDoc = { testTime: new Date().toISOString(), status: "active" };
+
+      db.collection("projekte").doc("_ping_test_").set(testDoc)
+        .then(() => {
+          updateCloudBadge("☁️ Cloud Sync Aktiv", true);
+          triggerVibration([30, 50, 30]);
+          alert("✅ CLOUD SYNC RADI SAVRŠENO!\n\nTablet se uspješno spojio na Firebase bazu 'aprivina-planer' i ima punu dozvolu za spremanje i čitanje.");
+        })
+        .catch(err => {
+          updateCloudBadge("⚡ Fehler (" + err.code + ")", false);
+          triggerVibration([100, 50, 100]);
+          alert("❌ GREŠKA KOD SPAJANJA NA CLOUD:\n\nKod greške: " + err.code + "\nPoruka: " + err.message + "\n\nAko piše 'permission-denied', provjerite pravila u Firestore bazi.");
+        });
     }
 
     function triggerVibration(pattern = 25) {
@@ -1341,21 +1353,23 @@
 
     function initCloudSyncListener() {
       if (!db) {
-        updateCloudBadge(false);
+        updateCloudBadge("⚡ Offline Modus", false);
         return;
       }
       db.collection("projekte").onSnapshot(snapshot => {
-        updateCloudBadge(true);
+        updateCloudBadge("☁️ Cloud Sync Aktiv", true);
         let cloudList = [];
         snapshot.forEach(doc => {
-          cloudList.push(doc.data());
+          if (doc.id !== "_ping_test_") {
+            cloudList.push(doc.data());
+          }
         });
         if (cloudList.length > 0) {
           localStorage.setItem('aprivina_saved_objects', JSON.stringify(cloudList));
         }
       }, err => {
         console.warn("Cloud Snapshot Fehler:", err);
-        updateCloudBadge(false);
+        updateCloudBadge("⚡ Cloud Fehler (" + err.code + ")", false);
       });
     }
 
@@ -1378,7 +1392,6 @@
           while (rails.length < 4) rails.push([]);
           syncNextPhaseIndex();
           updateProjectLabels();
-          updateRailSelector();
           renderCabinet();
           return;
         } catch (e) {}
@@ -1431,16 +1444,27 @@
       ];
       syncNextPhaseIndex();
       updateProjectLabels();
-      updateRailSelector();
       saveState();
       renderCabinet();
       triggerVibration([40, 60, 40]);
     }
 
-    function quickAdd(room, desc, type, te, cable) {
-      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
-      let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
-      insertModuleRaw(railIdx, room, desc, type, te, phase, cable);
+    /* AUTOMATSKO DODAVANJE U PRVI SLOBODNI RED S DOVOLJNO MJESTA */
+    function quickAddFirstFree(room, desc, type, te, cable) {
+      let placed = false;
+      for (let r = 0; r < rowCount; r++) {
+        const usedTE = rails[r].reduce((acc, m) => acc + m.te, 0);
+        if (usedTE + te <= 12) {
+          let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
+          insertModuleRaw(r, room, desc, type, te, phase, cable);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        triggerVibration([100, 50, 100]);
+        alert("Kein Platz mehr auf den vorhandenen Hutschienen für " + desc + " (" + te + " TE)!");
+      }
     }
 
     function handleCatalogDragStart(e, room, desc, type, te, phase, cable) {
@@ -1626,11 +1650,7 @@
         `;
 
         btn.onclick = () => {
-          if (item.is3P) {
-            addPresetManual(item.room, item.desc, item.type, item.te, 'L1-L3', item.cable);
-          } else {
-            addAutoPreset(item.room, item.desc, item.type, item.te, item.cable);
-          }
+          quickAddFirstFree(item.room, item.desc, item.type, item.te, item.cable);
         };
 
         grid.appendChild(btn);
@@ -1668,7 +1688,7 @@
       document.getElementById('phase-balance-bar').innerHTML = `Phasen: <span style="color:#38bdf8; font-weight:bold;">L1: ${l1}</span> | <span style="color:#10b981; font-weight:bold;">L2: ${l2}</span> | <span style="color:#f59e0b; font-weight:bold;">L3: ${l3}</span>`;
     }
 
-    /* SPREMANJE U LOKALNU MEMORIJU I CLOUD (FIRESTORE) */
+    /* POUZDANO SPREMANJE (LOKALNO + CLOUD) S OBAVIJEŠĆU */
     function saveCurrentObject() {
       saveState();
       let list = getSavedObjectsList();
@@ -1689,20 +1709,23 @@
 
       localStorage.setItem('aprivina_saved_objects', JSON.stringify(list));
 
-      // Slanje u Firebase Firestore bazu
       if (db) {
         db.collection("projekte").doc(currentObjId).set(objRecord)
           .then(() => {
-            updateCloudBadge(true);
+            updateCloudBadge("☁️ Cloud Sync Aktiv", true);
+            triggerVibration([30, 50, 30]);
+            alert("✅ ERFOLGREICH GESPEICHERT!\n\nObjekt: " + project.name + "\nStandort: " + project.address + "\n\nGespeichert auf diesem Tablet und automatisch in der CLOUD synchronisiert.");
           })
           .catch(err => {
             console.error("Firestore Save Fehler:", err);
-            updateCloudBadge(false);
+            updateCloudBadge("⚡ Cloud Fehler", false);
+            triggerVibration([100, 50, 100]);
+            alert("⚠️ LOKAL GESPEICHERT!\n\nAuf diesem Tablet gespeichert, aber CLOUD-Synchronisierung fehlgeschlagen:\n" + err.message);
           });
+      } else {
+        triggerVibration([30, 50, 30]);
+        alert("✅ LOKAL GESPEICHERT!\n\nObjekt: " + project.name + " wurde erfolgreich im Speicher dieses Geräts gesichert.");
       }
-
-      triggerVibration([30, 50, 30]);
-      alert(`Objekt "${project.name}" wurde lokal und in der Cloud gespeichert!`);
     }
 
     function getSavedObjectsList() {
@@ -1743,7 +1766,6 @@
 
       document.getElementById('modal-project').style.display = 'none';
       updateProjectLabels();
-      updateRailSelector();
       saveState();
       renderCabinet();
       triggerVibration(30);
@@ -1796,7 +1818,6 @@
       syncNextPhaseIndex();
 
       updateProjectLabels();
-      updateRailSelector();
       saveState();
       renderCabinet();
       closeSavedObjectsModal();
@@ -1831,23 +1852,9 @@
       updatePhaseBalanceBar();
     }
 
-    function updateRailSelector() {
-      const sel = document.getElementById('sel-active-rail');
-      const curVal = sel.value || "0";
-      sel.innerHTML = "";
-      for (let i = 0; i < rowCount; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.innerText = `Reihe ${i + 1} (Hutschiene ${i + 1})`;
-        sel.appendChild(opt);
-      }
-      sel.value = Math.min(parseInt(curVal) || 0, rowCount - 1);
-    }
-
     function setRows(num) {
       rowCount = num;
       while (rails.length < rowCount) rails.push([]);
-      updateRailSelector();
       saveState();
       renderCabinet();
       triggerVibration(20);
@@ -1858,21 +1865,6 @@
       const chosen = phases[nextPhaseIdx % 3];
       nextPhaseIdx++;
       return chosen;
-    }
-
-    function addAutoPreset(room, desc, type, te, cable) {
-      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
-      insertModuleToRail(railIdx, room, desc, type, te, cable);
-    }
-
-    function addPresetManual(room, desc, type, te, phase, cable) {
-      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
-      insertModuleRaw(railIdx, room, desc, type, te, phase, cable);
-    }
-
-    function insertModuleToRail(railIdx, room, desc, type, te, cable) {
-      let phase = (te >= 3) ? 'L1-L3' : getNextRotatedPhase();
-      insertModuleRaw(railIdx, room, desc, type, te, phase, cable);
     }
 
     function insertModuleRaw(railIdx, room, desc, type, te, phase, cable) {
@@ -1889,17 +1881,6 @@
       triggerVibration(25);
       saveState();
       renderCabinet();
-    }
-
-    function clearActiveRail() {
-      const railIdx = parseInt(document.getElementById('sel-active-rail').value) || 0;
-      if (confirm(`Möchten Sie die Hutschiene ${railIdx + 1} wirklich komplett leeren?`)) {
-        rails[railIdx] = [];
-        syncNextPhaseIndex();
-        saveState();
-        renderCabinet();
-        triggerVibration([50, 50]);
-      }
     }
 
     function clearAllRails() {
@@ -2270,7 +2251,7 @@
     function downloadBackupJSON() {
       const fullBackup = {
         app: "APrivina Unterverteiler Planer",
-        version: "2.2",
+        version: "2.3",
         backupDate: new Date().toISOString(),
         userPin: getStoredPin(),
         activeProject: { id: currentObjId, project, rowCount, rails },
@@ -2312,7 +2293,6 @@
           closeSettingsModal();
           syncNextPhaseIndex();
           updateProjectLabels();
-          updateRailSelector();
           renderCabinet();
           triggerVibration([30, 50, 30]);
         } catch (err) {
