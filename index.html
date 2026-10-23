@@ -2,6 +2,9 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>APrivina Unterverteiler Planer</title>
   <link rel="manifest" href="manifest.json">
@@ -71,7 +74,7 @@
     button.warning { background: #d97706; border-color: #f59e0b; color:#fff; }
     button.danger { background: #991b1b; border-color: #b91c1c; color:#fff; }
 
-    /* Dinamični Layout za tablete */
+    /* Dinamični Layout */
     .app-container {
       display: grid; grid-template-columns: minmax(280px, 320px) 1fr; flex: 1; min-height: calc(100vh - 65px); padding-bottom: 60px;
     }
@@ -629,9 +632,20 @@
   </div>
 
   <script>
+    /* PWA AUTO-UPDATE REGISTRACIJA */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.register('./sw.js').then((registration) => {
+          registration.update();
+          registration.onupdatefound = () => {
+            const installingWorker = registration.installing;
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                window.location.reload();
+              }
+            };
+          };
+        }).catch(() => {});
       });
     }
 
@@ -1047,7 +1061,7 @@
     }
 
     /* =========================================================================
-       NATIVNI TOUCH ENGINE ZA PREMJEŠTANJE I BRISANJE PRSTOM
+       TOUCH ENGINE: DRAG, SWAP I BRISANJE
        ========================================================================= */
     let touchState = {
       isDragging: false,
@@ -1078,7 +1092,6 @@
         e.preventDefault();
         const touch = e.touches[0];
 
-        // Provjera je li prst iznad kante za smeće
         const trashBox = document.getElementById('trash-drop-zone').getBoundingClientRect();
         if (touch.clientX >= trashBox.left && touch.clientX <= trashBox.right &&
             touch.clientY >= trashBox.top && touch.clientY <= trashBox.bottom) {
@@ -1087,7 +1100,6 @@
           document.getElementById('trash-drop-zone').classList.remove('hover');
         }
 
-        // Provjera je li prst iznad drugog osigurača
         document.querySelectorAll('.module-item').forEach(other => {
           if (other === el) return;
           const rect = other.getBoundingClientRect();
@@ -1108,14 +1120,12 @@
 
         const moveDistance = Math.hypot(changedTouch.clientX - touchState.initialX, changedTouch.clientY - touchState.initialY);
 
-        // Ako se prst nije pomaknuo više od 8px, tretiraj kao običan dodir (Edit)
         if (moveDistance < 8) {
           openEditModule(touchState.fromRail, touchState.fromIdx);
           resetTouchState();
           return;
         }
 
-        // 1. Provjera brisanja u zoni za smeće
         const trashBox = document.getElementById('trash-drop-zone').getBoundingClientRect();
         if (changedTouch.clientX >= trashBox.left && changedTouch.clientX <= trashBox.right &&
             changedTouch.clientY >= trashBox.top && changedTouch.clientY <= trashBox.bottom) {
@@ -1127,7 +1137,6 @@
           return;
         }
 
-        // 2. Provjera zamjene mjesta (Swap) s drugim elementom
         let swapped = false;
         document.querySelectorAll('.module-item').forEach(other => {
           other.classList.remove('drag-target-hover');
