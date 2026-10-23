@@ -259,7 +259,7 @@
       .modal { border-radius: 16px 16px 0 0 !important; max-width: 100% !important; max-height: 85vh !important; }
     }
 
-    /* ČISTI A4 FORMAT PRINT (TOČNO 1 STRANICA PO CJELINI) */
+    /* ČISTI A4 FORMAT PRINT (1 STRANICA PO CJELINI + ZAGLAVLJE SA LOGOM) */
     .print-only { display: none; }
     .print-strips-only { display: none; }
 
@@ -271,25 +271,53 @@
       .app-container { display: block !important; padding-bottom: 0 !important; }
       main { padding: 0 !important; display: block !important; }
 
-      /* Standardni ispis dokumentacije */
       body.print-mode-doc .print-only { display: block !important; }
       body.print-mode-doc .print-strips-only { display: none !important; }
       body.print-mode-doc #view-verteiler, 
       body.print-mode-doc #view-topologie, 
       body.print-mode-doc #view-tabelle { display: block !important; }
 
-      /* Ispis označnih traka */
       body.print-mode-strips .print-only { display: none !important; }
       body.print-mode-strips #view-verteiler, 
       body.print-mode-strips #view-topologie, 
       body.print-mode-strips #view-tabelle { display: none !important; }
       body.print-mode-strips .print-strips-only { display: block !important; }
 
+      /* Profesionalno zaglavlje s logotipom firme */
       .doc-header-print {
-        border-bottom: 2px solid #0284c7; padding-bottom: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: flex-end;
+        border-bottom: 2px solid #0284c7;
+        padding-bottom: 5px;
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
-      .doc-header-print h1 { font-size: 13pt; color: #0369a1; font-weight: 800; }
-      .doc-meta-print { font-size: 7.5pt; text-align: right; line-height: 1.3; color: #334155; }
+      .print-company-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .print-logo-img {
+        max-height: 48px;
+        max-width: 140px;
+        object-fit: contain;
+      }
+      .print-company-details {
+        font-size: 7.5pt;
+        color: #334155;
+        line-height: 1.25;
+      }
+      .print-company-details strong {
+        font-size: 9.5pt;
+        color: #0369a1;
+        display: block;
+      }
+      .doc-meta-print {
+        font-size: 7.5pt;
+        text-align: right;
+        line-height: 1.35;
+        color: #1e293b;
+      }
 
       /* STRANICA 1: Ormar na cijelom A4 */
       #view-verteiler {
@@ -361,15 +389,22 @@
   <!-- Touch Trash Zone -->
   <div id="trash-drop-zone">🗑️ Hier loslassen zum Löschen</div>
 
-  <!-- Dokumentations-Header (Print A4) -->
+  <!-- Dokumentations-Header (Print A4) - VIDI SE SAMO NA PAPIRU -->
   <div class="print-only">
     <div class="doc-header-print">
-      <div>
-        <h1>APrivina Unterverteiler Planer</h1>
-        <div style="font-size: 8pt; color: #475569; font-weight: 600;">Elektrische Anlagendokumentation nach DIN 18015 / DIN EN 61439</div>
+      <div class="print-company-left">
+        <img id="print-company-logo" class="print-logo-img" style="display:none;" alt="Firmenlogo">
+        <div class="print-company-details">
+          <strong id="print-company-name">APrivina Elektrotechnik</strong>
+          <div id="print-company-address">Musterstraße 123, 80331 München</div>
+          <div>Tel: <span id="print-company-phone">+49 89 1234567</span> | E-Mail: <span id="print-company-email">info@aprivina.de</span></div>
+          <div>USt-IdNr.: <span id="print-company-tax">DE123456789</span></div>
+        </div>
       </div>
       <div class="doc-meta-print">
-        <div><strong>Objekt:</strong> <span id="print-obj-name">-</span> | <strong>Standort:</strong> <span id="print-obj-addr">-</span></div>
+        <div style="font-size: 9pt; font-weight:800; color:#0369a1; margin-bottom:2px;">Verteilerdokumentation DIN 18015</div>
+        <div><strong>Objekt:</strong> <span id="print-obj-name">-</span></div>
+        <div><strong>Standort:</strong> <span id="print-obj-addr">-</span></div>
         <div><strong>Prüfer:</strong> <span id="print-obj-author">-</span> | <strong>Datum:</strong> <span id="print-obj-date">-</span></div>
       </div>
     </div>
@@ -383,6 +418,7 @@
         <p style="font-size: 7.5pt; color: #666;"><span id="strip-obj-name">-</span> | Maßstabsgetreu ausdrucken und einlegen.</p>
       </div>
       <div style="font-size: 7.5pt; text-align:right;">
+        <span id="strip-company-name" style="font-weight:bold; display:block;"></span>
         <strong>Monteur:</strong> <span id="strip-obj-author">-</span>
       </div>
     </div>
@@ -615,11 +651,52 @@
     </div>
   </div>
 
-  <!-- Modal: Optionen -->
+  <!-- Modal: Optionen & Firmenangaben für den Druck -->
   <div class="modal-backdrop" id="modal-settings">
     <div class="modal">
-      <h3>⚙️ Optionen & Datensicherung</h3>
-      <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:14px;">
+      <h3>⚙️ Optionen & Firmenbriefkopf (Druck)</h3>
+      
+      <!-- Podaci firme za ispis -->
+      <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:12px; border:1px solid #334155;">
+        <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">🏢 Firmenangaben (Erscheint nur auf A4-Druck)</strong>
+        
+        <div class="form-group">
+          <label>Firmenlogo auswählen (PNG/JPG):</label>
+          <input type="file" id="inp-company-logo" accept="image/*" onchange="handleLogoUpload(event)">
+          <div id="logo-preview-box" style="margin-top:5px; font-size:0.7rem; color:#94a3b8;">Kein Logo hochgeladen</div>
+        </div>
+
+        <div class="form-group">
+          <label>Firmenname:</label>
+          <input type="text" id="cfg-comp-name" placeholder="z.B. APrivina Elektrotechnik GmbH">
+        </div>
+
+        <div class="form-group">
+          <label>Straße & Ort:</label>
+          <input type="text" id="cfg-comp-addr" placeholder="z.B. Musterstraße 123, 80331 München">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+          <div class="form-group">
+            <label>Telefon:</label>
+            <input type="text" id="cfg-comp-phone" placeholder="z.B. +49 89 1234567">
+          </div>
+          <div class="form-group">
+            <label>E-Mail:</label>
+            <input type="text" id="cfg-comp-email" placeholder="z.B. info@aprivina.de">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>USt-IdNr. / Steuer-Nr.:</label>
+          <input type="text" id="cfg-comp-tax" placeholder="z.B. DE123456789">
+        </div>
+
+        <button class="success" style="width:100%; justify-content:center; padding:8px;" onclick="saveCompanyProfile()">Firmenangaben speichern</button>
+      </div>
+
+      <!-- Backup JSON -->
+      <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:12px;">
         <strong style="color:#38bdf8; font-size:0.85rem; display:block; margin-bottom:6px;">💾 Manuelles Backup</strong>
         <div style="display:flex; gap:8px;">
           <button class="primary" style="flex:1;" onclick="downloadBackupJSON()">Export Datei</button>
@@ -627,12 +704,12 @@
           <input type="file" id="inp-file-import" style="display:none;" accept=".json" onchange="importBackupJSON(event)">
         </div>
       </div>
+
       <div class="modal-actions"><button onclick="closeSettingsModal()">Schließen</button></div>
     </div>
   </div>
 
   <script>
-    /* PWA AUTO-UPDATE REGISTRACIJA */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then((registration) => {
@@ -681,6 +758,16 @@
     let activeAsideCategory = 'Küche (EG)';
     let activeModalCategory = 'Küche (EG)';
     let calcCalculatedItem = null;
+
+    /* PROFIL FIRME ZA PRINT */
+    let companyProfile = {
+      name: "APrivina Elektrotechnik GmbH",
+      address: "Musterstraße 123, 80331 München",
+      phone: "+49 89 1234567",
+      email: "info@aprivina.de",
+      tax: "DE123456789",
+      logo: ""
+    };
 
     const ROOM_CATEGORIES = [
       'Küche (EG)', 'Wohnen/Essen (EG)', 'Kinderzimmer (OG/DG)', 'Eltern/Büro', 'Bäder & WC', 'Keller & HWR', 'Technik/Heizung', 'Außen & Garage'
@@ -745,6 +832,7 @@
     ];
 
     window.onload = function() {
+      loadCompanyProfile();
       if (sessionStorage.getItem('aprivina_auth') === 'true') {
         document.getElementById('pin-overlay').style.display = 'none';
         initApp();
@@ -1473,6 +1561,68 @@
       link.click();
     }
 
+    /* UPRAVLJANJE PROFILOM FIRME I LOGOTIPOM */
+    function loadCompanyProfile() {
+      const raw = localStorage.getItem('aprivina_company_profile');
+      if (raw) {
+        try { companyProfile = JSON.parse(raw); } catch(e){}
+      }
+      updatePrintCompanyUI();
+    }
+
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        companyProfile.logo = e.target.result;
+        document.getElementById('logo-preview-box').innerHTML = `✅ Logo ausgewählt (${file.name})`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveCompanyProfile() {
+      companyProfile.name = document.getElementById('cfg-comp-name').value.trim() || companyProfile.name;
+      companyProfile.address = document.getElementById('cfg-comp-addr').value.trim() || companyProfile.address;
+      companyProfile.phone = document.getElementById('cfg-comp-phone').value.trim() || companyProfile.phone;
+      companyProfile.email = document.getElementById('cfg-comp-email').value.trim() || companyProfile.email;
+      companyProfile.tax = document.getElementById('cfg-comp-tax').value.trim() || companyProfile.tax;
+
+      localStorage.setItem('aprivina_company_profile', JSON.stringify(companyProfile));
+      updatePrintCompanyUI();
+      alert("✅ Firmenangaben erfolgreich gespeichert!");
+      closeSettingsModal();
+    }
+
+    function updatePrintCompanyUI() {
+      document.getElementById('print-company-name').innerText = companyProfile.name;
+      document.getElementById('print-company-address').innerText = companyProfile.address;
+      document.getElementById('print-company-phone').innerText = companyProfile.phone;
+      document.getElementById('print-company-email').innerText = companyProfile.email;
+      document.getElementById('print-company-tax').innerText = companyProfile.tax;
+      document.getElementById('strip-company-name').innerText = companyProfile.name;
+
+      const logoImg = document.getElementById('print-company-logo');
+      if (companyProfile.logo) {
+        logoImg.src = companyProfile.logo;
+        logoImg.style.display = "block";
+      } else {
+        logoImg.style.display = "none";
+      }
+
+      // Popuni i u modalu
+      if (document.getElementById('cfg-comp-name')) {
+        document.getElementById('cfg-comp-name').value = companyProfile.name || "";
+        document.getElementById('cfg-comp-addr').value = companyProfile.address || "";
+        document.getElementById('cfg-comp-phone').value = companyProfile.phone || "";
+        document.getElementById('cfg-comp-email').value = companyProfile.email || "";
+        document.getElementById('cfg-comp-tax').value = companyProfile.tax || "";
+        if (companyProfile.logo) {
+          document.getElementById('logo-preview-box').innerHTML = "✅ Logo vorhanden";
+        }
+      }
+    }
+
     function printDoc() {
       document.body.className = "print-mode-doc";
       document.getElementById('view-verteiler').style.display = 'block';
@@ -1492,7 +1642,10 @@
       switchView('verteiler');
     };
 
-    function openSettingsModal() { document.getElementById('modal-settings').style.display = 'flex'; }
+    function openSettingsModal() { 
+      updatePrintCompanyUI();
+      document.getElementById('modal-settings').style.display = 'flex'; 
+    }
     function closeSettingsModal() { document.getElementById('modal-settings').style.display = 'none'; }
 
     function switchView(v) {
